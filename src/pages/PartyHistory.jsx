@@ -2,7 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PartyHistory.css';
 import LeftBlack from '../assets/left_black.svg';
-import PartySmallAfter from './PartySmallAfer';
+import PartySmallAfter from './PartySmallAfter';
 import PartySmallImages from '../assets/partysmall.jpg';
 
 export default function PartyHistory() {
