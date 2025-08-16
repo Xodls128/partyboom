@@ -12,6 +12,9 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 KAKAO_CLIENT_SECRET = os.getenv("KAKAO_CLIENT_SECRET", "")
 
+# AI 인증 키 (환경변수)
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
 # 로그인 회원가입 기능 활성화 여부
 ENABLE_AUTH = os.getenv("ENABLE_AUTH", "True").lower() == "true"
 
@@ -154,6 +157,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+STATICFILES_DIRS = [
+    BASE_DIR / 'config' / 'static',  # 직접 만든 static 폴더
+]
 
 AUTH_USER_MODEL = "users.User"
 

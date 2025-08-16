@@ -20,10 +20,13 @@ from signup.views import kakao_callback_debug
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api/", include("signup.urls")),
-    path("oauth/kakao/callback", kakao_callback_debug), # 카카오 로그인 콜백 URL 테스트용
-    path("api/", include(("homemap.urls", "homemap"), namespace="homemap")),
-    path("api/", include(("detailview.urls", "detailview"), namespace="detailview")),
+
+    # 카카오 로그인 콜백
+    path("oauth/kakao/callback", kakao_callback_debug),
+
+    # API 라우트
+    path("api/signup/", include("signup.urls")),
+    path("api/homemap/", include(("homemap.urls", "homemap"), namespace="homemap")),
+    path("api/detailview/", include(("detailview.urls", "detailview"), namespace="detailview")),
+    path("api/mypage/", include("mypage.urls")),
 ]
-
-

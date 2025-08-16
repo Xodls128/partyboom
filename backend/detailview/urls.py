@@ -1,9 +1,15 @@
-from django.urls import path
-from .views import PartyDetailView, ParticipationCreateView
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import PartyViewSet, PartyJoinAPIView, PartyLeaveAPIView,AIPartyCreateAPIView
 
 app_name = "detailview"
 
+router = DefaultRouter()
+router.register(r"parties", PartyViewSet, basename="party")
+
 urlpatterns = [
-    path("parties/<int:pk>/", PartyDetailView.as_view(), name="party-detail"),
-    path("parties/<int:pk>/participations/", ParticipationCreateView.as_view(), name="party-join"),
+    path("", include(router.urls)),
+    path("parties/<int:party_id>/join/", PartyJoinAPIView.as_view(), name="party-join"),
+    path("parties/<int:party_id>/leave/", PartyLeaveAPIView.as_view(), name="party-leave"),  # 선택
+    path("party/ai-create/", AIPartyCreateAPIView.as_view(), name="ai-party-create"),
 ]
