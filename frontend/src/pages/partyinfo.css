@@ -1,0 +1,223 @@
+.partyinfo-header {
+  position: relative;
+  width: 393px;
+  height: 279px;
+  margin: 0 auto 0 auto;
+  padding: 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.partyinfo-img {
+  width: 393px;
+  height: 279px;
+  object-fit: cover;
+  display: block;
+  border-radius: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.partyinfo-back-button {
+  position: fixed;
+  top: 39px;
+  left: 50%;
+  transform: translateX(-192px);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* 다른 요소 위에 표시 */
+}
+
+.partyinfo-back-icon {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.partyinfo-partyName {
+  margin-top: 14px;
+  margin-left: 19.5px;
+  font-family: Pretendard;
+  font-weight: 600; /* SemiBold weight */
+  font-size: 18px;
+  line-height: 150%; /* 1.5배 */
+  letter-spacing: -1.9%;
+  margin-bottom: 13px;
+}
+
+.partyinfo-date {
+
+  margin-left: 19.5px;
+}
+
+.partyinfo-dateText {
+  margin-left: 10px;
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: -1.9%;
+  position: relative;
+  top: -3px;
+}
+
+.partyinfo-options-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  margin-top: 12px;
+  margin-left: 12px;
+}
+
+.partyinfo-option {
+  display: flex;
+  padding: 4px 12px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border-radius: 8px;
+  background: var(--grayscale100, #F2F2F2);
+  color: #000;
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%; /* 27px */
+  letter-spacing: -0.342px;
+}
+
+.partyinfo-map-img-wrap {
+  position: relative;
+  margin-top: 12px;
+  margin-left: 12px;
+}
+
+
+.partyinfo-map-img {
+  width: 369px;
+  height: 186px;
+  border-radius: 8px;
+}
+
+.partyinfo-location-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 50px;
+  padding: 4px 10px;
+}
+
+.partyinfo-location-badge img {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+}
+
+.partyinfo-location-badge span {
+  margin-top: 4px;
+  margin-right: 6px;
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  color: black;
+}
+
+.partyinfo-divider {
+  width: 369px;
+  height: 2px;
+  background: var(--grayscale100, #F2F2F2);
+  margin-top: 12px;
+  margin-left: 12px;
+  margin-bottom: 12px;
+  border-radius: 1px;
+}
+
+.partyinfo-description {
+  width: 369px;
+  margin-left: 12px;
+  color: #000;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 24px */
+  letter-spacing: -0.304px;
+}
+
+.partyinfo-bottom-bar {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  width: 392px;
+  height: 154px;
+  align-items: center;
+  align-content: center;
+  gap: 14px 4px;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  background: #FFF;
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  z-index: 2000;
+}
+
+.partyinfo-person {
+  margin-left: 27.5px;
+  display: flex;
+  align-items: center;
+}
+
+.partyinfo-personText {
+  margin-left: 10px;
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: -1.9%;
+  position: relative;
+  top: 3px;
+  margin-right: 22px;
+}
+
+.profile-icons {
+  display: flex;
+}
+
+.profile-icon {
+  width: 42px;
+  height: 42px;
+  margin-left: -10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px #eee;
+}
+
+.partyinfo-apply-btn {
+  margin-left: 19.5px;
+  width: 354px;
+  height: 46px;
+  background-color: #FF6B00;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.partyinfo-spaceExpansion {
+  margin-top: 180px; /*아래로 끝까지 스크롤 해도 요소들이 다 보일 수 있도록 공간을 띄움*/
+}
