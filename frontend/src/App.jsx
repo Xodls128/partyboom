@@ -7,6 +7,7 @@ import Map from "./pages/Map.jsx";
 import AppFrame from './components/AppFrame.jsx';
 import KakaoLoginPage from "./pages/KakaoLoginPage.jsx";
 import KakaoCallbackPage from "./pages/KakaoCallbackPage.jsx";
+import Participants from './pages/Participants.jsx';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
           <Route path="/mypage" element={<Mypage />} /> */}
           <Route path="/kakao-login" element={<KakaoLoginPage />} />
           <Route path="/oauth/kakao/callback" element={<KakaoCallbackPage />} />
+          <Route path="/participants" element={<Participants />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
