@@ -1,7 +1,7 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
 
 :root {
-  --header-h: 101px;   /* Header 실제 높이에 맞춰 필요시 조정 */
+  --header-h: 101px;   
 }
 
 /* 전체 페이지 컨테이너 */
@@ -12,9 +12,9 @@
 
 /* 1. 프로필 정보 섹션 스타일 */
 .profile-info {
-  display: flex;         /* 자식 요소를 가로로 정렬 */
-  align-items: center;   /* 세로 가운데 정렬 */
-  gap: 19px;             /* 자식 요소 간 간격 */
+  display: flex;         
+  align-items: center;  
+  gap: 19px;            
   width: 356px;
   height: 155px;
 }
@@ -29,8 +29,8 @@
 .profile-image-wrap {
   width: 113px;
   height: 113px;
-  border-radius: 50%;    /* 완벽한 원형을 만듭니다. */
-  overflow: hidden;      /* 이미지가 테두리를 벗어나지 않도록 합니다. */
+  border-radius: 50%;    
+  overflow: hidden;      
 }
 .profile-image-svg {
   width: 100%;
@@ -38,7 +38,7 @@
   object-fit: cover; 
 }
 
-.edit-button {   /*수정하기버틍*/
+.edit-button {   /*수정하기버튼*/
   padding: 8px 10px;
   border: 0px ;
   background-color: #7B7B7B;
@@ -134,11 +134,11 @@
 
 .tooltip {
   position: absolute;
-  bottom: -60px; /* 아이콘 위쪽에 위치하도록 조정 */
+  bottom: -60px; 
   right: 120px;
   transform: translateX(50%);
   
-  width: 200px; /* 툴팁 너비 조정 */
+  width: 200px; 
   background-color: #F2F2F2;
   padding: 12px;
   border-radius: 8px;
@@ -191,7 +191,7 @@
   justify-content: space-between;
   align-items: center;
   background-color: #F2F2F2; 
-  flex: 1;      /* 부모 요소에 크기를 맞춤 */              
+  flex: 1;              
   height: 48px;
   border-radius: 8px;
 }
@@ -230,7 +230,7 @@
   right: 120px;
   transform: translateX(50%);
   
-  width: 200px; /* 툴팁 너비 조정 */
+  width: 200px; 
   background-color: #F2F2F2;
   padding: 12px;
   border-radius: 8px;
@@ -253,7 +253,7 @@
   margin-top: 20px;
 }
 .menu-list {
-  list-style: none; /* 목록의 점을 없앱니다. */
+  list-style: none; 
   padding: 0;
   margin: 0;
 }
