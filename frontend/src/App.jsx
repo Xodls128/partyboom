@@ -21,7 +21,7 @@ export default function App() {
           <Route path="/mypage" element={<Mypage />} /> */}
           <Route path="/kakao-login" element={<KakaoLoginPage />} />
           <Route path="/oauth/kakao/callback" element={<KakaoCallbackPage />} />
-          <Route path="/partyinfo" element={<Partyinfo />} />
+          <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>

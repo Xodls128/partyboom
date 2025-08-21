@@ -21,20 +21,26 @@ export default function Home() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
 
-        const formatted = data.map(p => ({
-          id: p.id,
-          image: p.place_photo || Party,
-          name: "#" + p.title,
-          date: new Date(p.start_time).toLocaleString("ko-KR", {
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
-          person: `${p.applied_count}/${p.max_participants}`,
-          location: p.place_name,
-        }));
-        setPartyList(formatted);
+        // API 응답이 배열인지 확인하여 안정성 확보
+        if (Array.isArray(data)) {
+          const formatted = data.map(p => ({
+            id: p.id,
+            image: Party, // 항상 프론트엔드의 기본 이미지를 사용
+            name: "#" + p.title,
+            date: new Date(p.start_time).toLocaleString("ko-KR", {
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            }),
+            person: `${p.participant_count ?? 0}/${p.max_participants}`,
+            location: p.place?.name,
+          }));
+          setPartyList(formatted);
+        } else {
+          console.error("API로부터 받은 데이터가 배열이 아닙니다:", data);
+          setPartyList([]); // 오류 발생 시 빈 배열로 초기화
+        }
       } catch (error) {
         console.error("파티 데이터를 불러오는 중 오류 발생:", error);
       }
