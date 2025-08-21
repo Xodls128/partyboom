@@ -78,6 +78,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # 프론트 엔드 개발 서버
+    "https://partyboom.vercel.app", # 배포된 프론트 엔드 주소
 ]
 
 SIMPLE_JWT = {
