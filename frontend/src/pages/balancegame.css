@@ -1,0 +1,226 @@
+.balancegame-header {
+  position: relative;
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.balancegame-back-button {
+  position: fixed;
+  top: 39px;
+  left: 50%;
+  transform: translateX(-192px);
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* 다른 요소 위에 표시 */
+}
+
+.balancegame-back-icon {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.balancegame-title {
+  margin-top: 24px;
+  color: #000;
+  text-align: center;
+  font-family: "PyeongChang Peace";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 36px */
+  letter-spacing: -0.456px;
+  width: 100%;
+  padding: 8px 0;
+  display: block;
+}
+
+.balancegame-content {
+  width: 338px;
+  margin-left: 20px;
+  margin-bottom: 6px;
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: -1.9%;
+}
+
+.balancegame-day {
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1.9%;
+  color: var(--grayscale500, #7B7B7B);
+  background: transparent;
+  margin-left: 20px;
+}
+
+.balancegame-block-red {
+  margin-bottom: -55px;
+}
+
+.balancegame-btn-red {
+  display: flex;
+  width: 341px;
+  height: 189px;
+  padding: 58px 32px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--main_red, #FF2824);
+  border: none;
+  margin: 32px auto 0 auto;
+  cursor: pointer;
+}
+
+.balancegame-red-text {
+  color: var(--Grayscale0, #FFF);
+  text-align: center;
+  font-family: "PyeongChang Peace";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%; /* 33.6px */
+  letter-spacing: -0.456px;
+  white-space: pre-line;
+}
+
+.balancegame-vs-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: -96px;
+}
+
+.balancegame-vs-img {
+  width: 200px;
+  height: 200px;
+  object-fit: contain;
+  display: block;
+}
+
+.balancegame-block-yellow {
+  margin-bottom: 16px;
+}
+
+.balancegame-btn-yellow {
+  display: flex;
+  width: 341px;
+  height: 189px;
+  padding: 58px 32px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--main_red, #FFCD50);
+  border: none;
+  margin: 32px auto 0 auto;
+  cursor: pointer;
+}
+
+.balancegame-yellow-text {
+  color: var(--Grayscale0, #000);
+  text-align: center;
+  font-family: "PyeongChang Peace";
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%; /* 33.6px */
+  letter-spacing: -0.456px;
+  white-space: pre-line;
+}
+
+.balancegame-status {
+  color: #000;
+  margin-top: 50px;
+  margin-left: 30px;
+  font-family: Pretendard;
+  font-size: 18px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%; /* 27px */
+  letter-spacing: -0.342px;
+}
+
+
+
+.balancegame-gauge-wrap {
+  width: 341px;
+  margin-left: 24px;
+  text-align: center;
+}
+
+.balancegame-gauge-bar {
+  display: flex;
+  width: 100%;
+  height: 32px;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #eee;
+  margin-bottom: 8px;
+}
+
+.balancegame-gauge-red {
+  background: var(--main_red, #FF2824);
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  height: 100%;
+  transition: width 0.3s;
+  color: #fff;
+  font-weight: 700;
+  font-size: 16px;
+  padding-left: 12px;
+}
+
+.balancegame-gauge-yellow {
+  background: #FFCD50;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  transition: width 0.3s;
+  color: #222;
+  font-weight: 700;
+  font-size: 16px;
+  padding-right: 12px;
+}
+
+.balancegame-gauge-text {
+  color: var(--Grayscale0, #FFF);
+  text-align: center;
+  font-family: "PyeongChang Peace";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%; /* 28px */
+  letter-spacing: -0.38px;
+}
+
+.balancegame-gauge-total {
+  color: var(--Grayscale0, #000);
+  text-align: center;
+  font-family: "PyeongChang Peace";
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 140%; /* 28px */
+  letter-spacing: -0.38px;
+  margin-top: 4px;
+}
