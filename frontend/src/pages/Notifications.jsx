@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import Back from '../assets/left_black.svg';
 import './notifications.css';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 export default function Notifications() {
   const navigate = useNavigate();
   const [notices, setNotices] = useState([]);
@@ -18,7 +20,7 @@ export default function Notifications() {
 
       // 1. API 엔드포인트를 DB 기반 알림을 가져오도록 변경
       const response = await fetch(
-        "http://127.0.0.1:8000/api/notice/",
+        `${API_BASE}/api/notice/`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -56,7 +58,7 @@ export default function Notifications() {
 
     try {
       const token = localStorage.getItem("access");
-      await fetch(`http://127.0.0.1:8000/api/notice/${noticeId}/`, {
+      await fetch(`${API_BASE}/api/notice/${noticeId}/`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',

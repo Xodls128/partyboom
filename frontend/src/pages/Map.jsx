@@ -7,6 +7,8 @@ import Header from '../components/Header.jsx';
 import NavBar from '../components/NavBar.jsx';
 import { useNavigate } from 'react-router-dom'; // useNavigate 추가
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 export default function Map() {
   // useRef - 리렌더 없이 값 기억 
   const sheetRef = useRef(null);          // 시트 DOM 참조 
@@ -47,8 +49,8 @@ export default function Map() {
   useEffect(() => {
     const fetchParties = async () => {
       try {
-        // 백엔드 API 엔드포인트 (로컬 개발 환경)
-        const response = await fetch('http://127.0.0.1:8000/api/detailview/parties/');
+        // 백엔드 API 엔드포인트 (배포환경에 맞게 수정)
+        const response = await fetch(`${API_BASE}/api/detailview/parties/`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

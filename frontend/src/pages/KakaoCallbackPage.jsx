@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const KAKAO_REDIRECT_URI = 'http://localhost:5173/oauth/kakao/callback';
-const BACKEND_KAKAO_LOGIN_URL = 'http://localhost:8000/api/signup/auth/kakao/';
+const API_BASE = import.meta.env.VITE_API_URL;
+
+const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+const BACKEND_KAKAO_LOGIN_URL = `${API_BASE}/api/signup/auth/kakao/`;
 
 function KakaoCallbackPage() {
   const location = useLocation();

@@ -10,6 +10,8 @@ import Location from '../assets/location.svg';
 import PopupImg from '../assets/bell.svg';
 import './home.css';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 export default function Home() {
   const [partyList, setPartyList] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
@@ -17,7 +19,7 @@ export default function Home() {
   useEffect(() => {
     const fetchParties = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:8000/api/homemap/home/");
+        const response = await fetch(`${API_BASE}/api/homemap/home/`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
 
