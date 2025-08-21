@@ -1,6 +1,6 @@
 from rest_framework.routers import DefaultRouter
 from django.urls import path
-from .views import NoticeViewSet
+from notice.views import NoticeViewSet
 
 router = DefaultRouter()
 router.register(r"", NoticeViewSet, basename="notice")

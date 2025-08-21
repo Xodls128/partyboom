@@ -4,10 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Count, F
-from .models import Party, Participation
-from .serializers import PartyListSerializer, PartyDetailSerializer
+from detailview.models import Party, Participation
+from detailview.serializers import PartyListSerializer, PartyDetailSerializer
 from django.db import transaction
-from .models import Party, Place, Tag
+from detailview.models import Party, Place, Tag
 from utils.partyAI import generate_party_by_ai
 
 
