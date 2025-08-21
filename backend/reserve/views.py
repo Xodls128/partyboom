@@ -1,21 +1,26 @@
 from rest_framework import generics, permissions
-from .serializers import CreatePaymentSerializer, PaymentSerializer
+from rest_framework.response import Response
+from .serializers import ReserveJoinSerializer, ParticipationSerializer, ReservePaySerializer, PaymentSerializer
 
-class CreatePaymentView(generics.CreateAPIView):
-    """
-    예약금 결제를 처리하는 API
-    POST /api/reserve/pay/
-    Body: { "participation_id": 123 }
-    """
+class ReserveJoinView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
-    serializer_class = CreatePaymentSerializer
+    serializer_class = ReserveJoinSerializer
 
-    def get_serializer_context(self):
-        # 시리얼라이저에 request 객체를 넘겨주어 유저 정보에 접근할 수 있게 함
-        return {"request": self.request, **super().get_serializer_context()}
+    def create(self, request, *args, **kwargs):
+        party_id = kwargs.get("party_id")
+        serializer = self.get_serializer(data={"party_id": party_id})
+        serializer.is_valid(raise_exception=True)
+        participation = serializer.save()
+        return Response(ParticipationSerializer(participation).data)
 
-    def get_queryset(self):
-        # 이 뷰는 생성(Create)만 담당하므로 queryset이 필요 없긴함 (형식상으로 남겨둠)
-        # 현재 사용자와 관련된 queryset을 반환하도록 설정
-        return self.request.user.payments.none()
+class ReservePayView(generics.CreateAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ReservePaySerializer
+
+    def create(self, request, *args, **kwargs):
+        participation_id = self.kwargs.get("participation_id")  # URL에서 받음
+        serializer = self.get_serializer(data={"participation_id": participation_id, **request.data})
+        serializer.is_valid(raise_exception=True)
+        payment = serializer.save()
+        return Response(PaymentSerializer(payment).data)
     

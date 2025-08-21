@@ -57,8 +57,17 @@ class ReportSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
-        validated_data['reporter'] = self.context['request'].user
-        return super().create(validated_data)
+        reporter = self.context['request'].user
+        validated_data['reporter'] = reporter
+        report = super().create(validated_data)
+
+        # 신고당한 유저 warnings +1
+        reported_user = report.reported_user
+        if reported_user:
+            reported_user.warnings = reported_user.warnings + 1
+            reported_user.save(update_fields=["warnings"])
+
+        return report
     
 
 class ExtraSettingFromJsonSerializer(serializers.Serializer):

@@ -152,9 +152,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 STATICFILES_DIRS = [
     BASE_DIR / 'config' / 'static',  # 직접 만든 static 폴더
 ]
@@ -189,8 +186,14 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+# 웹소켓 테스팅 할 때만 활성화
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
-} # 웹소켓 돌아가는지 확인하기 위해 넣은 코드
+}
