@@ -1,0 +1,80 @@
+import { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import './LoginSignup.css';
+import LeftIcon from '../assets/left_black.svg';
+import EyeIcon from '../assets/visibility.svg';
+import BombMark from '../assets/boomb.svg';
+import Wordmark from '../assets/logo.svg';
+
+export default function Login(){
+  const nav = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from || '/';
+
+  const [id, setId] = useState('');
+  const [pw, setPw] = useState('');
+  const [show, setShow] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const submit = async (e) => {
+    e?.preventDefault();
+    if(!id || !pw) return alert('아이디와 비밀번호를 입력해 주세요.');
+    setLoading(true);
+    setTimeout(() => {
+      alert('[MOCK] 로그인 성공');
+      nav(from, { replace: true });
+      setLoading(false);
+    }, 500);
+  };
+
+  return (
+    <div className="auth-page">
+      <header className="auth-top">
+        <button className="auth-back" onClick={()=>nav(-1)} aria-label="뒤로가기">
+          <img src={LeftIcon} alt="" />
+        </button>
+        <h1 className="auth-title">로그인</h1>
+      </header>
+
+      <main className="auth-form" role="form" onSubmit={submit}>
+        <div className="lg-logo">
+          <img className="lg-logo__bomb" src={BombMark} alt="" aria-hidden="true" />
+          <img className="lg-logo__word" src={Wordmark} alt="파티붐" />
+        </div>
+
+        <div className="auth-field">
+          <input
+            className="auth-input"
+            value={id}
+            onChange={e=>setId(e.target.value)}
+            placeholder="아이디"
+          />
+        </div>
+
+        <div className="auth-field">
+          <div className="auth-input-wrap">
+            <input
+              className="auth-input"
+              type={show ? 'text':'password'}
+              value={pw}
+              onChange={e=>setPw(e.target.value)}
+              placeholder="비밀번호"
+            />
+            <img
+              className="auth-eye"
+              src={EyeIcon}
+              alt=""
+              onClick={()=>setShow(s=>!s)}
+            />
+          </div>
+        </div>
+
+        <div className="auth-actions">
+          <button className="auth-btn auth-btn--primary" onClick={submit} disabled={loading}>
+            로그인 
+          </button>
+        </div>
+      </main>
+    </div>
+  );
+}
