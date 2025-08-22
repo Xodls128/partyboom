@@ -1,6 +1,5 @@
 //css 파일 따로 없이 JSX에서 스타일 적용
 import { useNavigate, useLocation } from 'react-router-dom';
-import './navbar.css';
 
 import bgHome   from '../assets/nav_home.svg?url';
 import bgMap    from '../assets/nav_map.svg?url';
