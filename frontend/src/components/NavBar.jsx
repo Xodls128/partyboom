@@ -1,5 +1,6 @@
 //css 파일 따로 없이 JSX에서 스타일 적용
 import { useNavigate, useLocation } from 'react-router-dom';
+import './navbar.css';
 
 import bgHome   from '../assets/nav_home.svg?url';
 import bgMap    from '../assets/nav_map.svg?url';
@@ -13,7 +14,7 @@ export default function NavBar() {
   const bg = (() => {
     if (pathname === '/' || pathname === '/home') return bgHome;
     if (pathname.startsWith('/map')) return bgMap;
-    if (pathname.startsWith('/assist')) return bgAssist;
+    if (pathname.startsWith('/assist') || pathname.startsWith('/balancewait')) return bgAssist;
     if (pathname.startsWith('/mypage')) return bgMy;
     return bgHome;
   })();
