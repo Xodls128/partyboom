@@ -157,14 +157,20 @@ class KakaoLoginAPIView(APIView):
                 user = None
                 if email:
                     user = User.objects.filter(email=email).first()
+                # 수정
                 if not user:
-                    user = User.objects.create_user(
+                    user, created = User.objects.get_or_create(
                         username=f"kakao_{kakao_id}",
-                        email=email or "",
-                        password=None,
+                        defaults={"email": email or ""}
                     )
-                    user.set_unusable_password()
-                    user.save(update_fields=["password"])
+                    if created:
+                        user.set_unusable_password()
+                        user.save(update_fields=["password"])
+
+                # 안전장치: user가 None이면 바로 반환
+                if not user:
+                    return Response({"detail": "User creation failed"}, status=500)
+
 
                 # ✅ nickname → name 으로 매핑
                 if nickname and not user.name:
