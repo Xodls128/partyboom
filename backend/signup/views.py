@@ -157,7 +157,12 @@ class KakaoLoginAPIView(APIView):
                 user = None
                 if email:
                     user = User.objects.filter(email=email).first()
-                # 수정
+
+                print("DEBUG >>> kakao_id:", kakao_id)
+                print("DEBUG >>> email:", email)
+                print("DEBUG >>> user before create:", user)
+
+                # username 중복 방지
                 if not user:
                     user, created = User.objects.get_or_create(
                         username=f"kakao_{kakao_id}",
@@ -166,13 +171,10 @@ class KakaoLoginAPIView(APIView):
                     if created:
                         user.set_unusable_password()
                         user.save(update_fields=["password"])
+                
+                print("DEBUG >>> user after create/get:", user)
 
-                # 안전장치: user가 None이면 바로 반환
-                if not user:
-                    return Response({"detail": "User creation failed"}, status=500)
-
-
-                # ✅ nickname → name 으로 매핑
+                # nickname 업데이트
                 if nickname and not user.name:
                     user.name = nickname
                     user.save(update_fields=["name"])
@@ -180,6 +182,9 @@ class KakaoLoginAPIView(APIView):
                 SocialAccount.objects.get_or_create(
                     user=user, provider="kakao", social_id=str(kakao_id)
                 )
+
+            if not user:
+                return Response({"detail": "User creation failed"}, status=500)
         except Exception as e:
             return Response({"detail": f"user upsert error: {e}"}, status=500)
 
