@@ -53,6 +53,7 @@ function KakaoCallbackPage() {
             localStorage.setItem('accessToken', data.access);
             localStorage.setItem('refreshToken', data.refresh);
             setMessage('카카오 로그인 성공!');
+            navigate("/");
           } else {
             setMessage(`로그인 실패: ${data.detail || JSON.stringify(data)}`);
           }

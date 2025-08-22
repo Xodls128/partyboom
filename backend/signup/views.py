@@ -148,6 +148,10 @@ class KakaoLoginAPIView(APIView):
         email = account.get("email")  # 동의 안 하면 None
         nickname = profile.get("nickname") or f"kakao_{kakao_id}"
 
+        print("DEBUG >>> kakao payload:", payload)
+        print("DEBUG >>> kakao_id:", kakao_id)
+        print("DEBUG >>> email:", email)
+
         if not kakao_id:
             return Response({"detail": "invalid kakao payload"}, status=400)
 
@@ -157,24 +161,43 @@ class KakaoLoginAPIView(APIView):
                 user = None
                 if email:
                     user = User.objects.filter(email=email).first()
-                if not user:
-                    user = User.objects.create_user(
-                        username=f"kakao_{kakao_id}",
-                        email=email or "",
-                        password=None,
-                    )
-                    user.set_unusable_password()
-                    user.save(update_fields=["password"])
 
-                # ✅ nickname → name 으로 매핑
+                print("DEBUG >>> user before create:", user)
+
+                # username 중복 방지
+                if not user:
+                    user, created = User.objects.get_or_create(
+                        username=f"kakao_{kakao_id}",
+                        defaults={"email": email or ""}
+                    )
+                    if created:
+                        user.set_unusable_password()
+                        user.save(update_fields=["password"])
+                
+                print("DEBUG >>> user after create/get:", user)
+
+                #  안전장치 추가: user가 None이면 여기서 바로 반환
+                if not user:
+                    return Response({"detail": "User creation failed"}, status=500)
+
+                print("DEBUG >>> nickname:", nickname, "user.name before:", user.name)
+
+                # nickname 업데이트
                 if nickname and not user.name:
                     user.name = nickname
                     user.save(update_fields=["name"])
 
+                print("DEBUG >>> about to create/get SocialAccount for user:", user)
                 SocialAccount.objects.get_or_create(
                     user=user, provider="kakao", social_id=str(kakao_id)
                 )
+
+            if not user:
+                return Response({"detail": "User creation failed"}, status=500)
         except Exception as e:
+            import traceback
+            print("DEBUG >>> user upsert exception:", e)
+            print(traceback.format_exc())
             return Response({"detail": f"user upsert error: {e}"}, status=500)
 
         # 4) issue JWT

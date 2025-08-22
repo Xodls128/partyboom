@@ -4,7 +4,7 @@ import 'leaflet/dist/leaflet.css';
 
 const API_BASE = import.meta.env.VITE_API_URL;
 // 메인 지도 이미지 경로
-const mapImageUrl = `${API_BASE}/static/map.png`;
+const mapImageUrl = `${API_BASE}/static/map/map.png`;
 // 지도 이미지 크기 (새로운 전체 이미지 크기)
 const imageWidth = 822; // 822
 const imageHeight = 460; // 460
@@ -14,14 +14,14 @@ const originalMapWidth = 822;
 const originalMapHeight = 460;
 
 // 배경 지도 이미지 경로 (더 넓은 영역을 커버)
-const backgroundMapImageUrl = `${API_BASE}/static/full_area_map.png`;
+const backgroundMapImageUrl = `${API_BASE}/static/map/full_area_map.png`;
 // 배경 지도 이미지 크기 (이전의 full_area_map.png 크기)
 const backgroundMapWidth = 3704; // 1857
 const backgroundMapHeight = 1824; // 912
 
 // 커스텀 아이콘 정의
 const partyIcon = L.icon({
-  iconUrl: `${API_BASE}/static/partyicon.png`, // 아이콘 이미지 경로
+  iconUrl: `${API_BASE}/static/icons/partyicon.png`, // 아이콘 이미지 경로
   iconSize: [64, 64], // 아이콘 크기
   iconAnchor: [32, 64], // 아이콘의 '뾰족한' 부분이 마커 위치에 오도록 조정 (아이콘 크기의 절반, 전체 높이)
   popupAnchor: [0, -64], // 팝업이 아이콘 위에 표시되도록 조정

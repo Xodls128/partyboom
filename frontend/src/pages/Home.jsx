@@ -15,7 +15,30 @@ const API_BASE = import.meta.env.VITE_API_URL;
 export default function Home() {
   const [partyList, setPartyList] = useState([]);
   const [showPopup, setShowPopup] = useState(false);
+  const [username, setUsername] = useState("게스트"); // 기본값 게스트
   
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem("access"); // 로그인 시 저장한 토큰
+        if (!token) return; // 토큰 없으면 게스트 유지
+
+        const response = await fetch(`${API_BASE}/api/user/me/`, {
+          headers: { "Authorization": `Bearer ${token}` }
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUsername(data.nickname || data.username || "게스트");
+        }
+      } catch (error) {
+        console.error("유저 정보를 불러오는 중 오류:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
+
   useEffect(() => {
     const fetchParties = async () => {
       try {
@@ -48,7 +71,7 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className='title'>OO님께 추천하는 파티🥳</div>
+      <div className='title'>{username}님께 추천하는 파티🥳</div>
 
       {partyList.map((party) => (
         <div className="party-block" key={party.id}>
