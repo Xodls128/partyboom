@@ -148,6 +148,10 @@ class KakaoLoginAPIView(APIView):
         email = account.get("email")  # 동의 안 하면 None
         nickname = profile.get("nickname") or f"kakao_{kakao_id}"
 
+        print("DEBUG >>> kakao payload:", payload)
+        print("DEBUG >>> kakao_id:", kakao_id)
+        print("DEBUG >>> email:", email)
+
         if not kakao_id:
             return Response({"detail": "invalid kakao payload"}, status=400)
 
@@ -158,8 +162,6 @@ class KakaoLoginAPIView(APIView):
                 if email:
                     user = User.objects.filter(email=email).first()
 
-                print("DEBUG >>> kakao_id:", kakao_id)
-                print("DEBUG >>> email:", email)
                 print("DEBUG >>> user before create:", user)
 
                 # username 중복 방지
@@ -178,11 +180,14 @@ class KakaoLoginAPIView(APIView):
                 if not user:
                     return Response({"detail": "User creation failed"}, status=500)
 
+                print("DEBUG >>> nickname:", nickname, "user.name before:", user.name)
+
                 # nickname 업데이트
                 if nickname and not user.name:
                     user.name = nickname
                     user.save(update_fields=["name"])
 
+                print("DEBUG >>> about to create/get SocialAccount for user:", user)
                 SocialAccount.objects.get_or_create(
                     user=user, provider="kakao", social_id=str(kakao_id)
                 )
@@ -190,6 +195,9 @@ class KakaoLoginAPIView(APIView):
             if not user:
                 return Response({"detail": "User creation failed"}, status=500)
         except Exception as e:
+            import traceback
+            print("DEBUG >>> user upsert exception:", e)
+            print(traceback.format_exc())
             return Response({"detail": f"user upsert error: {e}"}, status=500)
 
         # 4) issue JWT
