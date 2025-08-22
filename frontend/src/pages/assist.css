@@ -4,6 +4,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
+  margin-bottom: 45px;
 }
 
 .assist-countdown-text {
@@ -142,4 +143,30 @@
   border-radius: 50%;
   background: #fff;
   box-shadow: 0 0 0 1px #eee;
+}
+
+.assist-party-container {
+  width: 100%;
+  touch-action: pan-y;
+}
+
+.assist-indicators {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  margin-bottom: 23px;
+}
+
+.assist-indicator {
+  width: 40px;
+  height: 6px;
+  background-color: #E0E0E0;
+  margin: 0 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.assist-indicator-active {
+  background-color: #FF2824;
 }
