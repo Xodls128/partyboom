@@ -19,12 +19,40 @@ export default function Login(){
   const submit = async (e) => {
     e?.preventDefault();
     if(!id || !pw) return alert('아이디와 비밀번호를 입력해 주세요.');
-    setLoading(true);
-    setTimeout(() => {
-      alert('[MOCK] 로그인 성공');
-      nav(from, { replace: true });
+
+    try {
+      setLoading(true);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/signup/auth/login/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: id,   // 백엔드 로그인 필드는 username/password
+          password: pw,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err?.detail || "로그인 실패");
+      }
+
+      const data = await res.json();
+      console.log("로그인 성공:", data);
+
+      // 토큰과 유저정보를 localStorage에 저장
+      localStorage.setItem("access", data.access);
+      localStorage.setItem("refresh", data.refresh);
+      localStorage.setItem("user", JSON.stringify(data.user));
+
+      alert("로그인 성공");
+      nav(from, { replace: true }); // 로그인 전 페이지 or 홈으로 이동
+    } catch (e) {
+      alert(e.message);
+    } finally {
       setLoading(false);
-    }, 500);
+    }
   };
 
   return (
@@ -71,7 +99,7 @@ export default function Login(){
 
         <div className="auth-actions">
           <button className="auth-btn auth-btn--primary" onClick={submit} disabled={loading}>
-            로그인 
+            {loading ? "로그인 중..." : "로그인"}
           </button>
         </div>
       </main>

@@ -81,14 +81,42 @@ export default function Signup() {
     if (!agree) return alert('개인정보 처리방침에 동의해 주세요.');
 
     // API 연동 
-    setLoading(true);
-    setTimeout(() => {
-        alert('[MOCK] 회원가입이 완료되었습니다. 로그인해 주세요.');
-        sessionStorage.removeItem(DRAFT_KEY);
-        nav('/login', { replace: true });
-        setLoading(false);
-    }, 600);
-};  
+    const formData = new FormData();
+    formData.append("username", userId);           // 백엔드 User 모델 username 필드
+    formData.append("password", pw);               // 비밀번호
+    formData.append("password2", pw2);             // 비밀번호 확인
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("phone", phone);
+    formData.append("school", school);
+    formData.append("student_card_image", cardFile); // 📎 파일 업로드
+
+    try {
+      setLoading(true);
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/signup/auth/signup/`, {
+        method: "POST",
+        body: formData, // multipart/form-data 자동 적용됨
+      });
+
+      if (!res.ok) {
+        // 실패 시 서버 응답(JSON)을 파싱해서 사용자에게 보여줌
+        const err = await res.json().catch(() => ({}));
+        console.error("회원가입 실패:", err);
+        throw new Error(err?.detail || "회원가입에 실패했습니다.");
+      }
+
+      const data = await res.json();
+      console.log("회원가입 성공:", data);
+
+      alert("회원가입이 완료되었습니다. 로그인해 주세요.");
+      sessionStorage.removeItem(DRAFT_KEY);
+      nav("/login", { replace: true }); // 로그인 페이지로 이동
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="auth-page">
