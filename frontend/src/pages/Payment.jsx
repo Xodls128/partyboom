@@ -9,9 +9,28 @@ import Profilesmall from '../assets/profilesmall.svg';
 import Apply from '../assets/apply.svg';
 import './payment.css';
 
+const API_BASE = import.meta.env.VITE_API_URL;
+
 export default function Payment() {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState('coupon'); // 기본값은 쿠폰
+  const [points, setPoints] = useState(0);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch(`${API_BASE}/api/users/me/`, {
+          headers: { Authorization: `Bearer ${localStorage.getItem("access")}` }
+        });
+        if (!res.ok) throw new Error("유저 정보 불러오기 실패");
+        const data = await res.json();
+        setPoints(data.points);  // 이제 백엔드에서 받아온 points 반영
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    fetchUser();
+  }, []);
 
   return (
     <>
@@ -86,7 +105,7 @@ export default function Payment() {
           </label>
           <div className="payment-method-value-wrap">
             <span className="payment-method-point">잔여 포인트</span>
-            <span className="payment-method-value">10000P</span>
+            <span className="payment-method-value">{points}P</span>
           </div>
         </div>
         <div className="payment-method-option payment-method-disabled">
