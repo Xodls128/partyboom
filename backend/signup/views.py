@@ -174,6 +174,10 @@ class KakaoLoginAPIView(APIView):
                 
                 print("DEBUG >>> user after create/get:", user)
 
+                #  안전장치 추가: user가 None이면 여기서 바로 반환
+                if not user:
+                    return Response({"detail": "User creation failed"}, status=500)
+
                 # nickname 업데이트
                 if nickname and not user.name:
                     user.name = nickname
