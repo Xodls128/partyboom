@@ -22,7 +22,8 @@ export default function ReportUser() {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState(''); // 이제 enum 코드 저장 (ex: FAKE_INFO)
   const [detail, setDetail] = useState('');
-  const [categories, setCategories] = useState([]); // 서버에서 불러온 신고 유형 목록
+  const [categories, setCategories] = useState([]); 
+  const [message, setMessage] = useState(null); // 사용자 메시지 상태
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
@@ -44,12 +45,10 @@ export default function ReportUser() {
   }, []);
 
   const submit = async () => {
-    if (!reason) return alert('신고 유형을 선택해 주세요.');
+    if (!reason) return setMessage('신고 유형을 선택해 주세요.');
     if (!detail.trim())
-      return alert(
-        '예) 파티 현장에서 불쾌한 신체접촉이 있었고, 프로필 상의 내용과 실제 개인 정보가 다릅니다. '
-      );
-    if (!user.partyId) return alert('신고가 발생한 파티 정보가 없습니다.');
+      return setMessage('예) 파티 현장에서 불쾌한 신체접촉이 있었고, 프로필 상의 내용과 실제 개인 정보가 다릅니다.');
+    if (!user.partyId) return setMessage('신고가 발생한 파티 정보가 없습니다.');
 
     try {
       const response = await fetch(`${API_BASE}/api/mypage/reports/`, {
@@ -72,11 +71,11 @@ export default function ReportUser() {
         return alert(err.detail || '신고 중 오류가 발생했습니다.');
       }
 
-      alert('신고가 접수되었습니다.');
-      nav(-1);
+      setMessage('신고가 접수되었습니다.');
+      setTimeout(() => nav(-1), 1500); // 1.5초 뒤 자동 이동
     } catch (err) {
       console.error(err);
-      alert('신고 중 오류가 발생했습니다.');
+      setMessage('신고 중 오류가 발생했습니다.');
     }
   };
 
@@ -156,6 +155,8 @@ export default function ReportUser() {
             rows={5}
           />
         </section>
+        {/* 메시지 표시 영역 */}
+        {message && <div className="ru-message">{message}</div>}
       </main>
 
       <div className="ru-actions" onClick={(e) => e.stopPropagation()}>
