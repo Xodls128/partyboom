@@ -7,7 +7,7 @@ import DateIcon from '../assets/date.svg';
 import CheckIcon from '../assets/check.svg';
 import "./partyinfo.css";
 
-import LoginRequest from "./LoginRequest"; // 추가
+import LoginRequest from "../components/LoginRequest";; // 추가
 
 const API_BASE = import.meta.env.VITE_API_URL;
 

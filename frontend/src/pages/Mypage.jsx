@@ -8,7 +8,7 @@ import Vector from '../assets/Vector.svg';
 import Info from '../assets/info.svg';
 import RigthBlack from '../assets/right_black.svg';
 
-import LoginRequest from './LoginRequest'; // 로그인 모달 추가
+import LoginRequest from "../components/LoginRequest"; // 로그인 모달 추가
 
 const API_BASE = import.meta.env.VITE_API_URL;
 const MAIN_URL = `${API_BASE}/api/mypage/main/`;

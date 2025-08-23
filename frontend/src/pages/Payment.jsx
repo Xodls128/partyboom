@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import Back from '../assets/left_black.svg';
 import './payment.css';
 
-import LoginRequest from './LoginRequest'; // 로그인 모달 임포트
+import LoginRequest from "../components/LoginRequest"; // 로그인 모달 임포트
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
