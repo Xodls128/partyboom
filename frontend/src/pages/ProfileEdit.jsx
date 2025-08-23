@@ -7,7 +7,7 @@ import EditIcon from '../assets/edit.svg';
 
 const API_BASE = import.meta.env.VITE_API_URL
 const PROFILE_URL = `${API_BASE}/api/mypage/profile/`;
-const AUTH_SCHEME = 'JWT';
+const AUTH_SCHEME = 'Bearer';
 
 const getToken = () =>
   localStorage.getItem('access') ||
