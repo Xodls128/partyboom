@@ -13,7 +13,7 @@ export default function NavBar() {
   const bg = (() => {
     if (pathname === '/' || pathname === '/home') return bgHome;
     if (pathname.startsWith('/map')) return bgMap;
-    if (pathname.startsWith('/assist')) return bgAssist;
+    if (pathname.startsWith('/assist') || pathname.startsWith('/balancewait')) return bgAssist;
     if (pathname.startsWith('/mypage')) return bgMy;
     return bgHome;
   })();

@@ -1,36 +1,14 @@
-import re
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
-from rest_framework.validators import UniqueValidator
+from .models import User
 
-User = get_user_model()
-
-class UserSignupSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
-    email = serializers.EmailField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all(), message="이미 사용 중인 이메일입니다.")]
-    )
-    phone = serializers.CharField(
-        required=True,
-        validators=[UniqueValidator(queryset=User.objects.all(), message="이미 사용 중인 전화번호입니다.")]
-    )
+class UserSerializer(serializers.ModelSerializer):
+    profile_photo = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ["username", "password", "email", "phone"]
+        fields = ("id", "username", "email", "name", "intro", "profile_photo","points", "warnings")
 
-    def validate_phone(self, value):
-        value = value.strip()  # 공백 제거
-        if not re.match(r"^\d+$", value):
-            raise serializers.ValidationError("전화번호는 숫자만 입력해야 합니다. (하이픈 '-' 제외)")
-        return value
-
-    def create(self, validated_data):
-        user = User.objects.create_user(
-            username=validated_data["username"],
-            password=validated_data["password"],
-            email=validated_data["email"],
-            phone=validated_data["phone"]
-        )
-        return user
+    def get_profile_photo(self, obj):
+        request = self.context.get("request")
+        url = obj.get_photo_url()
+        return request.build_absolute_uri(url) if (request and url) else url

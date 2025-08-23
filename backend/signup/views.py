@@ -8,14 +8,69 @@ from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework_simplejwt.tokens import RefreshToken
 from users.models import SocialAccount
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
 from signup.serializers import (
     KakaoLoginRequestSerializer,
     TokenPairResponseSerializer,
-    UserBriefSerializer,
+    UserBriefSerializer, # 이거 왜 정의한 것인지..
+    UserSignupSerializer,
+    CustomTokenObtainPairSerializer,
 )
 
 User = get_user_model()
+
+class CustomLoginAPIView(TokenObtainPairView): # 일반 로그인 뷰 구현
+    permission_classes = [AllowAny]
+    serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        try:
+            response = super().post(request, *args, **kwargs)
+            response.data["detail"] = "로그인 성공"
+            return response
+        except TokenError as e:
+            # JWT에서 인증 실패 시
+            return Response({"detail": "로그인 실패: 아이디 또는 비밀번호가 올바르지 않습니다."},
+                            status=status.HTTP_401_UNAUTHORIZED)
+        except InvalidToken as e:
+            # 잘못된 토큰 요청 등
+            return Response({"detail": "로그인 실패: 잘못된 요청입니다."},
+                            status=status.HTTP_401_UNAUTHORIZED)
+    
+
+class UserSignupAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = UserSignupSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+
+            # JWT 토큰 발급
+            refresh = RefreshToken.for_user(user)
+            access = refresh.access_token
+
+            return Response(
+                {
+                    "access": str(access),
+                    "refresh": str(refresh),
+                    "user": {
+                        "id": user.id,
+                        "username": user.username,
+                        "name": user.name,
+                        "email": user.email,
+                        "phone": user.phone,
+                        "school": user.school,
+                        "student_card_image": request.build_absolute_uri(user.student_card_image.url) if user.student_card_image else None,
+                    }
+                },
+                status=status.HTTP_201_CREATED,
+            )
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 #테스트용 뷰        
 from django.http import HttpResponse
@@ -41,10 +96,10 @@ class KakaoLoginAPIView(APIView):
                 "user": {
                     "id": user.id,
                     "email": user.email,
-                    "nickname": getattr(user, "nickname", ""),
+                    "name": user.name,  # nickname 대신 name
                 }
             }, status=200)
-        
+
         in_ser = KakaoLoginRequestSerializer(data=request.data)
         in_ser.is_valid(raise_exception=True)
         code = in_ser.validated_data["code"]
@@ -93,6 +148,10 @@ class KakaoLoginAPIView(APIView):
         email = account.get("email")  # 동의 안 하면 None
         nickname = profile.get("nickname") or f"kakao_{kakao_id}"
 
+        print("DEBUG >>> kakao payload:", payload)
+        print("DEBUG >>> kakao_id:", kakao_id)
+        print("DEBUG >>> email:", email)
+
         if not kakao_id:
             return Response({"detail": "invalid kakao payload"}, status=400)
 
@@ -102,41 +161,57 @@ class KakaoLoginAPIView(APIView):
                 user = None
                 if email:
                     user = User.objects.filter(email=email).first()
+
+                print("DEBUG >>> user before create:", user)
+
+                # username 중복 방지
                 if not user:
-                    user = User.objects.create_user(
+                    user, created = User.objects.get_or_create(
                         username=f"kakao_{kakao_id}",
-                        email=email or "",
-                        password=None,
+                        defaults={"email": email or ""}
                     )
-                    # 권장: 소셜 전용 계정 명시
-                    user.set_unusable_password()
-                    user.save(update_fields=["password"])
+                    if created:
+                        user.set_unusable_password()
+                        user.save(update_fields=["password"])
+                
+                print("DEBUG >>> user after create/get:", user)
 
-                    if hasattr(user, "nickname") and nickname:
-                        user.nickname = nickname
-                        user.save(update_fields=["nickname"])
+                #  안전장치 추가: user가 None이면 여기서 바로 반환
+                if not user:
+                    return Response({"detail": "User creation failed"}, status=500)
 
+                print("DEBUG >>> nickname:", nickname, "user.name before:", user.name)
+
+                # nickname 업데이트
+                if nickname and not user.name:
+                    user.name = nickname
+                    user.save(update_fields=["name"])
+
+                print("DEBUG >>> about to create/get SocialAccount for user:", user)
                 SocialAccount.objects.get_or_create(
                     user=user, provider="kakao", social_id=str(kakao_id)
                 )
+
+            if not user:
+                return Response({"detail": "User creation failed"}, status=500)
         except Exception as e:
+            import traceback
+            print("DEBUG >>> user upsert exception:", e)
+            print(traceback.format_exc())
             return Response({"detail": f"user upsert error: {e}"}, status=500)
 
         # 4) issue JWT
         refresh = RefreshToken.for_user(user)
         access = refresh.access_token
 
-        # 응답을 시리얼라이저로 감싸서 스키마 고정
+        # 응답
         out = {
             "access": str(access),
             "refresh": str(refresh),
             "user": {
                 "id": user.id,
                 "email": user.email,
-                "nickname": getattr(user, "nickname", nickname),
-                # 필요하면 아래 두 줄도 프론트 디버깅용으로 노출 가능
-                # "provider": "kakao",
-                # "social_id": str(kakao_id),
+                "name": user.name,  # name 필드 통일
             }
         }
         return Response(TokenPairResponseSerializer(out).data, status=200)

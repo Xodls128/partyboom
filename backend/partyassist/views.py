@@ -61,7 +61,6 @@ class StandbyViewSet(viewsets.ViewSet):
             "standby_count": standby_count
         }, status=status.HTTP_200_OK)
         
-    # ✅ 참여자 리스트 조회 (파티 시작 이후만 허용)
     @action(detail=True, methods=['get'])
     def participants(self, request, pk=None):
         try:
@@ -77,6 +76,10 @@ class StandbyViewSet(viewsets.ViewSet):
             )
 
         participants = Participation.objects.filter(party=party).select_related("user")
-        serializer = PartyParticipantSerializer(participants, many=True)
+        serializer = PartyParticipantSerializer(
+            participants,
+            many=True,
+            context={"request": request}   # ✅ request를 context로 넘겨야 함
+        )
         return Response(serializer.data, status=200)
     

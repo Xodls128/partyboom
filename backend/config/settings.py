@@ -34,7 +34,10 @@ REST_FRAMEWORK = {
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# 배포 시에 .env 파일을 사용하여 허용된 주소를 추가해주기 위해 
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 
 KAKAO_ALLOWED_REDIRECT_URIS = [
     "http://localhost:5173/oauth/kakao/callback",
@@ -65,6 +68,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -72,11 +76,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # 프론트 엔드 개발 서버
+    "https://partyboom.vercel.app", # 배포된 프론트 엔드 주소
+    "http://3.34.135.176",
+    "https://partyboom.online",#구매한 도메인
+    "https://www.partyboom.online", 
+    "https://yyy-khaki.vercel.app"
 ]
 
 SIMPLE_JWT = {
@@ -152,9 +160,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-
-BASE_DIR = Path(__file__).resolve().parent.parent
-
 STATICFILES_DIRS = [
     BASE_DIR / 'config' / 'static',  # 직접 만든 static 폴더
 ]
@@ -189,8 +194,14 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+# 웹소켓 테스팅 할 때만 활성화
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels.layers.InMemoryChannelLayer"
     }
-} # 웹소켓 돌아가는지 확인하기 위해 넣은 코드
+}
