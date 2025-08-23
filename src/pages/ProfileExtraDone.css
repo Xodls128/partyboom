@@ -1,0 +1,73 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+.done-page{
+  padding: 20px;
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  font-family: Pretendard;
+}
+
+/* 상단 */
+.done-top{ 
+    height: 40px; 
+    display:flex; 
+    align-items:center; 
+}
+.done-back{ 
+    border:0; 
+    background:transparent; 
+    padding:4px; 
+    cursor:pointer; 
+}
+.done-back img{ 
+    width: 17px; 
+    height: 29px; 
+}
+
+
+/* 중앙 콘텐츠 */
+.done-center{
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.done-check{
+  width: 108px;      
+  height: 108px;
+  display: block;
+}
+.done-title{
+  font-family: Pretendard;
+  font-weight: 600;
+  font-size: 18px;
+  letter-spacing: -0.019em;
+  line-height: 1.5;
+  text-align: center;
+  color: #000000;
+}
+
+/* 하단 버튼 */
+.done-actions{
+  display: flex;
+  justify-content: center;
+}
+.done-btn{
+  width: 345px;
+  height: 46px;
+  border-radius: 8px;
+  border: 0;
+  padding: 8px;
+  background: #FF2824;
+
+  font-family: Pretendard;
+  font-weight: 600;
+  font-size: 20px;
+  letter-spacing: -0.019em;
+  line-height: 1.5;
+  text-align: center;
+  color: #FFFFFF
+}

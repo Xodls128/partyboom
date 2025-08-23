@@ -30,9 +30,9 @@ export default function Mypage() {
             <div className="profile-image-wrap">
               <img src={Vector} alt="프로필 이미지" className="profile-image-svg" />
             </div>
-            <div className="button-group">
-              <button className="edit-button">수정하기</button>
-            </div>
+            <button className="edit-button" onClick={() => navigate('/mypage/edit')}>
+              수정하기
+            </button>
           </div>
 
           <div className="profile-details">

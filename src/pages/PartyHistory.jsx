@@ -1,28 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './PartyHistory.css';
 import LeftBlack from '../assets/left_black.svg';
 import PartySmallAfter from './PartySmallAfter';
 import PartySmallImages from '../assets/partysmall.jpg';
+import ReviewModal from './ReviewModal.jsx';        
 
 export default function PartyHistory() {
   const navigate = useNavigate();
 
   const historyData = [
-    {
-      id: 1,
-      title: '#유학생과_언어교류',
-      date: '2025-08-25',
-      location: '주당끼리',
-      thumbnailUrl: PartySmallImages,
-      current: 4,
-      capacity: 5
-    },
+    { id: 1, title: '#유학생과_언어교류', date: '2025-08-25T18:00:00', location: '주당끼리', thumbnailUrl: PartySmallImages, current: 4, capacity: 5 },
   ];
 
-  const goBack = () => {
-    navigate(-1); // 이전 페이지로 이동
+  // ✅ 모달 상태
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState(null);
+
+  const onOpen = (party) => { setSelected(party); setOpen(true); };
+  const onClose = () => setOpen(false);
+  const onSubmit = (review) => {
+    console.log('리뷰 제출:', { partyId: selected?.id, ...review });
+    // 서버로 POST
+    setOpen(false);
+    alert('리뷰가 제출되었습니다!');
   };
+
+  const goBack = () => navigate(-1);
 
   return (
     <div className="history-page">
@@ -32,8 +36,7 @@ export default function PartyHistory() {
         </button>
         <h1 className="header-title">참여이력</h1>
       </header>
-      
-      {/* 참여 내역 목록 */}
+
       <section className="history-list">
         {historyData.map((party) => (
           <PartySmallAfter
@@ -44,10 +47,18 @@ export default function PartyHistory() {
             thumbnailUrl={party.thumbnailUrl}
             current={party.current}
             capacity={party.capacity}
-            onClick={() => console.log('리뷰 남기기 클릭')}
+            onClick={() => onOpen(party)}     
           />
         ))}
       </section>
+
+      {/* 리뷰 */}
+      <ReviewModal
+        open={open}
+        onClose={onClose}
+        onSubmit={onSubmit}
+        partyTitle={selected?.title ?? ''}
+      />
     </div>
   );
 }
