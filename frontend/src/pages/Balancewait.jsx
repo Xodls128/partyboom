@@ -90,6 +90,14 @@ export default function Balancewait() {
             {isStandby ? `대기중... (${standbyCount}/${participantCount})` : "밸런스게임\n참여하기"}
           </span>
         </button>
+
+          {isStandby && (
+            <div className="balancewait-join-overlay">
+              <span className="balancewait-join-text">
+                대기중...<br />{standbyCount}/{participantCount}
+              </span>
+            </div>
+          )}
       </div>
 
       <div className="balancewait-profile-icons">
