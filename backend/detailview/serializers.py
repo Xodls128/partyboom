@@ -1,3 +1,4 @@
+from urllib import request
 from rest_framework import serializers
 from .models import Party
 from django.utils import timezone
@@ -30,14 +31,12 @@ class PartyListSerializer(serializers.ModelSerializer):
         )
 
     def get_place_photo(self, obj):
-        img = getattr(obj.place, "photo", None)
-        if not img:
-            return None
         request = self.context.get("request")
-        url = img.url if hasattr(img, "url") else str(img)
-        # 요청 context가 있으면 절대 URL로
-        return request.build_absolute_uri(url) if request else url
-    
+        url = obj.place.get_photo_url() if obj.place else None
+        return request.build_absolute_uri(url) if (request and url) else url
+
+
+
     def get_applied_count(self, obj):
         # 뷰에서 .annotate(applied_count=Count("participations")) 했다면 이미 값이 있음
         val = getattr(obj, "applied_count", None)
@@ -78,13 +77,9 @@ class PartyDetailSerializer(serializers.ModelSerializer): # 추후에 지도이�
             "max_participants",
         )
     def get_place_photo(self, obj):
-        img = getattr(obj.place, "photo", None)
-        if not img:
-            return None
         request = self.context.get("request")
-        url = img.url if hasattr(img, "url") else str(img)
-        return request.build_absolute_uri(url) if request else url
-
+        url = obj.place.get_photo_url() if obj.place else None
+        return request.build_absolute_uri(url) if (request and url) else url
 
     def get_applied_count(self, obj):
         val = getattr(obj, "applied_count", None)

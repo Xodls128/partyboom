@@ -2,45 +2,31 @@ import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import Back from '../assets/left_black.svg';
 import './notifications.css';
-
-const API_BASE = import.meta.env.VITE_API_URL;
+import api from '../api/axios';   // axios 인스턴스 사용
 
 export default function Notifications() {
   const navigate = useNavigate();
   const [notices, setNotices] = useState([]);
   const [showLoginPopup, setShowLoginPopup] = useState(false);
 
+  // 알림 목록 불러오기
   const fetchNotices = async () => {
     try {
-      const token = localStorage.getItem("access");
+      const token = localStorage.getItem("accessToken");
       if (!token) {
         setShowLoginPopup(true);
         return;
       }
 
       // 1. API 엔드포인트를 DB 기반 알림을 가져오도록 변경
-      const response = await fetch(
-        `${API_BASE}/api/notice/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.status === 401) {
-        setShowLoginPopup(true);
-        return;
-      }
-
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      setNotices(data);
+      const response = await api.get("/api/notice/"); // fetch → api
+      setNotices(response.data);
     } catch (error) {
-      console.error("알림 데이터를 불러오는 중 오류 발생:", error);
+      if (error.response?.status === 401) {
+        setShowLoginPopup(true);
+      } else {
+        console.error("알림 데이터를 불러오는 중 오류 발생:", error);
+      }
     }
   };
 
@@ -57,15 +43,8 @@ export default function Notifications() {
     }
 
     try {
-      const token = localStorage.getItem("access");
-      await fetch(`${API_BASE}/api/notice/${noticeId}/`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ is_read: true }),
-      });
+      // 2-1. 읽음 처리 API 호출
+      await api.patch(`/api/notice/${noticeId}/`, { is_read: true }); // fetch → api
 
       // 3. UI에서 즉시 '읽음' 상태로 업데이트
       setNotices((prevNotices) =>

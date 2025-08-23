@@ -36,10 +36,11 @@ DEBUG = True
 
 # 배포 시에 .env 파일을 사용하여 허용된 주소를 추가해주기 위해 
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 
 KAKAO_ALLOWED_REDIRECT_URIS = [
-    "http://localhost:5173/oauth/kakao/callback",
-    # 운영 주소 이후 추가해야됨
+    uri.strip() for uri in os.getenv("KAKAO_ALLOWED_REDIRECT_URIS", "").split(",") if uri.strip()
 ]
 
 # Application definition
@@ -82,6 +83,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://3.34.135.176",
     "https://partyboom.online",#구매한 도메인
     "https://www.partyboom.online", 
+    "https://yyy-khaki.vercel.app"
 ]
 
 SIMPLE_JWT = {
@@ -156,10 +158,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'config' / 'static',  # 직접 만든 static 폴더
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles' #배포용 스테틱 설정
 
 AUTH_USER_MODEL = "users.User"
 

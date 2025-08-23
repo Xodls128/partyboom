@@ -1,0 +1,86 @@
+[
+  {
+    "model": "detailview.place",
+    "pk": 1,
+    "fields": {
+      "name": "매머드커피익스프레스 국민대후문점",
+      "address": "서울 성북구 정릉로9길 26",
+      "latitude": "37.609410931",
+      "longitude": "127.027832457",
+      "capacity": 20,
+      "photo": "places/매머드.jpg",
+      "x_norm": 0.5,
+      "y_norm": 0.5
+    }
+  },
+  {
+    "model": "detailview.place",
+    "pk": 2,
+    "fields": {
+      "name": "Caffe Tain",
+      "address": "서울 성북구 정릉동 390-1",
+      "latitude": "37.610822145",
+      "longitude": "127.029651289",
+      "capacity": 20,
+      "photo": "places/tain.jpg",
+      "x_norm": 0.5,
+      "y_norm": 0.5
+    }
+  },
+  {
+    "model": "detailview.place",
+    "pk": 3,
+    "fields": {
+      "name": "소한마리정육식당 정릉점",
+      "address": "서울 성북구 정릉로 165",
+      "latitude": "37.607865134",
+      "longitude": "127.003364399",
+      "capacity": 30,
+      "photo": "places/소한마리.jpg",
+      "x_norm": 0.5,
+      "y_norm": 0.5
+    }
+  },
+  {
+    "model": "detailview.place",
+    "pk": 4,
+    "fields": {
+      "name": "사발떡볶이",
+      "address": "서울 성북구 정릉동 667-1",
+      "latitude": "37.609112921",
+      "longitude": "127.004512731",
+      "capacity": 15,
+      "photo": "places/사발떡볶이.jpg",
+      "x_norm": 0.5,
+      "y_norm": 0.5
+    }
+  },
+  {
+    "model": "detailview.place",
+    "pk": 5,
+    "fields": {
+      "name": "청춘노가리",
+      "address": "서울 성북구 정릉동 179-27",
+      "latitude": "37.608745011",
+      "longitude": "127.028923178",
+      "capacity": 40,
+      "photo": "places/청춘노가리.jpg",
+      "x_norm": 0.5,
+      "y_norm": 0.5
+    }
+  },
+  {
+    "model": "detailview.place",
+    "pk": 6,
+    "fields": {
+      "name": "주락",
+      "address": "서울 성북구 정릉동 376-2",
+      "latitude": "37.609521284",
+      "longitude": "127.029874321",
+      "capacity": 25,
+      "photo": "places/주락.jpg",
+      "x_norm": 0.5,
+      "y_norm": 0.5
+    }
+  }
+]

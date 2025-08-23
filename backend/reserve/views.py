@@ -22,5 +22,10 @@ class ReservePayView(generics.CreateAPIView):
         serializer = self.get_serializer(data={"participation_id": participation_id, **request.data})
         serializer.is_valid(raise_exception=True)
         payment = serializer.save()
-        return Response(PaymentSerializer(payment).data)
-    
+        user = payment.participation.user
+        # 결제 후 남은 포인트를 반환
+        return Response({
+                **PaymentSerializer(payment).data,
+                "remaining_points": user.points
+            })
+                
