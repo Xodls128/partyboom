@@ -1,27 +1,36 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';  // location에서 participationId 받는다고 가정
+import { useNavigate, useLocation } from 'react-router-dom';
 import Back from '../assets/left_black.svg';
-import Party from '../assets/party.jpg';
-import Date from '../assets/date.svg';
-import Check from '../assets/check.svg';
-import Location from '../assets/location.svg';
-import Profilesmall from '../assets/profilesmall.svg';
-import Apply from '../assets/apply.svg';
 import './payment.css';
+
+import LoginRequest from './LoginRequest'; // 로그인 모달 임포트
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Payment() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { participationId } = location.state || {}; // 이전 페이지에서 넘겨받음
+  const { participationId } = location.state || {};
 
   const [paymentMethod, setPaymentMethod] = useState('point'); // 현재는 포인트만 사용
   const [points, setPoints] = useState(0);
   const [agree, setAgree] = useState(false);
 
+  // 로그인 상태 체크
+  const token = localStorage.getItem("access");
+  const isLoggedIn = !!token;
 
-  // 페이지 진입 시 participationId 유효성 검사
+  if (!isLoggedIn) {
+    return (
+      <LoginRequest 
+        isOpen={true} 
+        onClose={() => navigate("/")} 
+        redirectTo="/"   // 로그인 성공 후 무조건 홈으로 이동
+      />
+    );
+  }
+
+  // 페이지 진입 시 participationId 유효성 검사 및 유저 정보 로딩
   useEffect(() => {
     if (!participationId) {
       alert("예약 정보가 없습니다. 다시 시도해주세요.");
@@ -66,7 +75,7 @@ export default function Payment() {
 
       alert("결제 완료! 사용 포인트: " + data.amount);
       setPoints(data.remaining_points); // 응답으로 받은 남은 포인트 갱신
-      navigate("/paymentfinish"); // 결제 후 이동 (예약이 완료되었어요! 페이지로 이동. PaymentFinish.jsx)
+      navigate("/paymentfinish"); // 결제 완료 후 이동
     } catch (err) {
       console.error(err);
       alert("결제 중 오류가 발생했습니다.");

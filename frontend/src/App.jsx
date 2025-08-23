@@ -36,12 +36,7 @@ export default function App() {
       <AppFrame>
         <Routes>
           <Route index element={<Home />} />
-          <Route 
-            path="/notifications" 
-            element={
-              isLoggedIn ? <Notifications /> : <KakaoLoginPage />
-            } 
-          />
+          <Route path="/notifications" element={<Notifications />} />
           {/* <Route path="/assist" element={<Assist />} /> */}
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/map" element={<Map />} />

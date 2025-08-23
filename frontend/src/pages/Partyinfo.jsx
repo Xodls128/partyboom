@@ -7,6 +7,8 @@ import DateIcon from '../assets/date.svg';
 import CheckIcon from '../assets/check.svg';
 import "./partyinfo.css";
 
+import LoginRequest from "./LoginRequest"; // 추가
+
 const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Partyinfo() {
@@ -15,6 +17,9 @@ export default function Partyinfo() {
   const [party, setParty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  // 로그인 요청 모달 상태
+  const [showLoginRequest, setShowLoginRequest] = useState(false);
 
   useEffect(() => {
     const fetchPartyDetails = async () => {
@@ -37,7 +42,8 @@ export default function Partyinfo() {
   const handleJoin = async () => {
     const token = localStorage.getItem("access");
     if (!token) {
-      alert("로그인이 필요합니다.");
+      // 로그인 안 된 경우 → 모달 띄우기
+      setShowLoginRequest(true);
       return;
     }
 
@@ -163,6 +169,15 @@ export default function Partyinfo() {
           <button className="join-button" onClick={handleJoin}>참가신청</button>
         </section>
       </main>
+
+      
+      {showLoginRequest && (// 로그인 모달
+        <LoginRequest 
+          isOpen={true} 
+          onClose={() => setShowLoginRequest(false)} 
+          redirectTo={`/partyinfo/${partyId}`} 
+        />
+      )}
     </div>
   );
 }

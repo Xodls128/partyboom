@@ -1,16 +1,28 @@
 import { useNavigate } from 'react-router-dom';
 import './loginrequest.css';
 
-export default function LoginRequest({ isOpen, onClose }) {
+const KAKAO_REST_API_KEY = import.meta.env.VITE_KAKAO_REST_API_KEY; 
+const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
+
+export default function LoginRequest({ isOpen, onClose, redirectTo }) {
   const navigate = useNavigate();
   
   if (!isOpen) return null;
 
   const handleKakaoLogin = () => {
-    navigate('/kakao-login');
-    onClose();
+    // redirectTo 값 저장 (없으면 홈으로)
+    if (redirectTo) {
+      localStorage.setItem("redirectPath", redirectTo);
+    } else {
+      localStorage.setItem("redirectPath", "/");
+    }
+
+    const kakaoAuthUrl = 
+      `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_REST_API_KEY}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;
+    
+    window.location.href = kakaoAuthUrl;
   };
-  
+
   return (
     <div className="loginrequest-overlay" onClick={onClose}>
       <div className="loginrequest-modal" onClick={e => e.stopPropagation()}>
@@ -20,7 +32,7 @@ export default function LoginRequest({ isOpen, onClose }) {
         <div className="loginrequest-buttons">
           <button 
             className="loginrequest-login-btn"
-            onClick={handleKakaoLogin} // 카카오 로그인 페이지로 이동하는 함수 호출
+            onClick={handleKakaoLogin}
           >
             카카오 로그인
           </button>
