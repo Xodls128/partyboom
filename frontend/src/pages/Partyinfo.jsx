@@ -6,6 +6,7 @@ import DefaultPartyImage from '../assets/party.jpg'; // 기본 파티 이미지 
 import DateIcon from '../assets/date.svg';
 import "./partyinfo.css";
 
+const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Partyinfo() {
   const { partyId } = useParams();
@@ -18,10 +19,8 @@ export default function Partyinfo() {
     const fetchPartyDetails = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`http://127.0.0.1:8000/api/detailview/parties/${partyId}/`);
-        if (!response.ok) {
-          throw new Error('파티 정보를 불러오는데 실패했습니다.');
-        }
+        const response = await fetch(`${API_BASE}/api/detailview/parties/${partyId}/`);
+        if (!response.ok) throw new Error('파티 정보를 불러오는데 실패했습니다.');
         const data = await response.json();
         setParty(data);
       } catch (err) {
@@ -34,17 +33,39 @@ export default function Partyinfo() {
     fetchPartyDetails();
   }, [partyId]);
 
-  if (loading) {
-    return <div className="party-info-container">로딩 중...</div>;
+  const handleJoin = async () => {
+  const token = localStorage.getItem("access");
+  if (!token) {
+    alert("로그인이 필요합니다.");
+// 추후에 팝업창 생기면 여기에 추가 설정해줘야함 일단 지금은 미구현 및 기본 경고로 구현
+    return;
   }
 
-  if (error) {
-    return <div className="party-info-container">에러: {error}</div>;
-  }
+  try {
+    const res = await fetch(`${API_BASE}/api/reserve/join/${partyId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      }
+    });
 
-  if (!party) {
-    return null; 
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData?.detail || "참가 신청 실패");
+    }
+
+    const data = await res.json();
+    navigate("/payment", { state: { participationId: data.id } });
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "참가 신청 중 오류가 발생했습니다.");
   }
+};
+
+  if (loading) return <div className="party-info-container">로딩 중...</div>;
+  if (error) return <div className="party-info-container">에러: {error}</div>;
+  if (!party) return null;
 
   const { 
     title, 
@@ -68,6 +89,8 @@ export default function Partyinfo() {
       <main className="party-info-main">
         {party.place_photo && <img src={party.place_photo || DefaultPartyImage} alt={title} className="party-main-image" />}
         <h1 className="party-name">{title}</h1>
+
+        
           <div className="party-info-card">
             {/* 날짜 한 줄 (SVG 아이콘 + 텍스트) */}
             <div className="party-info-row meta-date">
@@ -80,22 +103,6 @@ export default function Partyinfo() {
             </div>
             {/*  CSS로 숨겨둠  (추후 확인 후 지워도 된다면 지우기) */}
             <div className="party-info-row">
-              <span className="info-label">장소</span>
-              <span className="info-value">{place?.name}</span>
-            </div>
-            <div className="party-info-row">
-              <span className="info-label">참여인원</span>
-              <span className="info-value">{participant_count ?? 0} / {max_participants}</span>
-            </div>
-          </div>
-        {/* <div className="party-info-card">
-          <div className="party-info-row">
-            <span className="info-label">날짜</span>
-            <span className="info-value">{new Date(start_time).toLocaleString('ko-KR', { 
-              year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-            })}</span>
-          </div>
-          <div className="party-info-row">
             <span className="info-label">장소</span>
             <span className="info-value">{place?.name}</span>
           </div>
@@ -103,12 +110,13 @@ export default function Partyinfo() {
             <span className="info-label">참여인원</span>
             <span className="info-value">{participant_count ?? 0} / {max_participants}</span>
           </div>
-        </div> */}
+        </div>
 
         <section className="party-tags">
-          {/* <h2>태그</h2> */}
           <div className="tags-container">
-            {(tags || []).map((tag, index) => <span key={`${tag.id}-${index}`} className="tag">#{tag.name}</span>)}
+            {(tags || []).map((tag, index) => (
+              <span key={`${tag.id}-${index}`} className="tag">#{tag.name}</span>
+            ))}
           </div>
         </section>
 
@@ -132,7 +140,6 @@ export default function Partyinfo() {
             ))}
           </div>
         </section>
-
       </main>
 
       <footer className="party-info-footer">
@@ -150,9 +157,8 @@ export default function Partyinfo() {
                 />
             ))}
           </div>
-          
         </div>
-        <button className="join-button">참가신청</button>
+        <button className="join-button" onClick={handleJoin}>참가신청</button>
       </footer>
     </div>
   );
