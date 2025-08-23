@@ -66,7 +66,7 @@ export default function Payment() {
 
       alert("결제 완료! 사용 포인트: " + data.amount);
       setPoints(data.remaining_points); // 응답으로 받은 남은 포인트 갱신
-      navigate("/assist"); // 결제 후 이동 (파티 보조로)
+      navigate("/"); // 결제 후 이동 (홈으로 설정해놨는데 추후에 어시스트로 이동되게바꿔야함)
     } catch (err) {
       console.error(err);
       alert("결제 중 오류가 발생했습니다.");
