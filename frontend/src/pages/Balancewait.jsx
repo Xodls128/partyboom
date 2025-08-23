@@ -12,12 +12,14 @@ export default function Balancewait() {
   const [participantCount, setParticipantCount] = useState(0);
   const [participants, setParticipants] = useState([]);
   const [isStandby, setIsStandby] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [navigating, setNavigating] = useState(false);
 
   const navigate = useNavigate();
-  const { partyId } = useParams(); // URL에 /balancewait/:partyId 형식으로 전달된다고 가정
+  const { partyId } = useParams();
   const token = localStorage.getItem("access");
 
-  // standby 토글 (참여/취소)
+  // standby 토글
   const handleJoin = async () => {
     try {
       const res = await axios.post(
@@ -33,7 +35,7 @@ export default function Balancewait() {
     }
   };
 
-  // participants 불러오기
+  // 참가자 불러오기
   const fetchParticipants = async () => {
     try {
       const res = await axios.get(
@@ -46,36 +48,46 @@ export default function Balancewait() {
     }
   };
 
-  // WebSocket 연결 + fallback polling
+  // WebSocket 연결
   useEffect(() => {
-    fetchParticipants(); // 최초 1번 불러오기
+    fetchParticipants();
 
-    let interval; // polling fallback용 변수
+    let interval;
     const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
     const wsUrl = `${wsProtocol}://${window.location.host}/ws/party/${partyId}/`;
-
     const ws = new WebSocket(wsUrl);
 
     ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
+
+      if (data.type === "send_game_created" && !navigating) {
+        setNavigating(true); // 중복 방지
+        setShowModal(true);  // 모달 띄우기
+
+        const roundId = data.data.round_id;
+        setTimeout(() => {
+          navigate(`/balancegame/${roundId}`);
+        }, 2000); // 2초 지연
+        return;
+      }
+
       if (data.type === "send_standby_update") {
         setStandbyCount(data.data.standby_count);
         setParticipantCount(data.data.participation_count);
-        fetchParticipants(); // 참가자 목록 갱신
+        fetchParticipants();
       }
     };
 
     ws.onclose = () => {
-      console.log("WebSocket closed, fallback to polling");
+      console.log("WebSocket closed, fallback polling ON");
       interval = setInterval(fetchParticipants, 10000);
     };
 
-    // cleanup
     return () => {
       ws.close();
       if (interval) clearInterval(interval);
     };
-  }, [partyId]);
+  }, [partyId, navigate, navigating]);
 
   return (
     <>
@@ -91,13 +103,13 @@ export default function Balancewait() {
           </span>
         </button>
 
-          {isStandby && (
-            <div className="balancewait-join-overlay">
-              <span className="balancewait-join-text">
-                대기중...<br />{standbyCount}/{participantCount}
-              </span>
-            </div>
-          )}
+        {isStandby && (
+          <div className="balancewait-join-overlay">
+            <span className="balancewait-join-text">
+              대기중...<br />{standbyCount}/{participantCount}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="balancewait-profile-icons">
@@ -117,11 +129,21 @@ export default function Balancewait() {
           className="balancewait-participants-link"
           onClick={() => navigate(`/participants/${partyId}`)}
         >
-          참여자 프로필 보기→
+          참여자 프로필 보기 →
         </button>
       </div>
 
       <NavBar />
+
+      {/* 게임 시작 모달 */}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <p>게임이 곧 시작됩니다...</p>
+            <div className="spinner"></div>
+          </div>
+        </div>
+      )}
     </>
   );
 }
