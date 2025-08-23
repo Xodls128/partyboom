@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';  // location에서 participationId 받는다고 가정
 import Back from '../assets/left_black.svg';
 import Party from '../assets/party.jpg';
 import Date from '../assets/date.svg';
@@ -13,9 +13,15 @@ const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Payment() {
   const navigate = useNavigate();
-  const [paymentMethod, setPaymentMethod] = useState('coupon'); // 기본값은 쿠폰
-  const [points, setPoints] = useState(0);
+  const location = useLocation();
+  const { participationId } = location.state || {}; // 이전 페이지에서 넘겨받음
 
+  const [paymentMethod, setPaymentMethod] = useState('point'); // 현재는 포인트만 사용
+  const [points, setPoints] = useState(0);
+  const [agree, setAgree] = useState(false);
+
+
+  // 초기 유저 정보 불러오기
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -24,13 +30,46 @@ export default function Payment() {
         });
         if (!res.ok) throw new Error("유저 정보 불러오기 실패");
         const data = await res.json();
-        setPoints(data.points);  // 이제 백엔드에서 받아온 points 반영
+        setPoints(data.points);
       } catch (err) {
         console.error(err);
       }
     };
     fetchUser();
   }, []);
+
+  // 결제 처리
+  const handlePayment = async () => {
+    if (!agree) {
+      alert("환불 정책에 동의해야 결제할 수 있습니다.");
+      return;
+    }
+    if (!participationId) {
+      alert("결제할 예약 정보가 없습니다.");
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/api/reserve/pay/${participationId}/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("access")}`
+        },
+        body: JSON.stringify({ payment_method: "point" })
+      });
+
+      if (!res.ok) throw new Error("결제 실패");
+      const data = await res.json();
+
+      alert("결제 완료! 사용 포인트: " + data.amount);
+      setPoints(data.remaining_points); // 응답으로 받은 남은 포인트 갱신
+      navigate("/assist"); // 결제 후 이동 (파티 보조로)
+    } catch (err) {
+      console.error(err);
+      alert("결제 중 오류가 발생했습니다.");
+    }
+  };
 
   return (
     <>
@@ -61,36 +100,8 @@ export default function Payment() {
         </div>
       </div>
 
-      <div className="payment-desc-box">
-        <div className="payment-desc-title">*예약금은 무분별한 예약 취소를 방지하고, 가게와의 제휴 할인을 위한 비용입니다.</div>
-        <div className="payment-desc-policy">
-          <b>환불 정책</b><br />
-          파티 시작 이전에 파티 참여를 취소하는 경우, 다음과 같은 환불 정책이 적용됩니다.<br />
-          - 파티 시작 24시간 전: 전액 환불<br />
-          - 파티 시작 24시간 이내: 50% 환불<br />
-          - 파티 시작 이후: 환불 불가
-        </div>
-      </div>
-
       <div className="payment-method-box">
         <div className="payment-method-title">결제 수단</div>
-        <div className={`payment-method-option ${paymentMethod === 'coupon' ? 'payment-method-selected' : ''}`}>
-          <label className="payment-method-radio-label">
-            <input 
-              type="radio" 
-              name="paymentMethod" 
-              value="coupon" 
-              checked={paymentMethod === 'coupon'} 
-              onChange={() => setPaymentMethod('coupon')} 
-              className="payment-method-radio"
-            />
-            <span className="payment-method-label">파티 무료 참여 쿠폰</span>
-          </label>
-          <div className="payment-method-value-wrap">
-            <span className="payment-method-coupon">잔여 쿠폰</span>
-            <span className="payment-method-value">3</span>
-          </div>
-        </div>
         <div className={`payment-method-option ${paymentMethod === 'point' ? 'payment-method-selected' : ''}`}>
           <label className="payment-method-radio-label">
             <input 
@@ -108,29 +119,21 @@ export default function Payment() {
             <span className="payment-method-value">{points}P</span>
           </div>
         </div>
-        <div className="payment-method-option payment-method-disabled">
-          <label className="payment-method-radio-label">
-            <input 
-              type="radio" 
-              name="paymentMethod" 
-              value="card" 
-              disabled
-              className="payment-method-radio"
-            />
-            <span className="payment-method-card">카드 결제</span>
-          </label>
-          <div className="payment-method-value-wrap">
-            <span className="payment-method-card-value">준비 중인 기능이에요</span>
-          </div>
-        </div>
       </div>
 
       <div className="payment-bottom-bar">
         <div className="payment-agree-row">
-          <input type="checkbox" id="agree" />
+          <input 
+            type="checkbox" 
+            id="agree" 
+            checked={agree}
+            onChange={() => setAgree(!agree)}
+          />
           <span className="payment-agree">환불 정책을 확인하였으며 이에 동의합니다.</span>
         </div>
-        <button className="payment-btn">결제하기</button>
+        <button className="payment-btn" onClick={handlePayment}>
+          결제하기
+        </button>
       </div>
     </>
   );
