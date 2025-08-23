@@ -5,7 +5,11 @@ import Partyinfo from './pages/Partyinfo.jsx';
 import Notifications from "./pages/Notifications.jsx";
 import Map from "./pages/Map.jsx";
 // import Assist from "./pages/Assist.jsx";
-// import Mypage from "./pages/Mypage.jsx";  {/*페이지의 파일명, 경로명 일치시키기 */}
+import Mypage from './pages/Mypage.jsx';
+import PartyHistory from './pages/PartyHistory.jsx';   
+import ProfileEdit from './pages/ProfileEdit.jsx';
+import ProfileExtra from './pages/ProfileExtra.jsx';
+import ProfileExtraDone from './pages/ProfileExtraDone.jsx';
 import AppFrame from './components/AppFrame.jsx';
 import KakaoLoginPage from "./pages/KakaoLoginPage.jsx";
 import KakaoCallbackPage from "./pages/KakaoCallbackPage.jsx";
@@ -37,9 +41,13 @@ export default function App() {
               isLoggedIn ? <Notifications /> : <KakaoLoginPage />
             } 
           />
-          {/* <Route path="/assist" element={<Assist />} />
-          <Route path="/mypage" element={<Mypage />} /> */}
-          <Route path="/map" element={<Map />} />
+          {/* <Route path="/assist" element={<Assist />} /> */}
+          <Route path="/mypage" element={<Mypage />} /> 
+          <Route path="/mypage" element={<Mypage />} />
+          <Route path="/mypage/history" element={<PartyHistory />} />
+          <Route path="/mypage/edit" element={<ProfileEdit />} />
+          <Route path="/mypage/extra" element={<ProfileExtra/>} />
+          <Route path="/mypage/extra/done" element={<ProfileExtraDone />} />
           <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
           <Route path="/kakao-login" element={<KakaoLoginPage />} />
           <Route path="/oauth/kakao/callback" element={<KakaoCallbackPage />} />
