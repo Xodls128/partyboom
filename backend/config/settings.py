@@ -35,8 +35,8 @@ REST_FRAMEWORK = {
 DEBUG = True
 
 # 배포 시에 .env 파일을 사용하여 허용된 주소를 추가해주기 위해 
-ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
-# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+# ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 KAKAO_ALLOWED_REDIRECT_URIS = [

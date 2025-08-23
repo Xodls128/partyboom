@@ -5,7 +5,7 @@ import Partyinfo from './pages/Partyinfo.jsx';
 import Notifications from "./pages/Notifications.jsx";
 import Map from "./pages/Map.jsx";
 // import Assist from "./pages/Assist.jsx";
-import Mypage from "./pages/Mypage.jsx";  {/*페이지의 파일명, 경로명 일치시키기 */}
+import Mypage from "./pages/Mypage.jsx";  //*페이지의 파일명, 경로명 일치시키기
 import AppFrame from './components/AppFrame.jsx';
 import KakaoLoginPage from "./pages/KakaoLoginPage.jsx";
 import KakaoCallbackPage from "./pages/KakaoCallbackPage.jsx";
@@ -14,6 +14,7 @@ import Signup from './pages/SignUp.jsx';
 import Payment from './pages/Payment.jsx';
 import Balancewait from './pages/Balancewait.jsx';
 import Balancegame from "./pages/Balancegame.jsx";
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
