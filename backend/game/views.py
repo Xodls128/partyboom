@@ -16,6 +16,10 @@ from .serializers import (
 # Party 컨텍스트 기반 밸런스 문항 생성 유틸 함수
 from utils.gameAI import generate_balance_by_ai
 
+# WebSocket 관련 임포트
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
+
 
 class RoundAICreateView(APIView):
     """
@@ -106,5 +110,19 @@ class VoteCreateView(APIView):
         # 업데이트된 문항만 가볍게 반환
         q = vote.question
         q.refresh_from_db(fields=["vote_a_count", "vote_b_count"])
+
+        # WebSocket 브로드캐스트
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"round_{q.round_id}",
+            {
+                "type": "vote_update",
+                "question_id": q.id,
+                "round_id": str(q.round_id),   # 라운드 정보도 같이
+                "vote_a_count": q.vote_a_count,
+                "vote_b_count": q.vote_b_count,
+            }
+        )
+
+
         return Response(BalanceQuestionReadSerializer(q).data, status=status.HTTP_201_CREATED)
-    

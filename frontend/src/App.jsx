@@ -12,8 +12,8 @@ import KakaoCallbackPage from "./pages/KakaoCallbackPage.jsx";
 import Login from './pages/Login.jsx';
 import Signup from './pages/SignUp.jsx';
 import Payment from './pages/Payment.jsx';
-// import Balancegame from "./pages/Balancegame.jsx";
 import Balancewait from './pages/Balancewait.jsx';
+import Balancegame from "./pages/Balancegame.jsx";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -46,8 +46,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/payment" element={<Payment />} />
-          {/* <Route path="/balancegame/:partyId" element={<Balancegame />} /> */}
           <Route path="/balancewait/:partyId" element={<Balancewait />} />
+          <Route path="/balancegame/:partyId" element={<Balancegame />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
