@@ -4,7 +4,6 @@ import Home from "./pages/Home.jsx";
 import Partyinfo from './pages/Partyinfo.jsx';
 import Notifications from "./pages/Notifications.jsx";
 import Map from "./pages/Map.jsx";
-import Mypage from './pages/Mypage.jsx';
 import PartyHistory from './pages/PartyHistory.jsx';   
 import ProfileEdit from './pages/ProfileEdit.jsx';
 import ProfileExtra from './pages/ProfileExtra.jsx';
