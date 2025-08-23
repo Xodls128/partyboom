@@ -1,0 +1,126 @@
+.notifications-header {
+  position: relative;
+  height: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 33px;
+}
+
+.back-button {
+  position: absolute;
+  top: 39px;
+  left: 4px;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.back-icon {
+  width: 24px;
+  height: 24px;
+  pointer-events: none;
+}
+
+.notifications-title {
+  font-family: Pretendard;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 150%;
+  letter-spacing: -1.9%;
+  margin-top: 41px;
+}
+
+.notifications-content {
+  width: 338px;
+  margin-left: 20px;
+  margin-bottom: 6px;
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: -1.9%;
+}
+
+.notifications-day {
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: -1.9%;
+  color: var(--grayscale500, #7B7B7B);
+  background: transparent;
+  margin-left: 20px;
+}
+
+.notification-block {
+  margin-bottom: 16px;
+}
+
+.notification-divider {
+  width: 354px;
+  height: 1px;
+  margin: 12px 0 0 20px;
+  background: var(--grayscale200, #DDD);
+  border-radius: 1px;
+}
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5); /* 반투명 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* 다른 요소보다 위 */
+}
+
+/* 팝업 박스 */
+.popup-box {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 300px;
+  text-align: center;
+}
+
+.popup-box p {
+  margin-bottom: 15px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.popup-box button {
+  margin: 5px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.popup-box button:first-of-type {
+  background-color: #FF6B00; /* Button color */
+  border-radius: 8px; /* Rounded corners */
+  color: white;
+}
+
+.popup-box button:last-of-type {
+  background-color: #ddd;
+}
+
+/* 읽은 알림 스타일 */
+.notification-block.read {
+  opacity: 0.6;
+  cursor: default;
+}
