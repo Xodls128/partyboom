@@ -10,7 +10,7 @@ import RigthBlack from '../assets/right_black.svg';
 
 const API_BASE = import.meta.env.VITE_API_URL 
 const MAIN_URL = `${API_BASE}/api/mypage/main/`;
-const AUTH_SCHEME = 'JWT'; // 중요: 서버가 Bearer 요구
+const AUTH_SCHEME = 'JWT'; 
 
 // 저장된 토큰 구하기(여러 키 대응)
 const getToken = () =>
