@@ -56,7 +56,7 @@ export default function Partyinfo() {
     }
 
     const data = await res.json();
-    navigate("/assist", { state: { participationId: data.id } });
+    navigate("/payment", { state: { participationId: data.id } });
   } catch (err) {
     console.error(err);
     alert(err.message || "참가 신청 중 오류가 발생했습니다.");
