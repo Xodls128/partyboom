@@ -1,0 +1,72 @@
+/* 시트를 깔 컨테이너 */
+.phone-stage {
+  position: relative;
+  height: 100%;
+}
+
+/* 바텀시트 본체 */
+.bottom-sheet{
+  z-index: 1000; /* 지도보다 항상 위에 있도록 보장 */
+  position: absolute;
+  left: 0; right: 0; bottom: 100px;
+  background: #fff;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 16px rgba(0,0,0,.12);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  /* JS 로딩 전 깜빡임 방지: 최소 높이(PhoneSheet의 MIN_PCT와 동일하게) */
+  height: 30%;
+
+  /* 이진 스냅 전환감 — 더 즉시 전환을 원하면 none 으로 */
+  transition: height .12s ease;
+
+  user-select: none;        /* 드래그 중 텍스트 선택 방지 */
+  -webkit-user-select: none;
+  padding-bottom: env(safe-area-inset-bottom); /* iOS 하단 제스처 영역 */
+  will-change: height;
+}
+
+/* 손잡이 */
+.bottom-sheet .grabber{
+  width: 56px;
+  height: 6px;
+  border-radius: 999px;
+  background: #d9d9d9;
+  margin: 10px auto 6px;
+  cursor: grab;
+}
+
+/* 내부 스크롤 영역 */
+.bottom-sheet .sheet-scroll{
+  flex: 1;
+  overflow-x: hidden; /* 가로 스크롤바 숨김 */
+  overflow-y: hidden; /* 세로 스크롤바는 유지 */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* 스크롤바(옵션) */
+.bottom-sheet .sheet-scroll::-webkit-scrollbar{ width:6px; }
+.bottom-sheet .sheet-scroll::-webkit-scrollbar-track{ background: transparent; }
+.bottom-sheet .sheet-scroll::-webkit-scrollbar-thumb{
+  background: rgba(0,0,0,.25);
+  border-radius: 999px;
+}
+
+/* 모션 최소화 설정을 존중 */
+@media (prefers-reduced-motion: reduce) {
+  .bottom-sheet { transition: none; }
+}
+
+.map-page-container {
+  width: 100%;
+  height: 100%;
+  position: relative; /* This will be the positioning context for markers later */
+  overflow: hidden; /* Hide anything that might spill out */
+}
+
+.sheet-scroll {
+  overscroll-behavior: contain;
+}

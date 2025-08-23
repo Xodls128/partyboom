@@ -1,0 +1,25 @@
+.header {
+  background-image: url('../assets/header.svg');
+  background-size: cover;
+  background-position: center;
+  width: 393px;
+  height: 101px;
+  position: absolute; /* fixed → absolute */
+  top: 0;
+  left: 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 900;
+}
+
+/* 알림 버튼 클릭 영역 */
+.bell-button {
+  position: absolute;
+  top: 58%;
+  right: 18px;                    /* 오른쪽 여백 */
+  transform: translateY(-50%);
+  width: 24px;
+  height: 36px;
+  background: transparent;        /* 배경 투명 */
+  border: none;
+  cursor: pointer;
+}

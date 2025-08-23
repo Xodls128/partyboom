@@ -1,0 +1,39 @@
+/* 기본 리셋 */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+}
+body { overflow: hidden; }
+
+/* 화면 중앙에 프레임 고정 */
+.viewport-lock {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: #fff; 
+}
+
+/* 프레임을 393×852px로 고정 */
+.phone {
+  width: 393px;
+  height: 852px;
+
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* 내부 스크롤 영역 */
+.app-scroll {
+  flex: 1;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}

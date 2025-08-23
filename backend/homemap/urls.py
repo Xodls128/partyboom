@@ -1,9 +1,9 @@
 from django.urls import path
-from detailview.views import PartyListForHomeView  # deatailview와 같은 뷰 사용
+from detailview.views import PartyViewSet  # deatailview와 같은 뷰 사용
 
 app_name = "homemap"
 
 urlpatterns = [
-    path("home/", PartyListForHomeView.as_view(), name="home-parties"),
-    path("map/",  PartyListForHomeView.as_view(), name="map-parties"),
+    path("home/", PartyViewSet.as_view({"get": "list"}), name="home-parties"),
+    path("map/",  PartyViewSet.as_view({"get": "list"}), name="map-parties"),
 ]

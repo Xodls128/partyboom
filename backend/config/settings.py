@@ -12,20 +12,17 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 KAKAO_CLIENT_SECRET = os.getenv("KAKAO_CLIENT_SECRET", "")
 
+# AI 인증 키 (환경변수)
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
 # 로그인 회원가입 기능 활성화 여부
 ENABLE_AUTH = os.getenv("ENABLE_AUTH", "True").lower() == "true"
 
 #인증 인가 기능 활성화 여부
 
-if not ENABLE_AUTH:
-    # 인증 비활성화 모드
-    REST_FRAMEWORK = {
-        "DEFAULT_AUTHENTICATION_CLASSES": [],
-        "DEFAULT_PERMISSION_CLASSES": ["rest_framework.permissions.AllowAny"],
-    }
-else:
-    # 인증 활성화 모드
-    REST_FRAMEWORK = {
+
+    
+REST_FRAMEWORK = {
         "DEFAULT_AUTHENTICATION_CLASSES": [
             "rest_framework_simplejwt.authentication.JWTAuthentication",
         ],
@@ -37,7 +34,10 @@ else:
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+# 배포 시에 .env 파일을 사용하여 허용된 주소를 추가해주기 위해 
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
+# ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 
 KAKAO_ALLOWED_REDIRECT_URIS = [
     "http://localhost:5173/oauth/kakao/callback",
@@ -64,9 +64,11 @@ INSTALLED_APPS = [
     'users',
     'reserve',
     'corsheaders',
+    "channels",
 ]
 
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -74,11 +76,15 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # 프론트 엔드 개발 서버
+    "https://partyboom.vercel.app", # 배포된 프론트 엔드 주소
+    "http://3.34.135.176",
+    "https://partyboom.online",#구매한 도메인
+    "https://www.partyboom.online", 
+    "https://yyy-khaki.vercel.app"
 ]
 
 SIMPLE_JWT = {
@@ -154,6 +160,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'config' / 'static',  # 직접 만든 static 폴더
+]
 
 AUTH_USER_MODEL = "users.User"
 
@@ -161,3 +170,38 @@ AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+ASGI_APPLICATION = "config.asgi.application" 
+
+# Redis 사용 (실시간 메시지 브로커)
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
+}
+
+CELERY_BEAT_SCHEDULE = {
+    "party_open_1day_notices": {
+        "task": "notice.tasks.create_party_open_notices",
+        "schedule": 3600.0,  # 1시간마다 실행
+    },
+    "party_insufficient_notices": {
+        "task": "notice.tasks.create_insufficient_party_notices",
+        "schedule": 3600.0,  # 1시간마다 실행
+    },
+}
+
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+# 웹소켓 테스팅 할 때만 활성화
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer"
+    }
+}
