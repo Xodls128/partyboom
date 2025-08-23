@@ -43,7 +43,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/payment" element={<Payment />} />
-          <Route path="/balancegame" element={<Balancegame />} />
+          <Route path="/balancegame/:partyId" element={<Balancegame />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
