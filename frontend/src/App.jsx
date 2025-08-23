@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { useEffect, useState } from "react";
 import Home from "./pages/Home.jsx";
+import Partyinfo from './pages/Partyinfo.jsx';
 import Notifications from "./pages/Notifications.jsx";
 import Map from "./pages/Map.jsx";
 // import Assist from "./pages/Assist.jsx";
@@ -11,13 +12,15 @@ import KakaoCallbackPage from "./pages/KakaoCallbackPage.jsx";
 import Login from './pages/Login.jsx';
 import Signup from './pages/SignUp.jsx';
 import Payment from './pages/Payment.jsx';
+// import Balancegame from "./pages/Balancegame.jsx";
+import Balancewait from './pages/Balancewait.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   // 앱 시작 시 localStorage에서 토큰 확인
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = localStorage.getItem("access");
     if (token) {
       setIsLoggedIn(true);
     }
@@ -37,11 +40,14 @@ export default function App() {
           {/* <Route path="/assist" element={<Assist />} />
           <Route path="/mypage" element={<Mypage />} /> */}
           <Route path="/map" element={<Map />} />
+          <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
           <Route path="/kakao-login" element={<KakaoLoginPage />} />
           <Route path="/oauth/kakao/callback" element={<KakaoCallbackPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/payment" element={<Payment />} />
+          {/* <Route path="/balancegame/:partyId" element={<Balancegame />} /> */}
+          <Route path="/balancewait/:partyId" element={<Balancewait />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
