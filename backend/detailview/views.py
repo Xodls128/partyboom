@@ -22,7 +22,7 @@ class PartyViewSet(viewsets.ReadOnlyModelViewSet):
         qs =(
             Party.objects
             .select_related("place")
-            .prefetch_related("tags")
+            .prefetch_related("tags", "participations__user")
             .annotate(applied_count=Count("participations",distinct=True))
         )
 

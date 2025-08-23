@@ -49,6 +49,7 @@ export default function App() {
           <Route path="/payment" element={<Payment />} />
           <Route path="/balancewait/:partyId" element={<Balancewait />} />
           <Route path="/balancegame/:partyId" element={<Balancegame />} />
+          <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
