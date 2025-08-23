@@ -116,7 +116,7 @@
 
 /* 버튼 영역 */
 .pe-actions{
-  margin-top: auto;
+  margin-top: 90px;
   display: flex;
   flex-direction: column;
   gap: 12px;
