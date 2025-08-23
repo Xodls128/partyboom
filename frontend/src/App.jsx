@@ -4,12 +4,12 @@ import Home from "./pages/Home.jsx";
 import Partyinfo from './pages/Partyinfo.jsx';
 import Notifications from "./pages/Notifications.jsx";
 import Map from "./pages/Map.jsx";
-// import Assist from "./pages/Assist.jsx";
 import Mypage from './pages/Mypage.jsx';
 import PartyHistory from './pages/PartyHistory.jsx';   
 import ProfileEdit from './pages/ProfileEdit.jsx';
 import ProfileExtra from './pages/ProfileExtra.jsx';
 import ProfileExtraDone from './pages/ProfileExtraDone.jsx';
+import Mypage from "./pages/Mypage.jsx";  //*페이지의 파일명, 경로명 일치시키기
 import AppFrame from './components/AppFrame.jsx';
 import KakaoLoginPage from "./pages/KakaoLoginPage.jsx";
 import KakaoCallbackPage from "./pages/KakaoCallbackPage.jsx";
@@ -18,6 +18,7 @@ import Signup from './pages/SignUp.jsx';
 import Payment from './pages/Payment.jsx';
 import Balancewait from './pages/Balancewait.jsx';
 import Balancegame from "./pages/Balancegame.jsx";
+
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,6 +43,7 @@ export default function App() {
             } 
           />
           {/* <Route path="/assist" element={<Assist />} /> */}
+          <Route path="/mypage" element={<Mypage />} />
           <Route path="/map" element={<Map />} />
           <Route path="/mypage" element={<Mypage />} /> 
           <Route path="/mypage" element={<Mypage />} />
@@ -57,6 +59,7 @@ export default function App() {
           <Route path="/payment" element={<Payment />} />
           <Route path="/balancewait/:partyId" element={<Balancewait />} />
           <Route path="/balancegame/:partyId" element={<Balancegame />} />
+          <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>

@@ -40,8 +40,7 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",")
 
 
 KAKAO_ALLOWED_REDIRECT_URIS = [
-    "http://localhost:5173/oauth/kakao/callback",
-    # 운영 주소 이후 추가해야됨
+    uri.strip() for uri in os.getenv("KAKAO_ALLOWED_REDIRECT_URIS", "").split(",") if uri.strip()
 ]
 
 # Application definition
@@ -159,10 +158,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'config' / 'static',  # 직접 만든 static 폴더
 ]
+STATIC_ROOT = BASE_DIR / 'staticfiles' #배포용 스테틱 설정
 
 AUTH_USER_MODEL = "users.User"
 
