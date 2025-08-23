@@ -42,6 +42,7 @@ export default function App() {
             } 
           />
           {/* <Route path="/assist" element={<Assist />} /> */}
+          <Route path="/map" element={<Map />} />
           <Route path="/mypage" element={<Mypage />} /> 
           <Route path="/mypage" element={<Mypage />} />
           <Route path="/mypage/history" element={<PartyHistory />} />
