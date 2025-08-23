@@ -34,26 +34,34 @@ export default function Partyinfo() {
   }, [partyId]);
 
   const handleJoin = async () => {
-    try {
-      const res = await fetch(`${API_BASE}/api/reserve/join/${partyId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access")}`,
-        }
-      });
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData?.detail || "참가 신청 실패");
+  const token = localStorage.getItem("access");
+  if (!token) {
+    alert("로그인이 필요합니다.");
+// 추후에 팝업창 생기면 여기에 추가 설정해줘야함 일단 지금은 미구현 및 기본 경고로 구현
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/reserve/join/${partyId}/`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
       }
-      const data = await res.json();
-      // data.id = participationId
-      navigate("/payment", { state: { participationId: data.id } });
-    } catch (err) {
-      console.error(err);
-      alert(err.message || "참가 신청 중 오류가 발생했습니다.");
+    });
+
+    if (!res.ok) {
+      const errData = await res.json();
+      throw new Error(errData?.detail || "참가 신청 실패");
     }
-  };
+
+    const data = await res.json();
+    navigate("/assist", { state: { participationId: data.id } });
+  } catch (err) {
+    console.error(err);
+    alert(err.message || "참가 신청 중 오류가 발생했습니다.");
+  }
+};
 
   if (loading) return <div className="party-info-container">로딩 중...</div>;
   if (error) return <div className="party-info-container">에러: {error}</div>;
