@@ -21,8 +21,14 @@ export default function Payment() {
   const [agree, setAgree] = useState(false);
 
 
-  // 초기 유저 정보 불러오기
+  // 페이지 진입 시 participationId 유효성 검사
   useEffect(() => {
+    if (!participationId) {
+      alert("예약 정보가 없습니다. 다시 시도해주세요.");
+      navigate(-1); // 이전 페이지로 되돌리기
+      return;
+    }
+
     const fetchUser = async () => {
       try {
         const res = await fetch(`${API_BASE}/api/users/me/`, {
@@ -36,16 +42,12 @@ export default function Payment() {
       }
     };
     fetchUser();
-  }, []);
+  }, [participationId, navigate]);
 
   // 결제 처리
   const handlePayment = async () => {
     if (!agree) {
       alert("환불 정책에 동의해야 결제할 수 있습니다.");
-      return;
-    }
-    if (!participationId) {
-      alert("결제할 예약 정보가 없습니다.");
       return;
     }
 
