@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.templatetags.static import static
 
 class User(AbstractUser):
     # 일반 회원가입과 카카오 로그인 nickname이 동일하게 저장되도록 할 예정
@@ -25,6 +26,10 @@ class User(AbstractUser):
     def __str__(self):
         return self.username or f"user-{self.pk}"
 
+    def get_photo_url(self):
+        if self.profile_image:  
+            return self.profile_image.url
+        return static("icons/default_profile.png") 
 
 class SocialAccount(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

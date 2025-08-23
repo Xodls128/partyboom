@@ -8,11 +8,15 @@ class Notice(models.Model):
     PARTY_OPEN_1DAY = "party_open_1day"
     PARTY_INSUFFICIENT = "party_insufficient"
     PARTY_NEW = "party_new"
+    PARTY_APPLIED = "party_applied"
+    PARTY_CANCELED = "party_canceled"
 
     NOTICE_TYPES = [
         (PARTY_OPEN_1DAY, "파티 오픈 1일 전"),
         (PARTY_INSUFFICIENT, "인원 미달 오픈 1일 전"),
         (PARTY_NEW, "새 파티 생성"),
+        (PARTY_APPLIED, "파티 신청 완료"),
+        (PARTY_CANCELED, "파티 신청 취소"),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notices")
