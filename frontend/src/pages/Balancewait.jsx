@@ -48,46 +48,76 @@ export default function Balancewait() {
     }
   };
 
-  // WebSocket 연결
+    // WebSocket 연결
   useEffect(() => {
-    fetchParticipants();
-
-    let interval;
-    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const wsUrl = `${wsProtocol}://${window.location.host}/ws/party/${partyId}/`;
-    const ws = new WebSocket(wsUrl);
-
-    ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-
-      if (data.type === "send_game_created" && !navigating) {
-        setNavigating(true); // 중복 방지
-        setShowModal(true);  // 모달 띄우기
-
-        const roundId = data.data.round_id;
-        setTimeout(() => {
-          navigate(`/balancegame/${roundId}`);
-        }, 2000); // 2초 지연
-        return;
+    // --- 활성 게임 여부 확인 ---
+    const checkForActiveGame = async () => {
+      try {
+        const res = await axios.get(
+          `${API_BASE}/api/v1/game/parties/${partyId}/active-round/`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        if (res.data.round_id && !navigating) {
+          setNavigating(true);
+          setShowModal(true);
+          setTimeout(() => {
+            navigate(`/balancegame/${res.data.round_id}`);
+          }, 2000);
+          return true;
+        }
+      } catch (err) {
+        if (err.response?.status !== 404) {
+          console.error("활성 게임 확인 실패:", err);
+        }
       }
-
-      if (data.type === "send_standby_update") {
-        setStandbyCount(data.data.standby_count);
-        setParticipantCount(data.data.participation_count);
-        fetchParticipants();
-      }
+      return false;
     };
 
-    ws.onclose = () => {
-      console.log("WebSocket closed, fallback polling ON");
-      interval = setInterval(fetchParticipants, 10000);
+    const initialize = async () => {
+      const gameInProgress = await checkForActiveGame();
+      if (gameInProgress) return;
+
+      fetchParticipants();
+
+      let interval;
+      const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+      const wsUrl = `${wsProtocol}://${window.location.host}/ws/party/${partyId}/`;
+      const ws = new WebSocket(wsUrl);
+
+      ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+
+        if (data.type === "send_game_created" && !navigating) {
+          setNavigating(true); // 중복 방지
+          setShowModal(true);  // 모달 띄우기
+
+          const roundId = data.data.round_id;
+          setTimeout(() => {
+            navigate(`/balancegame/${roundId}`);
+          }, 2000); // 2초 지연
+          return;
+        }
+
+        if (data.type === "send_standby_update") {
+          setStandbyCount(data.data.standby_count);
+          setParticipantCount(data.data.participation_count);
+          fetchParticipants();
+        }
+      };
+
+      ws.onclose = () => {
+        console.log("WebSocket closed, fallback polling ON");
+        interval = setInterval(fetchParticipants, 10000);
+      };
+
+      return () => {
+        ws.close();
+        if (interval) clearInterval(interval);
+      };
     };
 
-    return () => {
-      ws.close();
-      if (interval) clearInterval(interval);
-    };
-  }, [partyId, navigate, navigating]);
+    initialize();
+  }, [partyId, navigate, token, navigating]);
 
   return (
     <>
