@@ -5,15 +5,15 @@ import Partyinfo from './pages/Partyinfo.jsx';
 import Notifications from "./pages/Notifications.jsx";
 import Map from "./pages/Map.jsx";
 // import Assist from "./pages/Assist.jsx";
-// import Mypage from "./pages/Mypage.jsx";  {/*페이지의 파일명, 경로명 일치시키기 */}
+import Mypage from "./pages/Mypage.jsx";  {/*페이지의 파일명, 경로명 일치시키기 */}
 import AppFrame from './components/AppFrame.jsx';
-import ReportUser from './pages/ReportUser.jsx';
-import KakaoLoginPage from './pages/KakaoLoginPage';
-import KakaoCallbackPage from './pages/KakaoCallbackPage';
-import Login from './pages/Login';
-import Signup from './pages/SignUp';
-import Payment from './pages/Payment';
-import Balancewait from './pages/Balancewait';
+import KakaoLoginPage from "./pages/KakaoLoginPage.jsx";
+import KakaoCallbackPage from "./pages/KakaoCallbackPage.jsx";
+import Login from './pages/Login.jsx';
+import Signup from './pages/SignUp.jsx';
+import Payment from './pages/Payment.jsx';
+import Balancewait from './pages/Balancewait.jsx';
+import Balancegame from "./pages/Balancegame.jsx";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -37,8 +37,8 @@ export default function App() {
               isLoggedIn ? <Notifications /> : <KakaoLoginPage />
             } 
           />
-          {/* <Route path="/assist" element={<Assist />} />
-          <Route path="/mypage" element={<Mypage />} /> */}
+          {/* <Route path="/assist" element={<Assist />} /> */}
+          <Route path="/mypage" element={<Mypage />} />
           <Route path="/map" element={<Map />} />
           <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
           <Route path="/kakao-login" element={<KakaoLoginPage />} />
@@ -46,11 +46,8 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/payment" element={<Payment />} />
-          {/* <Route path="/balancegame/:partyId" element={<Balancegame />} /> */}
           <Route path="/balancewait/:partyId" element={<Balancewait />} />
-          {/* <Route path="/assist" element={<Assist />} />
-          <Route path="/mypage" element={<Mypage />} /> */}
-          <Route path="/report/:userId" element={<ReportUser />} /> 
+          <Route path="/balancegame/:partyId" element={<Balancegame />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
