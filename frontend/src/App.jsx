@@ -11,6 +11,7 @@ import KakaoCallbackPage from "./pages/KakaoCallbackPage.jsx";
 import Login from './pages/Login.jsx';
 import Signup from './pages/SignUp.jsx';
 import Payment from './pages/Payment.jsx';
+import PaymentFinish from "./pages/PaymentFinish.jsx";
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -42,6 +43,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/payment" element={<Payment />} />
+          <Route path="/paymentfinish" element={<PaymentFinish />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
