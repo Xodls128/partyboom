@@ -224,3 +224,26 @@
   letter-spacing: -0.38px;
   margin-top: 4px;
 }
+
+/* 집계 막대 애니메이션 */
+.balancegame-gauge-red,
+.balancegame-gauge-yellow {
+  transition: width 0.6s ease-in-out;
+}
+
+/* 슬라이드 progress bar */
+.balancegame-progress {
+  width: 100%;
+  height: 6px;
+  background: #eee;
+  border-radius: 3px;
+  margin-top: 16px;
+  overflow: hidden;
+}
+
+.balancegame-progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #FF2824, #FFCD50);
+  transition: width 0.4s ease;
+}
+
