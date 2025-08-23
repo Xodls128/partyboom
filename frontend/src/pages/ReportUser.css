@@ -188,3 +188,34 @@
   line-height: 1.5;
   cursor: pointer;
 }
+
+/* 상단 Toast 알림 */
+.ru-toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  min-width: 260px;
+  max-width: 90%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-in-out, fadeOut 0.3s ease-in-out 1.2s forwards;
+}
+
+/* 성공 */
+.ru-toast.success {
+  background-color: #e6ffed;
+  color: #1a7f37;
+  border: 1px solid #a7e3b9;
+}
+
+/* 실패/경고 */
+.ru-toast.error {
+  background-color: #fff1f0;
+  color: #cf1322;
+  border: 1px solid #ffa39e;
+}

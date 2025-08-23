@@ -20,14 +20,14 @@ export default function ReportUser() {
     };
 
   const [open, setOpen] = useState(false);
-  const [reason, setReason] = useState(''); // 이제 enum 코드 저장 (ex: FAKE_INFO)
+  const [reason, setReason] = useState(''); 
   const [detail, setDetail] = useState('');
   const [categories, setCategories] = useState([]); 
-  const [message, setMessage] = useState(null); // 사용자 메시지 상태
+  const [toast, setToast] = useState(null); 
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-  // 신고 유형 목록 불러오기 (DRF OPTIONS)
+  // 신고 유형 목록 불러오기
   useEffect(() => {
     fetch(`${API_BASE}/api/mypage/reports/`, {
       method: 'OPTIONS',
@@ -45,22 +45,33 @@ export default function ReportUser() {
   }, []);
 
   const submit = async () => {
-    if (!reason) return setMessage('신고 유형을 선택해 주세요.');
-    if (!detail.trim())
-      return setMessage('예) 파티 현장에서 불쾌한 신체접촉이 있었고, 프로필 상의 내용과 실제 개인 정보가 다릅니다.');
-    if (!user.partyId) return setMessage('신고가 발생한 파티 정보가 없습니다.');
+    if (!reason) {
+      setToast({ text: "⚠️ 신고 유형을 선택해 주세요.", type: "error" });
+      setTimeout(() => setToast(null), 1500);
+      return;
+    }
+    if (!detail.trim()) {
+      setToast({ text: "⚠️ 신고 내용을 입력해 주세요.", type: "error" });
+      setTimeout(() => setToast(null), 1500);
+      return;
+    }
+    if (!user.partyId) {
+      setToast({ text: "⚠️ 신고가 발생한 파티 정보가 없습니다.", type: "error" });
+      setTimeout(() => setToast(null), 1500);
+      return;
+    }
 
     try {
       const response = await fetch(`${API_BASE}/api/mypage/reports/`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access')}`, // JWT 토큰
+          Authorization: `Bearer ${localStorage.getItem('access')}`, 
         },
         body: JSON.stringify({
           party: user.partyId,
           reported_user: user.id,
-          category: reason, // 이제 그대로 enum 코드 전송
+          category: reason,
           content: detail,
         }),
       });
@@ -68,14 +79,21 @@ export default function ReportUser() {
       if (!response.ok) {
         const err = await response.json();
         console.error('신고 실패:', err);
-        return alert(err.detail || '신고 중 오류가 발생했습니다.');
+        setToast({ text: err.detail || "❌ 신고 중 오류가 발생했습니다.", type: "error" });
+        setTimeout(() => setToast(null), 1500);
+        return;
       }
 
-      setMessage('신고가 접수되었습니다.');
-      setTimeout(() => nav(-1), 1500); // 1.5초 뒤 자동 이동
+      // 성공
+      setToast({ text: "✅ 신고가 접수되었습니다.", type: "success" });
+      setTimeout(() => {
+        setToast(null);
+        nav(-1);
+      }, 1500);
     } catch (err) {
       console.error(err);
-      setMessage('신고 중 오류가 발생했습니다.');
+      setToast({ text: "❌ 신고 중 오류가 발생했습니다.", type: "error" });
+      setTimeout(() => setToast(null), 1500);
     }
   };
 
@@ -155,8 +173,13 @@ export default function ReportUser() {
             rows={5}
           />
         </section>
-        {/* 메시지 표시 영역 */}
-        {message && <div className="ru-message">{message}</div>}
+
+        {/* 토스트 메시지 */}
+        {toast && (
+          <div className={`ru-toast ${toast.type}`}>
+            {toast.text}
+          </div>
+        )}
       </main>
 
       <div className="ru-actions" onClick={(e) => e.stopPropagation()}>
