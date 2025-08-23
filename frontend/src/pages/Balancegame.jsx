@@ -24,7 +24,7 @@ export default function Balancegame() {
     <>
       <div className="balancegame-header">
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/')}
           className="balancegame-back-button"
           aria-label="뒤로가기"
         >
