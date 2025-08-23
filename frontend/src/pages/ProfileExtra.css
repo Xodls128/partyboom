@@ -132,6 +132,7 @@
 /* 하단 진행바 (이미지) */
 .ex-progress{
   margin-top: auto;
+  margin-bottom: auto;
   display: flex;
   gap: 8px;
   align-items: center;
