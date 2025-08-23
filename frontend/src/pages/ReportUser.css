@@ -1,0 +1,190 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+.ru-page{
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  font-family: Pretendard;
+  background: #fff;
+}
+
+/* 상단 */
+.ru-top{ 
+  display:flex; 
+  align-items:center; 
+  gap: 8px; 
+  height: 40px; }
+.ru-back{ 
+  border:0; 
+  background:transparent; 
+  padding:4px; 
+  cursor:pointer; }
+.ru-back img{ 
+  width:17px; 
+  height:29px; }
+.ru-title{
+  margin: 0 auto;
+  transform: translateX(-18px);       
+  font-family: Pretendard;
+  font-size: 18px; 
+  font-weight: 600;
+  letter-spacing: -0.019em; 
+  line-height: 1.5;
+}
+
+/* 메인 */
+.ru-main{ padding-top: 8px; }
+
+.ru-profile{
+  display:flex; 
+  flex-direction: column; 
+  align-items:center; 
+  justify-content:center;
+  margin: 19px 0 20px;
+}
+.ru-avatar{
+  width: 113px; 
+  height: 113px; 
+  border-radius: 50%;
+  object-fit: cover; 
+  background: #DDDDDD;
+}
+.ru-avatar--placeholder{ 
+  background: #DDDDDD; 
+}
+.ru-name{ 
+  margin-top:16px; 
+  font-family: Pretendard;
+  font-size: 18px; 
+  font-weight: 600;
+  letter-spacing: -0.019em; 
+  line-height: 1.5;
+}
+
+.ru-field{ 
+  margin: 14px 0; 
+}
+.ru-label{ 
+  display:block; 
+  margin-bottom:9px; 
+  font-family: Pretendard;
+  font-size: 16px; 
+  font-weight: 600;
+  letter-spacing: -0.019em; 
+  line-height: 1.5;
+}
+
+/* 셀렉트 */
+.ru-select{
+  position: relative;
+  width: 345px;
+  height: 47px;
+  border-radius: 8px;
+  justify-content: space-between;
+  background: #F2F2F2;
+  display:flex; 
+  align-items:center; 
+  cursor: pointer;
+  
+  box-sizing: border-box;     
+  padding: 10px;
+}
+.ru-placeholder{ 
+  color:#7B7B7B; 
+  font-family: Pretendard;
+  font-size: 16px; 
+  font-weight: 400;
+  letter-spacing: -0.019em; 
+  line-height: 1.5;
+}
+.ru-placeholder.has{ 
+  color:#000000; 
+}
+.ru-caret{
+  position:absolute;
+  right: 10px;
+  top:50%;
+  transform: translateY(-50%) rotate(0deg);
+  width: 16px;  
+  height: 16px;
+}
+.ru-select.open .ru-caret{
+  transform: translateY(-50%) rotate(180deg);  /* 클릭시 위로 향하게*/
+}
+
+/* 드롭다운 */
+.ru-menu{
+  position: absolute; 
+  left:0; 
+  right:0; 
+  top: 48px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  width: 345px;
+  height: 204px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.25);
+  padding: 8px 0;
+  z-index: 5;
+
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+}
+.ru-option{ 
+  padding: 9px 12px; 
+  font-family: Pretendard;
+  font-size: 16px; 
+  font-weight: 400;
+  letter-spacing: -0.019em; 
+  line-height: 1.5;
+  color:#000000; 
+}
+.ru-option:hover{ 
+  background:#F2F2F2; 
+}
+
+/* 텍스트 영역 */
+.ru-textarea{
+  width: 345px;
+  height: 181px;
+  border-radius: 8px;
+  border: 0;
+  background: #F2F2F2;
+  padding: 11px 12px;
+  resize: none;
+  outline: none;
+
+  font-family: Pretendard;
+  font-size: 16px; 
+  font-weight: 400;
+  letter-spacing: -0.019em; 
+  line-height: 1.5;
+  color:#7B7B7B; 
+  box-sizing: border-box;
+}
+.ru-textarea::placeholder{
+  white-space: pre-line; /* \n을 줄바꿈 */
+}
+
+
+/* 하단 버튼 */
+.ru-actions{ 
+  margin-top: auto; 
+  padding: 16px 0 calc(16px + env(safe-area-inset-bottom)); 
+}
+.ru-submit{
+  width: 345px; 
+  height: 46px; 
+  border: 0; 
+  border-radius: 8px;
+  background:#FF2824; 
+
+  color:#FFFFFF;
+  font-family: Pretendard;
+  font-size: 20px; 
+  font-weight: 600;
+  letter-spacing: -0.019em; 
+  line-height: 1.5;
+  cursor: pointer;
+}
