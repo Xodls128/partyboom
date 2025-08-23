@@ -5,7 +5,26 @@ import LeftIcon from '../assets/left_black.svg';
 import CameraIcon from '../assets/camera.svg';
 import EditIcon from '../assets/edit.svg';
 
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = import.meta.env.VITE_API_URL
+const PROFILE_URL = `${API_BASE}/api/mypage/profile/`;
+const AUTH_SCHEME = 'JWT';
+
+const getToken = () =>
+  localStorage.getItem('access') ||
+  localStorage.getItem('accessToken') ||
+  localStorage.getItem('token') ||
+  sessionStorage.getItem('access') ||
+  (() => {
+    try {
+      const pick = (k) => {
+        const raw = localStorage.getItem(k);
+        if (!raw) return null;
+        const o = JSON.parse(raw);
+        return o?.access || o?.token || o?.access_token || null;
+      };
+      return pick('auth') || pick('user') || '';
+    } catch { return ''; }
+  })();
 
 export default function ProfileEdit() {
   const nav = useNavigate();
@@ -27,28 +46,33 @@ export default function ProfileEdit() {
   const onFile = (e) => {
     const f = e.target.files?.[0];
     if (f) {
-      // 미리보기 갱신
       if (photoUrl) URL.revokeObjectURL(photoUrl);
       setPhotoUrl(URL.createObjectURL(f));
       setPhotoFile(f);
     }
   };
 
-  // 최초 로드: 내 정보 불러오기 (홈 패턴과 동일)
+  // 최초 로드: 내 정보 불러오기
   useEffect(() => {
-    const token = localStorage.getItem('access');
-    const headers = token ? { Authorization: `Bearer ${token}` } : {};
     (async () => {
+      const token = getToken();
+      if (!token) return;
+
       try {
-        const res = await fetch(`${API_BASE}/api/mypage/profile/`, { headers });
+        const res = await fetch(PROFILE_URL, {
+          headers: {
+            Authorization: `${AUTH_SCHEME} ${token}`,
+            Accept: 'application/json',
+          },
+        });
         if (!res.ok) return;
         const me = await res.json();
-        // 서버 필드명 대응: intro/bio
+
         setValues((s) => ({
           ...s,
           intro: me.intro ?? me.bio ?? s.intro,
         }));
-        // 기존 프로필 이미지가 있으면 미리보기 설정
+
         const existing = me.profile_image || me.avatar_url || me.photo_url;
         if (existing) setPhotoUrl(existing);
       } catch (e) {
@@ -56,12 +80,12 @@ export default function ProfileEdit() {
       }
     })();
 
-    // 미리보기 URL 정리
     return () => { if (photoUrl?.startsWith('blob:')) URL.revokeObjectURL(photoUrl); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const save = async () => {
-    const token = localStorage.getItem('access');
+    const token = getToken();
     if (!token) {
       alert('로그인이 필요합니다.');
       return nav('/login');
@@ -72,15 +96,14 @@ export default function ProfileEdit() {
     }
 
     setSaving(true);
-    const headers = { Authorization: `Bearer ${token}` };
 
     try {
       // 1) 비밀번호 변경 (입력한 경우)
       if (values.pw) {
-        const pwdRes = await fetch(`${API_BASE}/api/mypage/profile/`, {
+        const pwdRes = await fetch(PROFILE_URL, {
           method: 'POST',
           headers: {
-            ...headers,
+            Authorization: `${AUTH_SCHEME} ${token}`,
             'Content-Type': 'application/json',
             Accept: 'application/json',
           },
@@ -100,10 +123,13 @@ export default function ProfileEdit() {
       fd.append('intro', values.intro);
       if (photoFile) fd.append('profile_image', photoFile); // 서버 필드명에 맞춰 사용
 
-      // FormData 전송 시 Content-Type 명시 금지 (브라우저가 boundary 자동 설정)
-      const profRes = await fetch(`${API_BASE}/api/mypage/profile/`, {
+      const profRes = await fetch(PROFILE_URL, {
         method: 'PATCH',
-        headers,
+        headers: {
+          Authorization: `${AUTH_SCHEME} ${token}`,
+          Accept: 'application/json',
+          // ⚠️ FormData일 땐 Content-Type 넣지 않기
+        },
         body: fd,
       });
       if (!profRes.ok) {
@@ -151,7 +177,7 @@ export default function ProfileEdit() {
           <label>비밀번호 수정</label>
           <div className="pe-input">
             <input
-              type="password"                
+              type="password"
               autoComplete="new-password"
               value={values.pw}
               onChange={(e) => onChange('pw', e.target.value)}
@@ -167,7 +193,7 @@ export default function ProfileEdit() {
           <label>새 비밀번호 확인</label>
           <div className="pe-input">
             <input
-              type="password"                
+              type="password"
               autoComplete="new-password"
               value={values.pw2}
               onChange={(e) => onChange('pw2', e.target.value)}
