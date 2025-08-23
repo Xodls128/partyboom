@@ -8,12 +8,32 @@ import Vector from '../assets/Vector.svg';
 import Info from '../assets/info.svg';
 import RigthBlack from '../assets/right_black.svg';
 
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = import.meta.env.VITE_API_URL 
+const MAIN_URL = `${API_BASE}/api/mypage/main/`;
+const AUTH_SCHEME = 'JWT'; // 중요: 서버가 Bearer 요구
+
+// 저장된 토큰 구하기(여러 키 대응)
+const getToken = () =>
+  localStorage.getItem('access') ||
+  localStorage.getItem('accessToken') ||
+  localStorage.getItem('token') ||
+  sessionStorage.getItem('access') ||
+  (() => {
+    try {
+      const pick = (k) => {
+        const raw = localStorage.getItem(k);
+        if (!raw) return null;
+        const o = JSON.parse(raw);
+        return o?.access || o?.token || o?.access_token || null;
+      };
+      return pick('auth') || pick('user') || '';
+    } catch { return ''; }
+  })();
 
 export default function Mypage() {
   const navigate = useNavigate();
 
-  // ── 홈 패턴과 동일: 상태들 선언
+  // 상태
   const [username, setUsername] = useState('게스트');
   const [intro, setIntro] = useState('한 줄 소개를 작성해주세요');
   const [tags, setTags] = useState(['소속학년', '소속대학', '성격', 'MBTI']);
@@ -22,96 +42,63 @@ export default function Mypage() {
   const [warningCount, setWarningCount] = useState(0);
   const [avatarUrl, setAvatarUrl] = useState('');
 
-  // 포인트 툴팁
+  // 툴팁
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
-  const onTooltipClick = () => { setIsTooltipVisible(!isTooltipVisible); };
-
-  // 경고 툴팁
   const [isWarningTooltipVisible, setIsWarningTooltipVisible] = useState(false);
-  const onWarningTooltipClick = () => { setIsWarningTooltipVisible(!isWarningTooltipVisible); };
+  const onTooltipClick = () => setIsTooltipVisible((v) => !v);
+  const onWarningTooltipClick = () => setIsWarningTooltipVisible((v) => !v);
 
-  const handleParticipationClick = () => { navigate('/mypage/history'); };
+  const handleParticipationClick = () => navigate('/mypage/history');
 
-  // ── 홈 패턴과 동일: 마운트 시 유저/요약 데이터 로드
+  // 마운트 시 한 번만: /api/mypage/main/에서 프로필+요약 모두 세팅
   useEffect(() => {
-    const token = localStorage.getItem('access');
-    const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+    (async () => {
+      const token = getToken();
+      if (!token) {
+        console.warn('[Mypage] 토큰 없음(미로그인/만료)');
+        return; // 필요 시 navigate('/login')
+      }
 
-    // 1) 프로필(닉네임/자기소개/태그/아바타) 불러오기
-    const fetchUser = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/mypage/main/`, { headers });
-        if (!res.ok) return; // 토큰 없거나 게스트면 그대로 둠
+        const res = await fetch(MAIN_URL, {
+          headers: {
+            Authorization: `${AUTH_SCHEME} ${token}`,
+            Accept: 'application/json',
+          },
+        });
+        if (res.status === 401) {
+          console.warn('401: 로그인 필요/토큰 만료');
+          return;
+        }
+        if (!res.ok) {
+          console.error('마이페이지 호출 실패:', res.status);
+          return;
+        }
+
         const data = await res.json();
 
+        // 프로필
         setUsername(data.nickname || data.username || '게스트');
         setIntro(data.intro || data.bio || '');
         setAvatarUrl(data.profile_image || data.avatar_url || '');
 
-        // 태그: 서버 포맷이 다양할 수 있으니 안전하게 생성
+        // 태그
         const t1 = data.grade || data.year || '소속학년';
         const t2 = data.college || data.department || '소속대학';
         const t3 = data.trait || data.keyword || '성격';
         const t4 = data.mbti || 'MBTI';
-        const list = Array.isArray(data.tags) && data.tags.length > 0
-          ? data.tags.slice(0, 4)
-          : [t1, t2, t3, t4];
+        const list = Array.isArray(data.tags) && data.tags.length ? data.tags.slice(0, 4) : [t1, t2, t3, t4];
         setTags(list.filter(Boolean).slice(0, 4));
+
+        // 요약
+        setPoints(Number(data.points ?? data.point ?? 0));
+        setParticipationCount(Number(data.participation_count ?? data.participated ?? 0));
+        setWarningCount(Number(data.warning_count ?? data.warnings ?? 0));
       } catch (e) {
-        // 콘솔만 찍고 UI는 기본값 유지
         console.error('유저 정보를 불러오는 중 오류:', e);
       }
-    };
-
-    // 2) 마이페이지 요약(포인트/참여횟수/경고수) 불러오기
-    const fetchSummary = async () => {
-      try {
-        const res = await fetch(`${API_BASE}/api/mypage/main/`, { headers });
-        if (!res.ok) return;
-        const s = await res.json();
-        setPoints(Number(s.points ?? s.point ?? 0));
-        setParticipationCount(Number(s.participation_count ?? s.participated ?? 0));
-        setWarningCount(Number(s.warning_count ?? s.warnings ?? 0));
-      } catch (e) {
-        console.warn('요약 정보 불러오는 중 오류:', e);
-      }
-    };
-
-    fetchUser();
-    fetchSummary();
+    })();
   }, []);
-
-  // 로그아웃/탈퇴 (li 클릭에만 연결, className 변경 없음)
-  // const handleLogout = async () => {
-  //   const token = localStorage.getItem('access');
-  //   const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-  //   try {
-  //     // 백엔드에 맞춰 조정 (예: POST /api/auth/logout/)
-  //     await fetch(`${API_BASE}/api/auth/logout/`, { method: 'POST', headers });
-  //   } catch (_) {
-  //     // 엔드포인트 없으면 토큰만 지우고 이동
-  //   } finally {
-  //     localStorage.removeItem('access');
-  //     navigate('/login');
-  //   }
-  // };
-
-  // const handleDeleteAccount = async () => {
-  //   if (!confirm('정말 계정을 탈퇴하시겠어요? 이 작업은 되돌릴 수 없습니다.')) return;
-  //   const token = localStorage.getItem('access');
-  //   const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-  //   try {
-  //     // 백엔드에 맞춰 조정 (예: DELETE /api/user/me/)
-  //     const res = await fetch(`${API_BASE}/api/user/me/`, { method: 'DELETE', headers });
-  //     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-  //     alert('계정이 탈퇴되었습니다.');
-  //     localStorage.removeItem('access');
-  //     navigate('/signup');
-  //   } catch (e) {
-  //     alert('탈퇴 처리 중 오류가 발생했습니다.');
-  //     console.error(e);
-  //   }
-  // };
 
   return (
     <>
