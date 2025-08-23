@@ -1,0 +1,26 @@
+{% extends "admin/change_list.html" %}
+{% load static %}
+
+{% block object-tools %}
+    <div class="object-tools">
+        <ul>
+            <li>
+                <a href="{% url 'admin:create-random-ai-party' %}" 
+                style="
+                    display:inline-block;
+                    padding:8px 16px;
+                    font-size:17px;
+                    font-weight:bold;
+                    background-color:#4CAF50;
+                    color:#fff;
+                    border-radius:6px;
+                    text-decoration:none;
+                    margin-right:150px;
+                ">
+                AI로 랜덤 파티 생성
+                </a>
+            </li>
+        </ul>
+    </div>
+    {{ block.super }}
+{% endblock %}

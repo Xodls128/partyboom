@@ -103,4 +103,36 @@
   padding: 0;
 }
 
+.modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 24px 32px;
+  border-radius: 12px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.spinner {
+  margin: 16px auto 0;
+  width: 32px;
+  height: 32px;
+  border: 4px solid #ccc;
+  border-top-color: #ff2824;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 

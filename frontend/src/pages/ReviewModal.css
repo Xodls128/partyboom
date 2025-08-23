@@ -1,0 +1,124 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+.rv-backdrop{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* 모달 카드 */
+.rv-modal{
+  width: 352px;
+  height: 453px;
+  background: #FFFFFF;
+  border-radius: 8px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.2);
+  padding: 16px;
+  position: relative;
+}
+.rv-modal, .rv-modal * { box-sizing: border-box; }
+
+.rv-close{
+  position: absolute;
+  right: 8px; 
+  top: 6px;
+  width: 36px; 
+  height: 36px;
+  border: 0; 
+  background: transparent;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  cursor: pointer;
+}
+.rv-close-ic{
+  width: 14px; 
+  height: 14px; 
+  display: block;
+}
+
+/* 질문 3줄 폰트 스타일 */
+.rv-row{
+  margin: 14px 0 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.rv-label{
+  margin: 0 0 6px;
+  font-family: Pretendard;
+  font-weight: 600;
+  font-size: 16px;
+  color: #000000;
+  letter-spacing: -0.019em;
+  line-height: 1.5;
+}
+.rv-stars{
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+}
+.rv-star-btn{
+  border: 0; 
+  background: transparent; 
+  cursor: pointer;
+  padding: 4px; 
+  width: 36px; 
+  height: 36px;
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+}
+.rv-star-img{
+  width: 31px; 
+  height: 29px; 
+  display: block;
+  pointer-events: none;        
+  user-select: none;           
+}
+
+/* 메모 입력 */
+.rv-textarea{
+  width: 319px; 
+  height: 118px;
+  display: block; 
+  margin: 12px auto 0;  
+  border-radius: 8px;
+  border: 1px solid #E5E5E5;
+  background: #F2F2F2;
+  padding: 10px 12px;
+  resize: none; 
+  outline: none;
+
+  font-family: Pretendard;
+  font-weight: 400; 
+  font-size: 16px;
+  color: #7B7B7B;
+  letter-spacing: -0.019em; 
+  line-height: 1.5;
+}
+
+/* 제출 버튼 */
+.rv-submit{
+  margin: 10px auto 0;         
+  width: 320px; 
+  height: 46px;
+  border: 0; 
+  border-radius: 8px;
+  background: #FF2824;
+  padding: 8px 10px;
+
+  font-family: Pretendard;
+  font-weight: 600; 
+  font-size: 20px;
+  color: #FFFFFF; 
+  letter-spacing: -0.019em; 
+  line-height: 1.5;
+
+  cursor: pointer;
+}
