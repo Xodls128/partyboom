@@ -1,10 +1,12 @@
 from django.shortcuts import render
+from rest_framework.views import APIView
 from rest_framework import viewsets, permissions, status, generics
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Review, Report, ExtraSetting
 from .serializers import ReviewSerializer, ReportSerializer, ExtraSettingFromJsonSerializer, ProfileUpdateSerializer
 from .permissions import IsParticipantOrAdmin, IsOwner
+from rest_framework.permissions import IsAuthenticated
 from detailview.models import Participation
 from mypage.models import Review, Report
 
@@ -61,37 +63,50 @@ class ReportViewSet(CreateOnlyViewSet):
 # -------------------------
 # 프로필 추가 설정
 # -------------------------
-class ExtraSettingViewSet(viewsets.ModelViewSet):
-    """
-    - 생성: 본인만 가능, 이미 있으면 생성 불가
-    - 조회/수정/삭제: 본인만 가능
-    - 데이터 포맷: ExtraSettingFromJsonSerializer (JSON 덩어리 파싱)
-    - 추가: /me/ 엔드포인트로 본인 데이터 바로 조회 가능
-    """
-    queryset = ExtraSetting.objects.all()
-    serializer_class = ExtraSettingFromJsonSerializer
-    permission_classes = [permissions.IsAuthenticated, IsOwner]
+class ExtraSettingMeAPIView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
-        # 중복 생성 방지
+    def get(self, request):
+        # 현재 유저의 extra setting 가져오기
+        extra = ExtraSetting.objects.filter(user=request.user).first()
+        if not extra:
+            return Response({"detail": "아직 설정이 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+        serializer = ExtraSettingFromJsonSerializer({"extra": {
+            "grade": extra.grade,
+            "college": extra.college,
+            "personality": extra.personality,
+            "mbti": {
+                "i_e": extra.mbti_i_e,
+                "n_s": extra.mbti_n_s,
+                "f_t": extra.mbti_f_t,
+                "p_j": extra.mbti_p_j,
+            }
+        }})
+        return Response(serializer.data)
+
+    def post(self, request):
+        # 새로 생성 (이미 있으면 에러 반환)
         if ExtraSetting.objects.filter(user=request.user).exists():
-            return Response(
-                {"detail": "이미 추가 설정이 존재합니다. 수정 기능을 이용하세요."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        return super().create(request, *args, **kwargs)
+            return Response({"detail": "이미 설정이 존재합니다. PATCH를 사용하세요."}, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(detail=False, methods=['get'], permission_classes=[permissions.IsAuthenticated])
-    def me(self, request):
-        """
-        현재 로그인한 사용자의 ExtraSetting 데이터 반환
-        """
-        try:
-            setting = ExtraSetting.objects.get(user=request.user)
-            serializer = self.get_serializer(setting)
-            return Response(serializer.data)
-        except ExtraSetting.DoesNotExist:
-            return Response({"detail": "추가 설정이 존재하지 않습니다."}, status=404)
+        serializer = ExtraSettingFromJsonSerializer(data=request.data, context={"request": request})
+        if serializer.is_valid():
+            instance = serializer.save()
+            return Response({"id": instance.id}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def patch(self, request):
+        # 기존 extra 수정
+        extra = ExtraSetting.objects.filter(user=request.user).first()
+        if not extra:
+            return Response({"detail": "아직 설정이 없습니다. POST로 생성하세요."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ExtraSettingFromJsonSerializer(extra, data=request.data, partial=True, context={"request": request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"detail": "업데이트 완료"})
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
 
 
 class MypageMainViewSet(viewsets.ViewSet):

@@ -4,10 +4,10 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.db.models import Count, F
-from .models import Party, Participation
-from .serializers import PartyListSerializer, PartyDetailSerializer
+from detailview.models import Party, Participation
+from detailview.serializers import PartyListSerializer, PartyDetailSerializer
 from django.db import transaction
-from .models import Party, Place, Tag
+from detailview.models import Party, Place, Tag
 from utils.partyAI import generate_party_by_ai
 
 
@@ -52,47 +52,47 @@ class PartyViewSet(viewsets.ReadOnlyModelViewSet):
         return PartyListSerializer
 
 
-class PartyJoinAPIView(APIView): # 파티 참가 신청
+# class PartyJoinAPIView(APIView): # 파티 참가 신청
 
-    permission_classes = [IsAuthenticated]
+#     permission_classes = [IsAuthenticated]
 
-    def post(self, request, party_id):
-        try:
-            with transaction.atomic():
-                party = Party.objects.select_for_update().get(pk=party_id)
+#     def post(self, request, party_id):
+#         try:
+#             with transaction.atomic():
+#                 party = Party.objects.select_for_update().get(pk=party_id)
 
-                if Participation.objects.filter(party=party, user=request.user).exists():
-                    return Response({"detail": "이미 신청한 파티입니다."}, status=status.HTTP_400_BAD_REQUEST)
+#                 if Participation.objects.filter(party=party, user=request.user).exists():
+#                     return Response({"detail": "이미 신청한 파티입니다."}, status=status.HTTP_400_BAD_REQUEST)
 
-                # 정원 검사 시, 확정된 인원만 카운트
-                confirmed_count = Participation.objects.filter(party=party, status=Participation.Status.CONFIRMED).count()
-                if confirmed_count >= party.max_participants:
-                    return Response({"detail": "정원이 초과되었습니다."}, status=status.HTTP_400_BAD_REQUEST)
+#                 # 정원 검사 시, 확정된 인원만 카운트
+#                 confirmed_count = Participation.objects.filter(party=party, status=Participation.Status.CONFIRMED).count()
+#                 if confirmed_count >= party.max_participants:
+#                     return Response({"detail": "정원이 초과되었습니다."}, status=status.HTTP_400_BAD_REQUEST)
 
-                # 예약금 여부에 따라 상태 분기
-                if party.deposit > 0:
-                    participation_status = Participation.Status.PENDING_PAYMENT
-                    message = "예약 신청이 완료되었습니다. 예약금을 결제해주세요."
-                else:
-                    participation_status = Participation.Status.CONFIRMED
-                    message = "예약이 확정되었습니다."
+#                 # 예약금 여부에 따라 상태 분기
+#                 if party.deposit > 0:
+#                     participation_status = Participation.Status.PENDING_PAYMENT
+#                     message = "예약 신청이 완료되었습니다. 예약금을 결제해주세요."
+#                 else:
+#                     participation_status = Participation.Status.CONFIRMED
+#                     message = "예약이 확정되었습니다."
 
-                participation = Participation.objects.create(
-                    party=party, 
-                    user=request.user,
-                    status=participation_status
-                )
+#                 participation = Participation.objects.create(
+#                     party=party, 
+#                     user=request.user,
+#                     status=participation_status
+#                 )
 
-                return Response(
-                    {
-                        "detail": message,
-                        "participation_id": participation.id,
-                        "status": participation.status,
-                    },
-                    status=status.HTTP_201_CREATED
-                )
-        except Party.DoesNotExist:
-            return Response({"detail": "파티가 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
+#                 return Response(
+#                     {
+#                         "detail": message,
+#                         "participation_id": participation.id,
+#                         "status": participation.status,
+#                     },
+#                     status=status.HTTP_201_CREATED
+#                 )
+#         except Party.DoesNotExist:
+#             return Response({"detail": "파티가 존재하지 않습니다."}, status=status.HTTP_404_NOT_FOUND)
         
 class PartyLeaveAPIView(APIView):
     permission_classes = [IsAuthenticated]

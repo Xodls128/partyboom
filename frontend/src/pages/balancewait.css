@@ -1,0 +1,106 @@
+@import url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2104@1.0/PyeongChangPeace.css');
+
+.balancewait-title {
+  margin-top: 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.balancewait-partyname {
+  color: #000;
+  font-family: Pretendard;
+  font-size: 20px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 150%; /* 30px */
+  letter-spacing: -0.38px;
+  text-align: center;
+  margin-bottom: 2px;
+}
+
+.balancewait-join-btn {
+  display: flex;
+  width: 343px;
+  height: 309px;
+  padding: 58px 32px;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: var(--main_red, #FF2824);
+  border: none;
+  margin: 32px auto 0 auto;
+  cursor: pointer;
+}
+
+.balancewait-join-text {
+  color: var(--Grayscale0, #FFF);
+  text-align: center;
+  font-family: "PyeongChangPeace";
+  font-size: 40px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 150%; /* 60px */
+  letter-spacing: -0.76px;
+  white-space: pre-line;
+}
+
+.balancewait-join-overlay {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  top: 0;
+  left: 0;
+  width: 343px;
+  height: 309px;
+  border-radius: 8px;
+  background: var(--main_gradient, linear-gradient(99deg, #FFCD50 1.05%, #FF2824 98.95%));
+  box-shadow: 0 0 10px 0 #FF2824;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.balancewait-profile-icons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 110px;
+}
+
+.balancewait-profile-icon {
+  width: 42px;
+  height: 42px;
+  margin-left: -10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px #eee;
+}
+
+.balancewait-participants-link-wrap {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.balancewait-participants-link {
+  margin-top: 12px;
+  background: none;
+  border: none;
+  color: #000;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.304px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+

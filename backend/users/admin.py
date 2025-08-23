@@ -5,9 +5,9 @@ from .models import User, SocialAccount
 @admin.register(User)
 class CustomUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
-        ("Profile", {"fields": ("nickname",)}),
+        ("Profile", {"fields": ("name",)}),
     )
-    list_display = ("username", "email", "first_name", "last_name", "is_staff", "nickname")
+    list_display = ("username", "email", "first_name", "last_name", "is_staff", "name")
 
     
 @admin.register(SocialAccount)
