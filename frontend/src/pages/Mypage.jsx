@@ -8,9 +8,11 @@ import Vector from '../assets/Vector.svg';
 import Info from '../assets/info.svg';
 import RigthBlack from '../assets/right_black.svg';
 
-const API_BASE = import.meta.env.VITE_API_URL 
+import LoginRequest from "../components/LoginRequest"; // 로그인 모달 추가
+
+const API_BASE = import.meta.env.VITE_API_URL;
 const MAIN_URL = `${API_BASE}/api/mypage/main/`;
-const AUTH_SCHEME = 'JWT'; 
+const AUTH_SCHEME = 'JWT';
 
 // 저장된 토큰 구하기(여러 키 대응)
 const getToken = () =>
@@ -27,7 +29,9 @@ const getToken = () =>
         return o?.access || o?.token || o?.access_token || null;
       };
       return pick('auth') || pick('user') || '';
-    } catch { return ''; }
+    } catch {
+      return '';
+    }
   })();
 
 export default function Mypage() {
@@ -50,13 +54,26 @@ export default function Mypage() {
 
   const handleParticipationClick = () => navigate('/mypage/history');
 
+  // 로그인 체크
+  const token = getToken();
+  const isLoggedIn = !!token;
+
+  if (!isLoggedIn) {
+    return (
+      <LoginRequest 
+        isOpen={true} 
+        onClose={() => navigate('/')} 
+        redirectTo="/mypage"   // 로그인 성공 후 다시 돌아올 경로
+      />
+    );
+  }
+
   // 마운트 시 한 번만: /api/mypage/main/에서 프로필+요약 모두 세팅
   useEffect(() => {
     (async () => {
-      const token = getToken();
       if (!token) {
         console.warn('[Mypage] 토큰 없음(미로그인/만료)');
-        return; // 필요 시 navigate('/login')
+        return;
       }
 
       try {
@@ -87,24 +104,29 @@ export default function Mypage() {
         const t2 = data.college || data.department || '소속대학';
         const t3 = data.trait || data.keyword || '성격';
         const t4 = data.mbti || 'MBTI';
-        const list = Array.isArray(data.tags) && data.tags.length ? data.tags.slice(0, 4) : [t1, t2, t3, t4];
+        const list =
+          Array.isArray(data.tags) && data.tags.length
+            ? data.tags.slice(0, 4)
+            : [t1, t2, t3, t4];
         setTags(list.filter(Boolean).slice(0, 4));
 
         // 요약
         setPoints(Number(data.points ?? data.point ?? 0));
-        setParticipationCount(Number(data.participation_count ?? data.participated ?? 0));
+        setParticipationCount(
+          Number(data.participation_count ?? data.participated ?? 0)
+        );
         setWarningCount(Number(data.warning_count ?? data.warnings ?? 0));
       } catch (e) {
         console.error('유저 정보를 불러오는 중 오류:', e);
       }
     })();
-  }, []);
+  }, [token]);
 
   return (
     <>
-      <Header/>
+      <Header />
       <div className="profile-page">
-        {/* 1. 프로필 정보 섹션: 프로필 사진, 이름, 한 줄 소개, 태그 */}
+        {/* 1. 프로필 정보 섹션 */}
         <section className="profile-info">
           <div className="profile-photo-group">
             <div className="profile-image-wrap">
@@ -114,19 +136,24 @@ export default function Mypage() {
                 className="profile-image-svg"
               />
             </div>
-            <button className="edit-button" onClick={() => navigate('/mypage/edit')}>
+            <button
+              className="edit-button"
+              onClick={() => navigate('/mypage/edit')}
+            >
               수정하기
             </button>
           </div>
 
           <div className="profile-details">
-            <div className='name-and-intro-container'>
+            <div className="name-and-intro-container">
               <p className="profile-name">{username}</p>
               <p className="profile-perinfo">{intro}</p>
             </div>
             <div className="profile-tags">
               {tags.map((t, i) => (
-                <span className="profile-tag" key={i}>{t}</span>
+                <span className="profile-tag" key={i}>
+                  {t}
+                </span>
               ))}
             </div>
           </div>
@@ -146,7 +173,11 @@ export default function Mypage() {
           </div>
           {isTooltipVisible && (
             <div className="tooltip">
-              <p>포인트는 파티붐 서비스 활동을 통해<br />획득하거나 사용할 수 있는 재화입니다.</p>
+              <p>
+                포인트는 파티붐 서비스 활동을 통해
+                <br />
+                획득하거나 사용할 수 있는 재화입니다.
+              </p>
             </div>
           )}
         </section>
@@ -155,15 +186,20 @@ export default function Mypage() {
         <section className="profile-stats">
           <div className="stat-item" onClick={handleParticipationClick}>
             <p>참여횟수</p>
-            <p className='stat-value'>
-              {participationCount} <img src={RigthBlack} alt="right 이미지" className="right-image-svg"/>
+            <p className="stat-value">
+              {participationCount}{' '}
+              <img
+                src={RigthBlack}
+                alt="right 이미지"
+                className="right-image-svg"
+              />
             </p>
           </div>
           <div className="stat-item">
             <p>경고</p>
-            <p className='stat-value' onClick={onWarningTooltipClick}>
+            <p className="stat-value" onClick={onWarningTooltipClick}>
               {warningCount}
-              <img src={Info} alt="info 이미지" className="info-image-svg"/>
+              <img src={Info} alt="info 이미지" className="info-image-svg" />
             </p>
             {isWarningTooltipVisible && (
               <div className="tooltip warning-tooltip">
@@ -173,16 +209,16 @@ export default function Mypage() {
           </div>
         </section>
 
-        {/* 4. 설정 메뉴 목록 섹션 */}
-         <section className="profile-menu">
+        {/* 4. 설정 메뉴 섹션 */}
+        <section className="profile-menu">
           <ul className="menu-list">
             <li>도움말</li>
             <li>로그아웃</li>
-            <li className='delete_account'>계정 탈퇴</li>
+            <li className="delete_account">계정 탈퇴</li>
           </ul>
         </section>
       </div>
-      <NavBar/>
+      <NavBar />
     </>
   );
 }
