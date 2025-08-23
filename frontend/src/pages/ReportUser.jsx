@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './ReportUser.css';
-
 import LeftIcon  from '../assets/left_black.svg'; 
 import BelowArrow from '../assets/below_arrow.svg';    
 
@@ -26,15 +25,41 @@ export default function ReportUser() {
   const [reason, setReason] = useState('');
   const [detail, setDetail] = useState('');
 
-  const submit = () => {
+  const API_BASE = import.meta.env.VITE_API_BASE_URL;
+
+  const submit = async () => {
     if (!reason) return alert('신고 유형을 선택해 주세요.');
-    if (!detail.trim()) return alert('예) 파티 현장에서 불쾌한 신체접촉이 있었고, 프로필 상의 내용과 실제 개인 정보가 다릅니다. ');
-    // 신고 API 호출 
-    console.log('신고 전송', { targetUser: user, reason, detail });
-    alert('신고가 접수되었습니다.');
-    nav(-1);
+    if (!detail.trim()) return alert('신고 내용을 입력해 주세요.');
+    if (!user.partyId) return alert('신고가 발생한 파티 정보가 없습니다.');
+
+    try {
+      const response = await fetch(`${API_BASE}/api/mypage/reports/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${localStorage.getItem("access")}`, // JWT 토큰
+        },
+        body: JSON.stringify({
+          party: user.partyId,
+          reported_user: user.id,
+          category: REASON_MAP[reason] || 'OTHER',
+          content: detail,
+        }),
+      });
+
+      if (!response.ok) {
+        const err = await response.json();
+        console.error("신고 실패:", err);
+        return alert(err.detail || "신고 중 오류가 발생했습니다.");
+      }
+
+      alert("신고가 접수되었습니다.");
+      nav(-1);
+    } catch (err) {
+      console.error(err);
+      alert("신고 중 오류가 발생했습니다.");
+    }
   };
-  
 
   return (
     <div className="ru-page" onClick={() => setOpen(false)}>
