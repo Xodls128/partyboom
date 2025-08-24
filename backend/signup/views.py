@@ -110,7 +110,7 @@ class KakaoLoginAPIView(APIView):
         data = {
             "grant_type": "authorization_code",
             "client_id": settings.KAKAO_REST_API_KEY,
-            "redirect_uri": settings.KAKAO_REDIRECT_URI,  # 운영 환경 고정값
+            "redirect_uri": settings.KAKAO_ALLOWED_REDIRECT_URIS[0],  # 운영 환경 고정값
             "code": code,
         }
         if getattr(settings, "KAKAO_CLIENT_SECRET", ""):
