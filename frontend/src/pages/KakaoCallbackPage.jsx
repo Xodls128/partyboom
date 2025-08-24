@@ -19,18 +19,13 @@ function KakaoCallbackPage() {
           redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI,
         });
         
-        const { access, refresh, is_additional_info_provided } = res.data;
+        const { access, refresh } = res.data;
 
-        // localStorage에 직접 저장하는 대신, context의 login 함수 호출
+        // Context의 login 함수 호출 (토큰 저장 및 유저 정보 로드)
         await login(access, refresh);
 
-        // login 함수가 사용자 정보를 context에 저장하면,
-        // is_additional_info_provided 값에 따라 페이지 이동
-        if (is_additional_info_provided) {
-          navigate("/");
-        } else {
-          navigate("/mypage/extra");
-        }
+        // 로그인 성공 후 홈으로 이동
+        navigate("/");
       } catch (err) {
         console.error("카카오 로그인 처리 중 에러 발생:", err);
         alert("로그인에 실패했습니다. 문제가 지속되면 관리자에게 문의하세요.");
