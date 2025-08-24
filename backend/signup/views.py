@@ -16,6 +16,8 @@ from signup.serializers import (
     CustomTokenObtainPairSerializer,
 )
 from django.templatetags.static import static
+from django.db import IntegrityError
+
 
 User = get_user_model()
 
@@ -66,7 +68,6 @@ class UserSignupAPIView(APIView):
 
 
 class KakaoLoginAPIView(APIView):
-    """카카오 로그인 API"""
     permission_classes = [AllowAny]
 
     def post(self, request):
@@ -76,6 +77,7 @@ class KakaoLoginAPIView(APIView):
         redirect_uri = serializer.validated_data["redirect_uri"]
 
         try:
+            # 1) 토큰 교환
             token_url = "https://kauth.kakao.com/oauth/token"
             data = {
                 "grant_type": "authorization_code",
@@ -86,9 +88,9 @@ class KakaoLoginAPIView(APIView):
             }
             token_res = requests.post(token_url, data=data)
             token_res.raise_for_status()
-            kakao_token = token_res.json()
-            access_token = kakao_token.get("access_token")
+            access_token = token_res.json().get("access_token")
 
+            # 2) 사용자 정보
             profile_url = "https://kapi.kakao.com/v2/user/me"
             headers = {"Authorization": f"Bearer {access_token}"}
             profile_res = requests.get(profile_url, headers=headers)
@@ -97,10 +99,16 @@ class KakaoLoginAPIView(APIView):
 
             kakao_id = kakao_profile.get("id")
             kakao_account = kakao_profile.get("kakao_account", {})
-            profile = kakao_account.get("profile", {})
-            nickname = profile.get("nickname", f"user_{kakao_id}")
+            profile = kakao_account.get("profile")
+
+            if isinstance(profile, dict):
+                nickname = profile.get("nickname") or f"user_{kakao_id}"
+            else:
+                nickname = f"user_{kakao_id}"
+
             email = kakao_account.get("email")
 
+            # 3) User & SocialAccount 처리
             with transaction.atomic():
                 social_account = SocialAccount.objects.filter(
                     provider="kakao", social_id=kakao_id
@@ -115,12 +123,23 @@ class KakaoLoginAPIView(APIView):
                         name=nickname,
                         school="국민대",
                     )
-                    SocialAccount.objects.create(
-                        user=user, provider="kakao", social_id=kakao_id
-                    )
+                    try:
+                        SocialAccount.objects.create(
+                            user=user, provider="kakao", social_id=kakao_id
+                        )
+                    except IntegrityError:
+                        pass
 
+            # 4) 토큰 발급
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token
+
+            # 5) 응답
+            profile_image = (
+                user.profile_image.url
+                if getattr(user, "profile_image", None)
+                else "/static/icons/default_profile.png"
+            )
 
             out = {
                 "access": str(access),
@@ -129,11 +148,7 @@ class KakaoLoginAPIView(APIView):
                     "id": user.id,
                     "username": user.username,
                     "name": user.name or "",
-                    "profile_image": (
-                        user.profile_image.url
-                        if user.profile_image
-                        else static("icons/default_profile.png")
-                    ),
+                    "profile_image": profile_image,
                     "intro": user.intro or "",
                     "school": user.school or "",
                     "points": user.points,
