@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { useAuth } from '../context/AuthContext'; // useAuth 훅 임포트
+import { useAuth } from '../context/AuthContext';
 
 function KakaoCallbackPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { login } = useAuth(); // AuthContext의 login 함수 사용
+  const { login } = useAuth();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -18,23 +18,25 @@ function KakaoCallbackPage() {
           code: authCode,
           redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI,
         });
-        
-        const { access, refresh, is_additional_info_provided } = res.data;
 
-        // localStorage에 직접 저장하는 대신, context의 login 함수 호출
+        const { access, refresh } = res.data;
+
+        // 토큰 저장 및 유저 정보 로드
         await login(access, refresh);
 
-        // login 함수가 사용자 정보를 context에 저장하면,
-        // is_additional_info_provided 값에 따라 페이지 이동
-        if (is_additional_info_provided) {
-          navigate("/");
-        } else {
-          navigate("/mypage/extra");
-        }
+        // 로그인 성공 → 홈으로 이동
+        navigate("/");
       } catch (err) {
         console.error("카카오 로그인 처리 중 에러 발생:", err);
-        alert("로그인에 실패했습니다. 문제가 지속되면 관리자에게 문의하세요.");
-        navigate("/login");
+
+        // 응답은 왔지만 상태 코드가 200이 아닌 경우만 로그인 실패 처리
+        if (err.response && err.response.status >= 400) {
+          alert("로그인에 실패했습니다. 다시 시도해주세요.");
+          navigate("/login");
+        } else {
+          // 혹시 토큰은 저장됐는데 네트워크 에러만 발생한 경우 → 홈으로 보내기
+          navigate("/");
+        }
       }
     };
 
@@ -46,7 +48,7 @@ function KakaoCallbackPage() {
       alert("카카오 인증에 실패했습니다. 로그인 페이지로 돌아갑니다.");
       navigate("/login");
     }
-  }, [location, navigate, login]); // login 함수를 의존성 배열에 추가
+  }, [location, navigate, login]);
 
   return (
     <div>

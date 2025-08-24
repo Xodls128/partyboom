@@ -2,156 +2,90 @@
 
 :root{
   --frame-max: 393px;
-  --frame-w: min(100vw, var(--frame-max));  
+  --frame-w: min(100vw, var(--frame-max));
   --side-gap: 16px;
-  --cta-h: 130px;                          
+  --cta-h: 130px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* 페이지 프레임 */
 .party-info-container{
-  width: var(--frame-w);                   
+  position: relative;
+  width: var(--frame-w);
   margin: 0 auto;
   background:#fff;
   border-radius: 16px;
   overflow: hidden;
-  padding-bottom: calc(var(--cta-h) + env(safe-area-inset-bottom, 0px));  /* UPDATED */
 }
 
 /* 상단 파티 이미지 */
 .party-main-image{
-  width: 100%;                             
+  width: 100%;
   height: 279px;
   object-fit: cover;
   display: block;
 }
 
+/* 헤더 */
 .party-info-header{
-  position: fixed;                         
-  top: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: var(--frame-w);
-  padding-left: var(--side-gap);
-  z-index: 1000;
+  position: absolute;
+  width: auto;
+  transform: none;
+  padding-left: 0;
+  z-index: 10;
 }
-.back-button img{ 
-  width:17px; height:29px;
-}
+.back-button img{ width:17px; height:29px; }
 
 /* 타이틀 */
 .party-name::before{
   content: "#";
   font-family: Pretendard;
-  font-size:18px; 
-  font-weight:600; 
-  letter-spacing:-0.019em; 
-  line-height:1.5;
+  font-size:18px; font-weight:600; letter-spacing:-0.019em; line-height:1.5;
 }
 .party-name{
-  margin-top: 10px;
-  margin-left: 10px;
+  margin-top: 10px; margin-left: 10px;
   font-family: Pretendard;
-  font-size:18px; 
-  font-weight:600; 
-  letter-spacing:-0.019em; 
-  line-height:1.5;
+  font-size:18px; font-weight:600; letter-spacing:-0.019em; line-height:1.5;
 }
 
 /* 날짜,시간  */
 .party-info-card .party-info-row.meta-date{
-  display: flex; 
-  align-items:center; 
-  gap:10px;
-  margin-left: 10px;
+  display:flex; align-items:center; gap:10px; margin-left: 10px;
 }
-.meta-icon{ 
-  width:16.5px; 
-  height:18.33px; 
-}
+.meta-icon{ width:16.5px; height:18.33px; }
 .party-info-card .meta-date .info-value{
   font-family: Pretendard;
-  font-size:16px; 
-  font-weight:400; 
-  letter-spacing:-0.019em; 
-  line-height:1.5;
-  display: inline-block;
+  font-size:16px; font-weight:400; letter-spacing:-0.019em; line-height:1.5;
+  display:inline-block;
 }
 
 /* ‘장소, 참여인원’ 숨김 */
 .party-info-card .party-info-row:not(.meta-date){ display:none; }
 
 /* 태그  */
-.party-tags{ 
-  margin-top: 10px;
-  margin-left: 10px;
-}
-.tags-container{ 
-  display:flex; 
-  flex-wrap:wrap; 
-  gap:10px; 
-}
+.party-tags{ margin-top: 10px; margin-left: 10px; }
+.tags-container{ display:flex; flex-wrap:wrap; gap:10px; }
 .tag{
-  background:#F2F2F2;
-  border-radius: 8px;
-  width: 86px; 
-  height: 35px;
-  text-align: center;
-  font-family: Pretendard;
+  background:#F2F2F2; 
+  border-radius:8px; 
+  width:86px; 
+  height:35px; 
+  text-align:center;
+  font-family:Pretendard; 
   font-size:18px; 
   font-weight:600; 
   letter-spacing:-0.019em; 
-  line-height:1.5;             
-  color: #000000;
+  line-height:1.5; 
+  color:#000;
 }
 
-.party-map-wrap {
-  position: relative;   /* 배지를 이미지 위에 올리기 위해 필요 */
-  width: 100%;
-}
-.location-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  display: flex;
-  align-items: center;
-  background: white;
-  border-radius: 50px;
-  padding: 4px 10px;
-}
-
-.location-badge img {
-  width: 20px;
-  height: 20px;
-  margin-right: 6px;
-}
-
-.location-badge span {
-  font-family: Pretendard;
-  font-weight: 400;
-  font-size: 16px;
-  color: black;
-}
-/* 지도 영역 컨테이너 */
-.party-map { 
-  width: calc(100% - 24px);
-  margin: 0 auto 12px;
-}
-
-/* 지도 이미지 */
-.party-map-image {
-  width: 100%;
+/* 지도 틀 */
+.party-map{ width: calc(100% - 24px); margin: 0 auto 12px; }
+.map-placeholder{
+  width: 100%;            
   height: 186px;
   border-radius: 8px;
-  object-fit: cover;   /* 이미지를 꽉 채우게 */
-  display: block;
-  margin-top: 12px;
-}
-
-/* 지도 placeholder */
-.map-placeholder {
-  width: 100%;
-  height: 186px;
-  border-radius: 8px;
+  border: 0;
   background: linear-gradient(180deg,#fafafa, #f6f6f6);
   position: relative;
   overflow: hidden;
@@ -159,129 +93,72 @@
 }
 .map-placeholder::after {
   content: "지도 이미지 넣고 변경";
-  position: absolute; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  color: #777; font-size: 14px; font-weight: 600;
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  color:#777; font-size:14px; font-weight:600;
 }
 
 
 /* 설명 */
-.party-description{ 
-  width: calc(100% - 24px); 
-  margin: 0 auto 16px; 
-}
-.party-description p{ 
-  font-family: Pretendard;
-  font-size:16px; 
-  font-weight:400; 
-  letter-spacing:-0.019em; 
-  line-height:1.5;
-  color:#000000; 
+.party-description{ width: calc(100% - 24px); margin: 0 auto 16px; }
+.party-description p{
+  font-family:Pretendard; font-size:16px; font-weight:400; letter-spacing:-0.019em; line-height:1.5; color:#000;
 }
 
 /* 참석자 섹션 */
-.party-attendees{ 
-  width: calc(100% - 24px);
-  margin: 0 auto 16px; 
-}
-.attendees-grid{ 
-  display:flex; gap:12px; 
-  flex-wrap:wrap; 
-}
-.attendee{ 
-  width:60px; 
-  display:flex; 
-  flex-direction:column; 
-  align-items:center; 
-}
+.party-attendees{ width: calc(100% - 24px); margin: 0 auto 16px; }
+.attendees-grid{ display:flex; gap:12px; flex-wrap:wrap; }
+.attendee{ width:60px; display:flex; flex-direction:column; align-items:center; }
 .attendee-img{
-  width:42px; 
-  height:42px; 
-  border-radius:50%;
-  object-fit:cover;
-  margin-bottom:4px; 
-  background:#fff; 
-  box-shadow:0 0 0 1px #eee;
+  width:42px; height:42px; border-radius:50%; object-fit:cover;
+  margin-bottom:4px; background:#fff; box-shadow:0 0 0 1px #eee;
 }
 .attendee-name{ font-size:12px; color:#333; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* 하단 인원/프로필 + 참가신청 바*/
-.party-cta {
-  position: fixed;                           
-  left: 50%; 
+/* 하단 참가신청 바 (항상 보이기) */
+.party-cta{
+  position: relative;  
+  left: 50%;
   transform: translateX(-50%);
-  bottom: calc(env(safe-area-inset-bottom, 0px));
-  width: 392px;                   
+  width: var(--frame-w);
   height: var(--cta-h);
-  margin: 0 ;
   background: #fff;
-  z-index: 1000;
+  margin: 0;
+  z-index: 9999;                
 }
 
+
 .partyinfo-attendees-summary{
-  display:flex; 
-  align-items:center; 
-  justify-content:space-between;
-  margin-bottom:10px;
+  display:flex; align-items:center; justify-content:space-between;
+  padding: 10px var(--side-gap) 0;
+  margin: 0;
 }
-.profile-icons{ 
-  display:flex; 
-  align-items:center; 
-  transform: translateX(-150px);
-  margin-top: 15px; 
-}
+.profile-icons{ display:flex; align-items:center; margin-top: 15px; }
 .profile-icon{
-  width:35px; 
-  height:35px; 
-  border-radius:50%; 
-  object-fit:cover;
-  margin-left:-8px;
-  position: relative;
+  width:35px; height:35px; border-radius:50%; object-fit:cover;
+  margin-left:-8px; position:relative;
 }
 .profile-icon:first-child{ margin-left:0; }
 
 .join-button{
-  width: calc(100% - 2 * var(--side-gap));  /* 프레임에 맞춤 */
+  width: calc(100% - 2 * var(--side-gap));
   max-width: 354px;
-  height:42px; 
-  border:0; 
-  border-radius:8px;
-  
+  height: 42px;
+  border: 0; border-radius: 8px;
   font-family: Pretendard;
-  font-size:20px; 
-  font-weight:600; 
-  letter-spacing:-0.019em; 
-  line-height:1.5;
+  font-size: 20px; font-weight: 600;
+  letter-spacing: -0.019em; line-height: 1.5;
   color: #FFFFFF;
   background: linear-gradient(90deg, #FFCD50 0%, #FF2824 100%);
-  cursor:pointer;
-  display:block;
-  margin: 25px auto 0;   
+  cursor: pointer;
+  display: block;
+  margin: 14px auto calc(12px + var(--safe-bottom)); /* 안전영역 고려 */
 }
 .join-button:active{ transform: translateY(1px); }
 
-/* 참석자 요약 줄 좌측: 원형 아이콘 + 인원수 */
+/* 좌측 체크 + 인원수 */
 .partyinfo-left{
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 20px; 
-  margin-left: 8px
+  display:flex; align-items:center; gap:8px;
+  margin: 8px 0 0 var(--side-gap);
 }
-.count-icon{
-  width: 18.33px;
-  height: 18.33px;
-  margin-left: 20px;
-  display: inline-block;
-  transform: translateY(1px); 
-}
-
-/* 인원수 텍스트 */
-.partyinfo-personText{
-  font-family: Pretendard;
-  font-size:16px; 
-  font-weight:400;               
-  letter-spacing:-0.019em; 
-  line-height:1.5;
-  color: #000000;
-}
+.count-icon{ width:18.33px; height:18.33px; }
