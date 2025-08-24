@@ -116,15 +116,17 @@
 .attendee-name{ font-size:12px; color:#333; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* 하단 참가신청 바 (항상 보이기) */
-.party-cta{
-  position: relative;  
+.party-cta {
+  position: fixed; /* 페이지 하단에 고정 */
+  bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   width: var(--frame-w);
   height: var(--cta-h);
   background: #fff;
-  margin: 0;
-  z-index: 9999;                
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1); /* 살짝 그림자 */
+  z-index: 1000;
+  padding-bottom: var(--safe-bottom);
 }
 
 
@@ -162,3 +164,17 @@
   margin: 8px 0 0 var(--side-gap);
 }
 .count-icon{ width:18.33px; height:18.33px; }
+
+/* 참가 버튼 - disabled 상태 (모집마감) */
+.join-button:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* 참가 버튼 - 신청 중 상태 */
+.join-button.joining {
+  background: linear-gradient(90deg, #ccc 0%, #aaa 100%);
+  cursor: wait;
+}
