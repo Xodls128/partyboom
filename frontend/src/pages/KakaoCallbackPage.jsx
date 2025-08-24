@@ -38,8 +38,8 @@ function KakaoCallbackPage() {
         })
         .then(data => {
           if (data.access && data.refresh) {
-            localStorage.setItem('accessToken', data.access);
-            localStorage.setItem('refreshToken', data.refresh);
+            localStorage.setItem('access', data.access);
+            localStorage.setItem('refresh', data.refresh);
 
             setMessage('카카오 로그인 성공!');
 
