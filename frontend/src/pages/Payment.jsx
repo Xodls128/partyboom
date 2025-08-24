@@ -56,17 +56,9 @@ export default function Payment() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/reserve/pay/${participationId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access")}`
-        },
-        body: JSON.stringify({ payment_method: "point" })
+      const { data } = await api.post(`/api/reserve/pay/${participationId}/`, {
+        payment_method: "point",
       });
-
-      if (!res.ok) throw new Error("결제 실패");
-      const data = await res.json();
 
       alert("결제 완료! 사용 포인트: " + data.amount);
       setPoints(data.remaining_points); // 응답으로 받은 남은 포인트 갱신
