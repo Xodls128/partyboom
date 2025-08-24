@@ -90,9 +90,12 @@ export default function Partyinfo() {
       </header>
 
       <main className="party-info-main">
-        {party.place_photo && (
-          <img src={party.place_photo || DefaultPartyImage} alt={title} className="party-main-image" />
-        )}
+        <img 
+          src={place_photo || DefaultPartyImage} 
+          alt={title} 
+          className="party-main-image" 
+        />
+        
         <h1 className="party-name">{title}</h1>
         
         <div className="party-info-card">
