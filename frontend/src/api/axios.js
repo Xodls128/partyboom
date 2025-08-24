@@ -5,7 +5,7 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem("access");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -22,14 +22,14 @@ api.interceptors.response.use(
       originalRequest._retry = true;
 
       try {
-        const refreshToken = localStorage.getItem("refreshToken");
+        const refreshToken = localStorage.getItem("refresh");
         const { data } = await axios.post(
           `${import.meta.env.VITE_API_URL}/api/signup/auth/refresh/`,
           { refresh: refreshToken }
         );
 
         // 새 accessToken 저장
-        localStorage.setItem("accessToken", data.access);
+        localStorage.setItem("access", data.access);
 
         // 실패했던 요청 다시 보내기
         api.defaults.headers.Authorization = `Bearer ${data.access}`;
@@ -37,8 +37,8 @@ api.interceptors.response.use(
         return api(originalRequest);
       } catch (refreshError) {
         // refresh도 만료 → 로그아웃 처리
-        localStorage.removeItem("accessToken");
-        localStorage.removeItem("refreshToken");
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
         localStorage.removeItem("user");
         window.location.href = "/login";
       }
