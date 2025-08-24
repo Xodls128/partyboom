@@ -14,7 +14,7 @@ function KakaoCallbackPage() {
 
     const handleKakaoLogin = async (authCode) => {
       try {
-        const res = await api.post('/api/signup/kakao/callback/', {
+        const res = await api.post('/api/signup/auth/kakao/', {
           code: authCode,
           redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI,
         });
