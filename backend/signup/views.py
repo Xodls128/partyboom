@@ -84,20 +84,6 @@ class KakaoLoginAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
-        if not settings.ENABLE_AUTH:
-            user = User.objects.first()
-            refresh = RefreshToken.for_user(user)
-            access = refresh.access_token
-            return Response({
-                "access": str(access),
-                "refresh": str(refresh),
-                "user": {
-                    "id": user.id,
-                    "email": user.email,
-                    "name": user.name,
-                }
-            }, status=200)
-
         in_ser = KakaoLoginRequestSerializer(data=request.data)
         in_ser.is_valid(raise_exception=True)
         code = in_ser.validated_data["code"]
@@ -170,33 +156,43 @@ class KakaoLoginAPIView(APIView):
                         defaults={
                             "email": email or "",
                             "name": nickname,
-                            "points": 10000,  # 신규 가입자만 기본 포인트 지급
+                            "points": 10000,
                         }
                     )
                     if created:
                         user.set_unusable_password()
                         user.save()
+                        print(f"[KAKAO LOGIN] ✅ 새 유저 생성됨: id={user.id}, username={user.username}")
+                    else:
+                        print(f"[KAKAO LOGIN] ⚠️ 이미 존재하는 유저 불러옴: id={user.id}, username={user.username}")
                 else:
-                    # 기존 유저 → 포인트는 그대로 두고, 닉네임만 보정
+                    # 기존 유저 → 포인트 유지, 닉네임만 보정
                     if not user.name and nickname:
                         user.name = nickname
                         user.save()
+                        print(f"[KAKAO LOGIN] ℹ️ 기존 유저 닉네임 업데이트: id={user.id}, name={user.name}")
 
                 # 소셜 계정 연결
-                SocialAccount.objects.get_or_create(
+                sa, sa_created = SocialAccount.objects.get_or_create(
                     user=user, provider="kakao", social_id=str(kakao_id)
                 )
+                if sa_created:
+                    print(f"[KAKAO LOGIN] ✅ 소셜 계정 연결됨: kakao_id={kakao_id}, user_id={user.id}")
+                else:
+                    print(f"[KAKAO LOGIN] ℹ️ 기존 소셜 계정 사용: kakao_id={kakao_id}, user_id={user.id}")
 
-            if not user:
+            # ✅ 안전장치: 실제 DB에 유저가 존재하는지 확인
+            if not user or not User.objects.filter(pk=user.pk).exists():
+                print("[KAKAO LOGIN] ❌ User 생성 실패 - DB에 없음")
                 return Response({"detail": "User creation failed"}, status=500)
 
         except Exception as e:
             import traceback
-            print("DEBUG >>> user upsert exception:", e)
+            print("KAKAO LOGIN ERROR >>>", e)
             print(traceback.format_exc())
             return Response({"detail": f"user upsert error: {e}"}, status=500)
 
-        # 4) issue JWT
+        # 4) issue JWT (유저가 확실히 DB에 있는 경우에만)
         refresh = RefreshToken.for_user(user)
         access = refresh.access_token
 
@@ -205,10 +201,11 @@ class KakaoLoginAPIView(APIView):
             "refresh": str(refresh),
             "user": {
                 "id": user.id,
-                "username": user.username,  # 카카오 닉네임
+                "username": user.username,
                 "name": user.name,
                 "email": user.email,
                 "points": user.points,
             }
         }
+        print(f"[KAKAO LOGIN] 🎟️ JWT 발급 완료: user_id={user.id}, access={access}")
         return Response(TokenPairResponseSerializer(out).data, status=200)
