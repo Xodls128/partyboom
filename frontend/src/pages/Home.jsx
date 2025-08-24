@@ -1,5 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import api from "../api/axios"; 
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 import Party from '../assets/party.jpg';
@@ -10,100 +11,76 @@ import Location from '../assets/location.svg';
 import LoginRequest from "../components/LoginRequest";
 import './home.css';
 
-const API_BASE = import.meta.env.VITE_API_URL;
-
-async function safeGetErrorText(res) {
-  try {
-    const data = await res.clone().json();
-    return data.detail || Object.values(data).join('\n');
-  } catch {
-    return await res.text();
-  }
-}
-
 export default function Home() {
   const [partyList, setPartyList] = useState([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [username, setUsername] = useState("게스트");
-  const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
+  const [isLoading, setIsLoading] = useState(false); 
   const navigate = useNavigate();
   const location = useLocation();
 
+  // 유저 정보 가져오기
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("access");
-        if (!token) return;
-        const response = await fetch(`${API_BASE}/api/user/me/`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setUsername(data.nickname || data.username || "게스트");
-        }
+        // ✅ 엔드포인트 수정: /api/mypage/
+        const { data } = await api.get("/api/mypage/");
+        setUsername(data.name || "게스트");
       } catch (error) {
-        console.error("유저 정보를 불러오는 중 오류:", error);
+        console.error("유저 정보를 불러오는 중 오류:", error.response?.data || error.message);
       }
     };
     fetchUser();
   }, []);
 
+  // 파티 목록 가져오기
   useEffect(() => {
     const fetchParties = async () => {
       try {
-        const response = await fetch(`${API_BASE}/api/homemap/home/`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
+        const { data } = await api.get("/api/homemap/home/");
         const formatted = data.map(p => ({
           id: p.id,
           image: p.place_photo || Party,
           name: "#" + p.title,
-          date: new Date(p.start_time).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }),
+          date: new Date(p.start_time).toLocaleString("ko-KR", { 
+            month: "2-digit", 
+            day: "2-digit", 
+            hour: "2-digit", 
+            minute: "2-digit" 
+          }),
           person: `${p.applied_count}/${p.max_participants}`,
           location: p.place_name,
           tags: p.tags ?? [],
         }));
         setPartyList(formatted);
       } catch (error) {
-        console.error("파티 데이터를 불러오는 중 오류 발생:", error);
+        console.error("파티 데이터를 불러오는 중 오류 발생:", error.response?.data || error.message);
       }
     };
     fetchParties();
   }, []);
 
-  // ---로딩 상태 처리가 추가된 handleApply 함수---
+  // 참가 신청
   const handleApply = async (partyId) => {
-    if (isLoading) return; // 이미 로딩 중이면 중복 실행 방지
+    if (isLoading) return;
 
-    const token = localStorage.getItem("access");
+    const token = localStorage.getItem("access"); // ✅ access 그대로 사용
     if (!token) {
       setShowLoginModal(true);
       return;
     }
 
-    setIsLoading(true); // 로딩 시작
+    setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/reserve/join/${partyId}/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) {
-        const errorMsg = await safeGetErrorText(res);
-        throw new Error(errorMsg || "참가 신청에 실패했습니다.");
-      }
-
-      const data = await res.json();
+      const { data } = await api.post(`/api/reserve/join/${partyId}/`);
       navigate("/payment", { state: { participationId: data.id } });
-
     } catch (err) {
-      console.error(err);
-      alert(err.message);
+      console.error("참가 신청 실패:", err.response?.data || err.message);
+      alert(err.response?.data?.detail || "참가 신청에 실패했습니다.");
     } finally {
-      setIsLoading(false); // 로딩 종료 (성공/실패 무관)
+      setIsLoading(false);
     }
   };
-  
 
   return (
     <>
@@ -140,7 +117,7 @@ export default function Home() {
           <button
             className="apply-btn"
             onClick={() => handleApply(party.id)}
-            disabled={isLoading} // 로딩 중일 때 비활성화
+            disabled={isLoading}
             aria-label="참가하기"
           >
             {isLoading ? (

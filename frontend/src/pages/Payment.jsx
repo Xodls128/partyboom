@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import api from "../api/axios";
 import Back from '../assets/left_black.svg';
 import './payment.css';
 
 import LoginRequest from "../components/LoginRequest"; // 로그인 모달 임포트
-
-const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Payment() {
   const navigate = useNavigate();
@@ -15,7 +14,7 @@ export default function Payment() {
   const [paymentMethod, setPaymentMethod] = useState('point'); // 현재는 포인트만 사용
   const [points, setPoints] = useState(0);
   const [agree, setAgree] = useState(false);
-
+  
   // 로그인 상태 체크
   const token = localStorage.getItem("access");
   const isLoggedIn = !!token;
@@ -30,6 +29,8 @@ export default function Payment() {
     );
   }
 
+  const [deposit, setDeposit] = useState(null);
+
   // 페이지 진입 시 participationId 유효성 검사 및 유저 정보 로딩
   useEffect(() => {
     if (!participationId) {
@@ -40,18 +41,15 @@ export default function Payment() {
 
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/users/me/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("access")}` }
-        });
-        if (!res.ok) throw new Error("유저 정보 불러오기 실패");
-        const data = await res.json();
-        setPoints(data.points);
-      } catch (err) {
-        console.error(err);
-      }
-    };
-    fetchUser();
-  }, [participationId, navigate]);
+      const { data } = await api.get(`/api/reserve/participation/${participationId}/`);
+      setPoints(data.user.points);
+      setDeposit(data.party?.deposit ?? 0); // party.deposit 값을 저장
+    } catch (err) {
+      console.error("예약 정보 불러오기 실패:", err.response?.data || err.message);
+    }
+  };
+  fetchUser();
+}, [participationId, navigate]);
 
   // 결제 처리
   const handlePayment = async () => {
@@ -61,24 +59,16 @@ export default function Payment() {
     }
 
     try {
-      const res = await fetch(`${API_BASE}/api/reserve/pay/${participationId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("access")}`
-        },
-        body: JSON.stringify({ payment_method: "point" })
+      const { data } = await api.post(`/api/reserve/pay/${participationId}/`, {
+        payment_method: "point",
       });
-
-      if (!res.ok) throw new Error("결제 실패");
-      const data = await res.json();
 
       alert("결제 완료! 사용 포인트: " + data.amount);
       setPoints(data.remaining_points); // 응답으로 받은 남은 포인트 갱신
       navigate("/paymentfinish"); // 결제 완료 후 이동
     } catch (err) {
-      console.error(err);
-      alert("결제 중 오류가 발생했습니다.");
+      console.error("결제 실패:", err.response?.data || err.message);
+      alert(err.response?.data?.detail || "결제 중 오류가 발생했습니다.");
     }
   };
 
@@ -102,12 +92,16 @@ export default function Payment() {
         </div>
         <div className="payment-info-row">
           <span className="payment-info-label">예약금</span>
-          <span className="payment-info-value">2000p</span>
+          <span className="payment-info-value">
+            {deposit !== null ? `${deposit}p` : "로딩중..."}
+          </span>
         </div>
         <div className="payment-divider"></div>
         <div className="payment-info-total">
           <span className="payment-info-label">합계</span>
-          <span className="payment-info-value">2000p</span>
+          <span className="payment-info-value">
+            {deposit !== null ? `${deposit}p` : "로딩중..."}
+          </span>
         </div>
       </div>
 
@@ -142,7 +136,7 @@ export default function Payment() {
           />
           <span className="payment-agree">환불 정책을 확인하였으며 이에 동의합니다.</span>
         </div>
-        <button className="payment-btn" onClick={handlePayment}>
+        <button className="payment-btn" onClick={handlePayment} disabled={!agree}>
           결제하기
         </button>
       </div>

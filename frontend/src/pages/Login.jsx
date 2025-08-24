@@ -5,6 +5,7 @@ import LeftIcon from '../assets/left_black.svg';
 import EyeIcon from '../assets/visibility.svg';
 import BombMark from '../assets/boomb.svg';
 import Wordmark from '../assets/logo.svg';
+import api from "../api/axios"; // axios 인스턴스 사용
 
 export default function Login(){
   const nav = useNavigate();
@@ -22,27 +23,16 @@ export default function Login(){
 
     try {
       setLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/signup/auth/login/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: id,   // 백엔드 로그인 필드는 username/password
-          password: pw,
-        }),
+      // axios로 로그인 요청
+      const { data } = await api.post("/api/signup/auth/login/", {
+        username: id,   // 백엔드 로그인 필드는 username/password
+        password: pw,
       });
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.detail || "로그인 실패");
-      }
-
-      const data = await res.json();
       console.log("로그인 성공:", data);
 
       // 토큰과 유저정보를 localStorage에 저장
-      localStorage.setItem("access", data.access);
+      localStorage.setItem("access", data.access); // 토큰 변수명 통일
       localStorage.setItem("refresh", data.refresh);
       localStorage.setItem("user", JSON.stringify(data.user));
 
