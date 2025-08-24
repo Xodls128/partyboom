@@ -70,3 +70,28 @@ def create_new_party_notice(party_id):
             notice_type=Notice.PARTY_NEW,
             message=f"새로운 파티가 열렸어요! '{party.title}'에서 새로운 친구들을 만나보세요."
         )
+
+# 4. 파티 신청/취소 알림
+@shared_task
+def create_participation_status_notice(participation_id, notice_type):
+    try:
+        participation = Participation.objects.select_related("party", "user").get(id=participation_id)
+    except Participation.DoesNotExist:
+        return
+
+    party_title = participation.party.title
+    user = participation.user
+    
+    message = ""
+    if notice_type == Notice.PARTY_APPLIED:
+        message = f"'{party_title}' 파티에 신청이 완료되었습니다."
+    elif notice_type == Notice.PARTY_CANCELED:
+        message = f"'{party_title}' 파티 신청이 취소되었습니다."
+
+    if message:
+        Notice.objects.create(
+            user=user,
+            target_party=participation.party,
+            notice_type=notice_type,
+            message=message
+        )

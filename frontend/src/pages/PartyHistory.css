@@ -1,0 +1,40 @@
+.history-page {
+  padding: 20px;
+}
+
+/* 상단 헤더 스타일 */
+.history-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 20px;
+  justify-content: center;
+  position: relative;
+}
+.back-button {
+  position: absolute;
+  left: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.back-icon {
+  width: 17px;
+  height: 29px;
+}
+.header-title {
+  font-family: Pretendard;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.019em;
+  color: #000000;
+  margin: 0;
+}
+
+/* 참여 내역 리스트 스타일 */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}

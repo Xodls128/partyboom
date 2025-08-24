@@ -3,7 +3,15 @@ html, body, #root {
   height: 100%;
   margin: 0;
 }
-body { overflow: hidden; }
+
+/* 수정: body에 safe area 패딩 적용 */
+body { 
+  overflow: hidden; 
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+}
 
 /* 화면 중앙에 프레임 고정 */
 .viewport-lock {
@@ -11,13 +19,22 @@ body { overflow: hidden; }
   inset: 0;
   display: grid;
   place-items: center;
-  background: #fff; 
+  background: #fff;  
+  /* 📍 추가: 화면 중앙 정렬을 위한 최소 높이 설정 */
+  min-height: 100vh; /* 브라우저 뷰포트 높이 */
 }
 
-/* 프레임을 393×852px로 고정 */
+/* 프레임을 유동적으로 조절 */
 .phone {
-  width: 393px;
-  height: 852px;
+  /* 📍 수정: 너비를 유동적으로 (100%), 최대 너비는 393px로 고정 */
+  width: 100%; 
+  max-width: 393px; 
+  /* 📍 수정: 높이를 100dvh로 설정하여 동적 뷰포트 높이 사용 */
+  height: 100dvh; 
+  max-height: 852px; /* 📍 수정: 최대 높이 설정 */
+
+  /* 📍 추가: 화면 비율을 유지하며 크기를 조절합니다. (선택 사항, 필요시 주석 해제) */
+  /* aspect-ratio: 393 / 852; */ 
 
   background: #fff;
   border: 1px solid rgba(0,0,0,0.12);

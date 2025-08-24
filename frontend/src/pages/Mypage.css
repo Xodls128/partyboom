@@ -1,0 +1,274 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+:root {
+  --header-h: 101px;   
+}
+
+/* 전체 페이지 컨테이너 */
+.profile-page {
+  padding: 20px;
+  padding-top: calc(20px + var(--header-h));   
+}
+
+/* 1. 프로필 정보 섹션 스타일 */
+.profile-info {
+  display: flex;         
+  align-items: center;  
+  gap: 19px;            
+  width: 356px;
+  height: 155px;
+}
+.profile-photo-group {
+  display: flex;
+  flex-direction: column;
+  width: 113px;
+  height: 155px;
+  gap: 12px;  
+}
+
+.profile-image-wrap {
+  width: 113px;
+  height: 113px;
+  border-radius: 50%;    
+  overflow: hidden;      
+}
+.profile-image-svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; 
+}
+
+.edit-button {   /*수정하기버튼*/
+  padding: 8px 10px;
+  border: 0px ;
+  background-color: #7B7B7B;
+  border-radius: 8px;
+  cursor: pointer;
+  width: 113px;
+  height: 30px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  font-family: Pretendard; 
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.019em;
+  color: #FFFFFF;
+}
+
+.profile-details {
+    width: 224px;
+    height: 155px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+.name-and-intro-container{
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.profile-name { /*9100*/
+  font-family: Pretendard;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 150%;
+  letter-spacing: -0.019em;
+  color: #000000;
+
+  width: 224px;
+  height: 27px;
+  margin: 0;
+  padding: 0;
+}
+.profile-perinfo { /*파티붐 화이팅입니다*/
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.019em;
+  color: #000000;
+
+  width: 224px;
+  height: 24px; 
+  margin: 0;
+  padding: 0;
+}
+
+.profile-tags {
+  width: 224px; 
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.profile-tag {
+  background-color: #FFCD50; 
+  padding: 4px 12px;
+  border-radius: 4px;
+  white-space: nowrap;  /* 태그 내부 텍스트 줄바꿈 금지 */
+  margin-bottom: 2px;
+
+  font-family: Pretendard; 
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: -0.019em;
+  color: #000000;
+}
+
+/*2. 수정하기 버튼 및 포인트 섹션 스타일 */
+.point-section {
+  position: relative;
+  display: flex;
+  justify-content: space-between; /* '포인트'와 '10,000P i'를 양 끝으로 정렬 */
+  align-items: center;
+  background-color: #F2F2F2; 
+  border-radius: 8px;
+  width: 356px;
+  height: 48px;
+  margin-top: 20px;
+}
+
+.tooltip {
+  position: absolute;
+  bottom: -60px; 
+  right: 120px;
+  transform: translateX(50%);
+  
+  width: 200px; 
+  background-color: #F2F2F2;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10; /* 다른 요소 위에 표시되도록 z-index 설정 */
+}
+.point-section .tooltip p {
+  margin: 0;
+  font-family: Pretendard;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.019em;
+  color: #7B7B7B;
+}
+
+.point-value-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.info-image-svg {
+  width: 20px;
+  height: 20px;
+  object-fit: cover; 
+  margin-right: 10px;
+}
+
+.point-section p {
+  margin: 0;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 600; 
+  line-height: 150%;
+  letter-spacing: -0.019em;
+  color: #000000;
+  text-indent: 10px;
+}
+
+/* 3. 참여 횟수 및 경고 섹션 스타일 */
+.profile-stats {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+  width: 356px;
+}
+.stat-item {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #F2F2F2; 
+  flex: 1;              
+  height: 48px;
+  border-radius: 8px;
+}
+
+.stat-item p {
+  margin: 0;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 600; 
+  line-height: 150%;
+  letter-spacing: -0.019em;
+  color: #000000;
+  text-indent: 10px;
+}
+.stat-value {
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 600; 
+  line-height: 150%;
+  letter-spacing: -0.019em;
+  color: #000000;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.right-image-svg {
+  width: 8px;
+  height: 14px;
+  object-fit: cover; 
+  margin-right: 10px;
+}
+
+.warning-tooltip {
+  position: absolute;
+  bottom: -55px; /* 아이콘 위쪽에 위치하도록 조정 */
+  right: 120px;
+  transform: translateX(50%);
+  
+  width: 200px; 
+  background-color: #F2F2F2;
+  padding: 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  z-index: 10;
+}
+.stat-item .warning-tooltip p {
+  margin: 0;
+  font-family: Pretendard;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.019em;
+  color: #7B7B7B;
+}
+
+
+/* 4. 설정 메뉴 목록 섹션 스타일 */
+.profile-menu {
+  margin-top: 20px;
+}
+.menu-list {
+  list-style: none; 
+  padding: 0;
+  margin: 0;
+}
+.menu-list .delete_account{
+  color: #A7A7A7
+}
+.menu-list li {
+  padding: 12px 0;
+  border-bottom: 1px solid #F2F2F2;
+
+  font-family: Pretendard;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 150%;
+  letter-spacing: -0.019em;
+  color: #000000;
+}
+;

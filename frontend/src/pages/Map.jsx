@@ -6,6 +6,8 @@ import PartySmallImages from '../assets/partysmall.jpg';
 import Header from '../components/Header.jsx';
 import NavBar from '../components/NavBar.jsx';
 import { useNavigate } from 'react-router-dom'; // useNavigate 추가
+import api from "../api/axios";
+
 
 export default function Map() {
   // useRef - 리렌더 없이 값 기억 
@@ -47,14 +49,9 @@ export default function Map() {
   useEffect(() => {
     const fetchParties = async () => {
       try {
-        // 백엔드 API 엔드포인트 (로컬 개발 환경)
-        const response = await fetch('http://127.0.0.1:8000/api/detailview/parties/');
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        // 백엔드 API 엔드포인트 (배포환경에 맞게 수정)
+        const { data } = await api.get("/api/detailview/parties/");
         
-        // API 데이터를 프론트엔드 컴포넌트 props에 맞게 변환
         const formattedParties = data.map(p => ({
           id: p.id,
           eventTitle: p.title,
@@ -62,15 +59,14 @@ export default function Map() {
           placeName: p.place_name,
           attendees: p.applied_count,
           capacity: p.max_participants,
-          placeImageUrl: p.place_photo || PartySmallImages, // 백엔드 이미지가 없으면 기본 이미지 사용
+          placeImageUrl: p.place_photo || PartySmallImages, 
           place_x_norm: p.place_x_norm,   
           place_y_norm: p.place_y_norm,
         }));
 
         setParties(formattedParties);
       } catch (error) {
-        console.error("Failed to fetch parties:", error);
-        // 에러 발생 시 사용자에게 알릴 수 있는 UI 처리 (옵션)
+        console.error("파티 데이터를 불러오는 중 오류:", error.response?.data || error.message);
       }
     };
 
@@ -134,7 +130,10 @@ export default function Map() {
 
   // 포인터 이벤트 핸들러 (마우스/터치 공통)
   const onPointer = (e) => {
-    // 이벤트가 지도까지 전파되는 것을 막아 드래그 기능 충돌 방지
+    // 버튼이나 내부 interactive 요소라면 막지 않음
+    if (e.target.closest("button") || e.target.closest("a") || e.target.closest("input")) {
+      return;
+    }
     e.stopPropagation();
 
     const scrollEl = sheetScrollRef.current; // 스크롤 가능한 요소 참조
@@ -268,7 +267,7 @@ export default function Map() {
         className="sheet-scroll"
         // 접혀있을 땐 시트만 드래그해야 하므로 내부 상호작용 차단
         style={{ 
-          pointerEvents: (heightPct >= MAX_PCT) ? 'auto' : 'none',
+          pointerEvents: 'auto',
           touchAction: 'none',
         }}
       >
@@ -278,7 +277,7 @@ export default function Map() {
             <li key={p.id}>
               <PartySmall
                 {...p}
-                onClick={() => navigate(`/parties/${p.id}`)} // 상세보기 버튼 클릭 시 이동
+                onClick={() => window.location.href = `/partyinfo/${p.id}`}
               />
             </li>
           ))}
