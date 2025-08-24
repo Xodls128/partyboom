@@ -42,6 +42,20 @@ export default function Partyinfo() {
     fetchPartyDetails();
   }, [partyId]);
 
+  // 참여자 목록 가져오기
+    useEffect(() => {
+    const fetchParticipations = async () => {
+      try {
+        const { data } = await api.get(`/api/reserve/participations/${partyId}/`);
+        setParticipations(data);
+      } catch (err) {
+        console.error("참석자 불러오기 실패:", err.response?.data || err.message);
+      }
+    };
+    fetchParticipations();
+  }, [partyId]);
+
+
   const handleJoin = async () => {
     if (isLoading) return; // 중복 실행 방지
 
