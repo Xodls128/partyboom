@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions
+from detailview.models import Participation
 from rest_framework.response import Response
-from .serializers import ReserveJoinSerializer, ParticipationSerializer, ReservePaySerializer, PaymentSerializer
+from .serializers import ReserveJoinSerializer, ParticipationSerializer, ReservePaySerializer, PaymentSerializer, ParticipationDetailSerializer
 
 class ReserveJoinView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
@@ -12,6 +13,12 @@ class ReserveJoinView(generics.CreateAPIView):
         serializer.is_valid(raise_exception=True)
         participation = serializer.save()
         return Response(ParticipationSerializer(participation).data)
+
+class ParticipationDetailView(generics.RetrieveAPIView):
+    queryset = Participation.objects.select_related("user", "party")
+    serializer_class = ParticipationDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
 
 class ReservePayView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]

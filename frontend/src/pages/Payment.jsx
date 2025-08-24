@@ -9,11 +9,12 @@ import LoginRequest from "../components/LoginRequest"; // 로그인 모달 임�
 export default function Payment() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { participationId } = location.state || {};
+  const { participationId, partyId } = location.state || {};
 
   const [paymentMethod, setPaymentMethod] = useState('point'); // 현재는 포인트만 사용
   const [points, setPoints] = useState(0);
   const [agree, setAgree] = useState(false);
+  
   
   // 로그인 상태 체크
   const token = localStorage.getItem("access");
@@ -37,7 +38,7 @@ export default function Payment() {
     return () => {
       if (!paymentCompleted.current && participationId) {
         console.log('Cancelling participation...');
-        api.post(`/api/reserve/cancel/${participationId}/`)
+        api.post(`/api/detailview/parties/${partyId}/leave/`)
           .catch(err => console.error("참가 신청 취소 실패:", err));
       }
     };
@@ -72,7 +73,7 @@ export default function Payment() {
 
     try {
       const { data } = await api.post(`/api/reserve/pay/${participationId}/`, {
-        payment_method: "point",
+        payment_method: "POINT",
       });
 
       paymentCompleted.current = true; // 결제 완료 상태로 변경
