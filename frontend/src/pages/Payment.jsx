@@ -64,8 +64,8 @@ export default function Payment() {
       setPoints(data.remaining_points); // 응답으로 받은 남은 포인트 갱신
       navigate("/paymentfinish"); // 결제 완료 후 이동
     } catch (err) {
-      console.error(err);
-      alert("결제 중 오류가 발생했습니다.");
+      console.error("결제 실패:", err.response?.data || err.message);
+      alert(err.response?.data?.detail || "결제 중 오류가 발생했습니다.");
     }
   };
 
