@@ -12,7 +12,6 @@ from users.models import SocialAccount
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 
-
 from signup.serializers import (
     KakaoLoginRequestSerializer,
     UserSignupSerializer,
@@ -110,9 +109,12 @@ class KakaoLoginAPIView(APIView):
         data = {
             "grant_type": "authorization_code",
             "client_id": settings.KAKAO_REST_API_KEY,
-            "redirect_uri": settings.KAKAO_REDIRECT_URI,  # 운영 환경 고정값
+            "redirect_uri": settings.KAKAO_ALLOWED_REDIRECT_URIS[0],  # 운영 환경 고정값
             "code": code,
         }
+
+        print("KAKAO TOKEN REQ >>>", data)  # 실제 요청 값 확인용 로그
+
         if getattr(settings, "KAKAO_CLIENT_SECRET", ""):
             data["client_secret"] = settings.KAKAO_CLIENT_SECRET
 
@@ -190,11 +192,14 @@ class KakaoLoginAPIView(APIView):
                     else:
                         print(f"[KAKAO LOGIN] 기존 이메일 유저 사용: id={user.id}, email={user.email}")
 
-                    # 소셜 계정 신규 연결
-                    SocialAccount.objects.create(
+                    # 소셜 계정 신규 연결 (중복 방지)
+                    sa, created = SocialAccount.objects.get_or_create(
                         user=user, provider="kakao", social_id=str(kakao_id)
                     )
-                    print(f"[KAKAO LOGIN] 소셜 계정 연결 완료: kakao_id={kakao_id}, user_id={user.id}")
+                    if created:
+                        print(f"[KAKAO LOGIN] ✅ 새 소셜 계정 연결 완료: kakao_id={kakao_id}, user_id={user.id}")
+                    else:
+                        print(f"[KAKAO LOGIN] ℹ️ 기존 소셜 계정 그대로 사용: kakao_id={kakao_id}, user_id={user.id}")
 
             # 4) JWT 발급
             refresh = RefreshToken.for_user(user)
@@ -205,17 +210,15 @@ class KakaoLoginAPIView(APIView):
                 "refresh": str(refresh),
                 "user": {
                     "id": user.id,
-                    "username": user.username,    # 로그인 아이디
-                    "name": user.name,            # 이름
-                    "profile_image": (
-                        user.profile_image.url if getattr(user, 'profile_image', None) else None
-                    ),
-                    "intro": user.intro or "",    # 한줄소개
+                    "username": user.username,     # 로그인 아이디
+                    "name": user.name,             # 이름
+                    "profile_image": user.profile_image.url if user.profile_image else None,
+                    "intro": user.intro or "",     # 한줄소개
                     "points": user.points,
                     "warnings": user.warnings,
                 },
             }
-            print(f"[KAKAO LOGIN] JWT 발급 완료: user_id={user.id}")
+            print(f"[KAKAO LOGIN] 🎟️ JWT 발급 완료: user_id={user.id}")
             return Response(out, status=200)
 
         except Exception as e:
