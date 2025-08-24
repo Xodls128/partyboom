@@ -33,13 +33,10 @@ export default function Balancewait() {
   // 참가자 불러오기
   const fetchParticipants = async () => {
     try {
-      const res = await axios.get(
-        `${API_BASE}/api/partyassist/standby/${partyId}/participants/`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setParticipants(res.data);
+      const { data } = await api.get(`/api/partyassist/standby/${partyId}/participants/`);
+      setParticipants(data);
     } catch (err) {
-      console.error("참여자 불러오기 실패:", err);
+      console.error("참여자 불러오기 실패:", err.response?.data || err.message);
     }
   };
 
@@ -48,15 +45,12 @@ export default function Balancewait() {
     // --- 활성 게임 여부 확인 ---
     const checkForActiveGame = async () => {
       try {
-        const res = await axios.get(
-          `${API_BASE}/api/v1/game/parties/${partyId}/active-round/`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        if (res.data.round_id && !navigating) {
+        const { data } = await api.get(`/api/v1/game/parties/${partyId}/active-round/`);
+        if (data.round_id && !navigating) {
           setNavigating(true);
           setShowModal(true);
           setTimeout(() => {
-            navigate(`/balancegame/${res.data.round_id}`);
+            navigate(`/balancegame/${data.round_id}`);
           }, 2000);
           return true;
         }
