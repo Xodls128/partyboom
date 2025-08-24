@@ -53,6 +53,7 @@ class PartyDetailSerializer(serializers.ModelSerializer):
     place_name = serializers.CharField(source="place.name", read_only=True)
     place_x_norm = serializers.FloatField(source="place.x_norm", read_only=True)
     place_y_norm = serializers.FloatField(source="place.y_norm", read_only=True)
+    place_map = serializers.ImageField(source="place.map", read_only=True)
     # --- SlugRelatedField를 TagSerializer로 변경 ---
     tags = TagSerializer(many=True, read_only=True)
     applied_count = serializers.SerializerMethodField()
@@ -70,6 +71,7 @@ class PartyDetailSerializer(serializers.ModelSerializer):
             "place_x_norm",
             "place_y_norm",
             "place_photo",
+            'place_map',
             "applied_count",
             "max_participants",
         )
