@@ -14,7 +14,7 @@ const API_BASE = import.meta.env.VITE_API_URL;
 const MAIN_URL = `${API_BASE}/api/mypage/main/`;
 const AUTH_SCHEME = 'JWT';
 
-// 저장된 토큰 구하기(여러 키 대응)
+// 저장된 토큰 구하기
 const getToken = () =>
   localStorage.getItem('access') ||
   localStorage.getItem('accessToken') ||
@@ -36,17 +36,21 @@ const getToken = () =>
 
 export default function Mypage() {
   const navigate = useNavigate();
+  const token = getToken();
+  const isLoggedIn = !!token;
 
-  // 상태
-  const [username, setUsername] = useState('게스트');
-  const [intro, setIntro] = useState('한 줄 소개를 작성해주세요');
-  const [tags, setTags] = useState(['소속학년', '소속대학', '성격', 'MBTI']);
-  const [points, setPoints] = useState(0);
-  const [participationCount, setParticipationCount] = useState(0);
-  const [warningCount, setWarningCount] = useState(0);
-  const [avatarUrl, setAvatarUrl] = useState('');
+  // userInfo 객체 하나로 통합 상태 관리
+  const [userInfo, setUserInfo] = useState({
+    username: '게스트',
+    intro: '한 줄 소개를 작성해주세요',
+    points: 0,
+    avatarUrl: '',
+    tags: ['소속학년', '소속대학', '성격', 'MBTI'],
+    participationCount: 0,
+    warningCount: 0,
+  });
 
-  // 툴팁
+  // 툴팁 상태
   const [isTooltipVisible, setIsTooltipVisible] = useState(false);
   const [isWarningTooltipVisible, setIsWarningTooltipVisible] = useState(false);
   const onTooltipClick = () => setIsTooltipVisible((v) => !v);
@@ -54,28 +58,33 @@ export default function Mypage() {
 
   const handleParticipationClick = () => navigate('/mypage/history');
 
-  // 로그인 체크
-  const token = getToken();
-  const isLoggedIn = !!token;
+  // 로그아웃 함수
+  const handleLogout = () => {
+    localStorage.removeItem('access');
+    localStorage.removeItem('refresh');
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('token');
+    sessionStorage.removeItem('access');
+    localStorage.removeItem('auth');
+    localStorage.removeItem('user');
 
+    navigate('/');
+  };
+
+  // 로그인 안 됐으면 모달
   if (!isLoggedIn) {
     return (
-      <LoginRequest 
-        isOpen={true} 
-        onClose={() => navigate('/')} 
-        redirectTo="/mypage"   // 로그인 성공 후 다시 돌아올 경로
+      <LoginRequest
+        isOpen={true}
+        onClose={() => navigate('/')}
+        redirectTo="/mypage"
       />
     );
   }
 
-  // 마운트 시 한 번만: /api/mypage/main/에서 프로필+요약 모두 세팅
+  // 마운트 시 API 호출
   useEffect(() => {
     (async () => {
-      if (!token) {
-        console.warn('[Mypage] 토큰 없음(미로그인/만료)');
-        return;
-      }
-
       try {
         const res = await fetch(MAIN_URL, {
           headers: {
@@ -83,10 +92,6 @@ export default function Mypage() {
             Accept: 'application/json',
           },
         });
-        if (res.status === 401) {
-          console.warn('401: 로그인 필요/토큰 만료');
-          return;
-        }
         if (!res.ok) {
           console.error('마이페이지 호출 실패:', res.status);
           return;
@@ -94,28 +99,26 @@ export default function Mypage() {
 
         const data = await res.json();
 
-        // 프로필
-        setUsername(data.nickname || data.username || '게스트');
-        setIntro(data.intro || data.bio || '');
-        setAvatarUrl(data.profile_image || data.avatar_url || '');
+        // MBTI 가공
+        const mbtiObj = data.mbti || {};
+        const mbtiString = [mbtiObj.i_e, mbtiObj.n_s, mbtiObj.f_t, mbtiObj.p_j]
+          .filter(Boolean)
+          .join('');
 
-        // 태그
-        const t1 = data.grade || data.year || '소속학년';
-        const t2 = data.college || data.department || '소속대학';
-        const t3 = data.trait || data.keyword || '성격';
-        const t4 = data.mbti || 'MBTI';
-        const list =
-          Array.isArray(data.tags) && data.tags.length
-            ? data.tags.slice(0, 4)
-            : [t1, t2, t3, t4];
-        setTags(list.filter(Boolean).slice(0, 4));
-
-        // 요약
-        setPoints(Number(data.points ?? data.point ?? 0));
-        setParticipationCount(
-          Number(data.participation_count ?? data.participated ?? 0)
-        );
-        setWarningCount(Number(data.warning_count ?? data.warnings ?? 0));
+        setUserInfo({
+          username: data.name || '게스트',
+          intro: data.intro || '한 줄 소개를 작성해주세요',
+          points: Number(data.points ?? 0),
+          avatarUrl: data.profile_image || Vector,
+          tags: [
+            data.grade || '소속학년',
+            data.college || '소속대학',
+            data.personality || '성격',
+            mbtiString || 'MBTI',
+          ],
+          participationCount: Number(data.participation_count ?? 0),
+          warningCount: Number(data.warnings ?? 0),
+        });
       } catch (e) {
         console.error('유저 정보를 불러오는 중 오류:', e);
       }
@@ -131,7 +134,7 @@ export default function Mypage() {
           <div className="profile-photo-group">
             <div className="profile-image-wrap">
               <img
-                src={avatarUrl || Vector}
+                src={userInfo.avatarUrl || Vector}
                 alt="프로필 이미지"
                 className="profile-image-svg"
               />
@@ -146,11 +149,11 @@ export default function Mypage() {
 
           <div className="profile-details">
             <div className="name-and-intro-container">
-              <p className="profile-name">{username}</p>
-              <p className="profile-perinfo">{intro}</p>
+              <p className="profile-name">{userInfo.username}</p>
+              <p className="profile-perinfo">{userInfo.intro}</p>
             </div>
             <div className="profile-tags">
-              {tags.map((t, i) => (
+              {userInfo.tags.map((t, i) => (
                 <span className="profile-tag" key={i}>
                   {t}
                 </span>
@@ -163,7 +166,7 @@ export default function Mypage() {
         <section className="point-section">
           <p>포인트</p>
           <div className="point-value-group">
-            <p>{Number(points).toLocaleString('ko-KR')}P</p>
+            <p>{userInfo.points.toLocaleString('ko-KR')}P</p>
             <img
               src={Info}
               alt="info 이미지"
@@ -187,7 +190,7 @@ export default function Mypage() {
           <div className="stat-item" onClick={handleParticipationClick}>
             <p>참여횟수</p>
             <p className="stat-value">
-              {participationCount}{' '}
+              {userInfo.participationCount}{' '}
               <img
                 src={RigthBlack}
                 alt="right 이미지"
@@ -198,7 +201,7 @@ export default function Mypage() {
           <div className="stat-item">
             <p>경고</p>
             <p className="stat-value" onClick={onWarningTooltipClick}>
-              {warningCount}
+              {userInfo.warningCount}
               <img src={Info} alt="info 이미지" className="info-image-svg" />
             </p>
             {isWarningTooltipVisible && (
@@ -213,7 +216,9 @@ export default function Mypage() {
         <section className="profile-menu">
           <ul className="menu-list">
             <li>도움말</li>
-            <li>로그아웃</li>
+            <li onClick={handleLogout} style={{ cursor: 'pointer' }}>
+              로그아웃
+            </li>
             <li className="delete_account">계정 탈퇴</li>
           </ul>
         </section>
