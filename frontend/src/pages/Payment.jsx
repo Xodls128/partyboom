@@ -29,6 +29,8 @@ export default function Payment() {
     );
   }
 
+  const [deposit, setDeposit] = useState(0);
+
   // 페이지 진입 시 participationId 유효성 검사 및 유저 정보 로딩
   useEffect(() => {
     if (!participationId) {
@@ -39,14 +41,15 @@ export default function Payment() {
 
     const fetchUser = async () => {
       try {
-        const { data } = await api.get("/api/users/me/");
-        setPoints(data.points);
-      } catch (err) {
-        console.error("유저 정보 불러오기 실패:", err.response?.data || err.message);
-      }
-    };
-    fetchUser();
-  }, [participationId, navigate]);
+      const { data } = await api.get(`/api/reserve/participation/${participationId}/`);
+      setPoints(data.user.points);
+      setDeposit(data.party.deposit); // party.deposit 값을 저장
+    } catch (err) {
+      console.error("예약 정보 불러오기 실패:", err.response?.data || err.message);
+    }
+  };
+  fetchParticipation();
+}, [participationId, navigate]);
 
   // 결제 처리
   const handlePayment = async () => {
