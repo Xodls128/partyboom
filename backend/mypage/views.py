@@ -112,7 +112,7 @@ class ExtraSettingMeAPIView(APIView):
 class MypageMainViewSet(viewsets.ViewSet):
     """
     마이페이지 메인 화면 API
-    GET /api/mypage/
+    GET /api/mypage/main
     """
     permission_classes = [permissions.IsAuthenticated]
 

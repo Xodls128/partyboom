@@ -2,13 +2,14 @@ import './PartySmall.css';
 
 export default function PartySmall(props) {
   const {
-    eventTitle    = props.title,       // 유학생과_언어교류
-    eventDate     = props.date,        // 2025-08-25
-    placeName     = props.location,    // 주당끼리 
-    placeImageUrl = props.thumbnailUrl, 
-    attendees     = props.current ?? 0,   // 현재 참여인원
-    capacity      = props.capacity ?? 0,  // 제한 인원 
-    onClickDetail = props.onClick,
+    eventTitle,
+    eventDate,
+    placeName,
+    placeImageUrl,
+    attendees = 0,
+    capacity = 0,
+    tags = [],
+    onClick: onClickDetail
   } = props;
 
   const d = new Date(eventDate);
@@ -30,6 +31,14 @@ export default function PartySmall(props) {
 
       <div className="party-item__content">
         <h3 className="party-item__title">{eventTitle}</h3>
+
+      
+        <div className="party-item__tags">
+          {tags.map(tag => (
+            <span key={tag.id} className="party-item__tag">#{tag.name}</span>
+          ))}
+        </div>
+   
 
         <div className="party-item__meta">
           <i className="material-icons-outlined">event</i>

@@ -1,0 +1,241 @@
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
+.auth-page{
+  min-height: 100dvh;
+  padding: 20px;
+  font-family: Pretendard;
+  background: #fff;
+  overflow-y: auto;        
+}
+
+/* 상단 공통 */
+.auth-top{
+  height: 40px;
+  display:flex; 
+  align-items:center; 
+  gap:8px;
+}
+.auth-back{
+  border:0; 
+  background:transparent; 
+  padding:4px; 
+  cursor:pointer;
+}
+.auth-back img{ 
+    width:17px; 
+    height:29px; 
+}
+.auth-title{
+  margin: 0 auto;
+  transform: translateX(-18px);
+  font-size: 18px; 
+  font-weight:600; 
+  letter-spacing:-0.019em; 
+  line-height:1.5;
+}
+
+/* 폼 */
+.auth-form{
+  width: 100%;
+  max-width: 345px;
+  margin: 12px auto 24px;
+}
+.auth-field{ margin: 14px 0; }
+.auth-field > label{
+  display:block; 
+  margin-bottom: 9px;
+
+  font-size: 16px; 
+  font-weight:600; 
+  letter-spacing:-0.019em; 
+  line-height:1.5;
+}
+.auth-input{
+  width: 345px; 
+  height: 47px; 
+  border:0; 
+  border-radius: 8px;
+  background:#F2F2F2; 
+  padding: 11px 12px; 
+
+  outline: none;
+  font-size: 14px; 
+  font-weight:400; 
+  letter-spacing:-0.019em; 
+  line-height:1.5;
+  color:#4A4A4A;
+  box-sizing: border-box;
+}
+
+/* 비밀번호 눈 아이콘 */
+.auth-input-wrap{ 
+    position: relative; 
+}
+.auth-eye{
+  position:absolute; 
+  right: 10px; 
+  top:50%; 
+  transform: translateY(-50%);
+  width: 22px; 
+  height: 15px; 
+  cursor: pointer; 
+  user-select: none;
+}
+.auth-helper{ 
+    margin-top:6px; 
+    font-size: 12px; 
+    font-weight:400; 
+    letter-spacing:-0.019em; 
+    line-height:1.5; 
+    color:#7B7B7B; 
+}
+
+/* OTP */
+.auth-otp-row{
+  display: grid; 
+  grid-template-columns: 1fr ;
+  gap: 8px;
+}
+
+/* 파일/메모 */
+.auth-file{ width:100%; }
+.auth-note{ 
+    margin-top:6px; 
+    font-size: 14px; 
+    font-weight:400; 
+    letter-spacing:-0.019em; 
+    line-height:1.5; 
+    color:#000000; 
+}
+
+/* 체크박스 */
+.auth-checkbox{
+  display:flex; 
+  gap: 8px; 
+  align-items:center; 
+  margin-top: 6px;
+  font-size: 14px; 
+  font-weight:400; 
+  letter-spacing:-0.019em; 
+  line-height:1.5; 
+  color:#000000;
+}
+
+/* 버튼들 */
+.auth-actions{ 
+    margin-top: 16px; 
+}
+.auth-btn{
+  width: 345px;
+  height: 46px; 
+  padding: 0 14px; 
+  border-radius: 8px; 
+  border:0; 
+  cursor:pointer;
+
+  font-size: 20px; 
+  font-weight:600; 
+  letter-spacing:-0.019em; 
+  line-height:1.5;
+}
+.auth-btn--primary{ 
+    width: 100%; 
+    background:#FFCD50; 
+    color:#000000; 
+}
+.auth-btn--sign{
+    width: 100%; 
+    background:#FF2824; 
+    color:#FFFFFF; 
+}
+.auth-btn--ghost{ 
+    padding: 0 14px; 
+    background:#7B7B7B; 
+
+    color:#FFFFFF; 
+    font-size: 16px; 
+    font-weight:600; 
+    letter-spacing:-0.019em; 
+    line-height:1.5;
+}
+
+
+/* 링크 */
+.auth-links{ 
+    margin-top: 10px; 
+    display:flex; 
+    gap:12px; 
+    justify-content:flex-end; 
+}
+.link-btn{ 
+    border:0; 
+    background:transparent; 
+    color:#333; 
+    text-decoration: underline; 
+    cursor:pointer; 
+}
+
+/* 로그인 상단 로고 묶음  */
+.lg-logo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 130px 0 210px;   
+}
+.lg-logo__bomb {
+  width: 150.52px;          
+  height: 150.52px;
+  display: block;
+}
+.lg-logo__word {
+  width: 177px;         
+  height: 96px;
+  display: block;
+  margin-top: -30px;
+}
+
+
+.sr-only{
+  position:absolute!important; 
+  width:1px; 
+  height:1px; 
+  padding:0; 
+  margin:-1px;
+  overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0;
+}
+.auth-file{ display:none; } 
+.auth-field .file-btn{
+  display: flex;              
+  align-items: center;       
+  justify-content: center;  
+
+  width: 345px;
+  height: 47px;
+  box-sizing: border-box;
+  line-height: 1;           
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: -0.019em;
+  border-radius: 8px;
+  background: #7B7B7B;
+  color: #fff;
+
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 혹시 내부에 span 등 자식이 있으면 이것도 같이 리셋 */
+.auth-field .file-btn * { line-height: 1; }
+
+
+.file-btn:is(:hover,:focus-visible){ filter:brightness(0.95); }
+.file-btn:active{ transform:translateY(1px); }
+.file-btn.is-selected{ background:#6f6f6f; } 
+
+/* 선택된 파일명(선택 사항) */
+.file-meta{
+  margin-top:6px;
+  font-size:12px;
+  color:#666;
+}
+
