@@ -33,10 +33,7 @@ export default function Home() {
   useEffect(() => {
     const fetchParties = async () => {
       try {
-        const response = await fetch(`${API_BASE}/api/homemap/home/`);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        const data = await response.json();
-
+        const { data } = await api.get("/api/homemap/home/");
         const formatted = data.map(p => ({
           id: p.id,
           image: p.place_photo || Party,
@@ -52,7 +49,7 @@ export default function Home() {
         }));
         setPartyList(formatted);
       } catch (error) {
-        console.error("파티 데이터를 불러오는 중 오류 발생:", error);
+        console.error("파티 데이터를 불러오는 중 오류 발생:", error.response?.data || error.message);
       }
     };
 
