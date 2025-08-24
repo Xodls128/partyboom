@@ -35,14 +35,18 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('access', accessToken);
     localStorage.setItem('refresh', refreshToken);
     try {
-      const { data } = await api.get('/api/mypage/main/');
+      // 토큰 저장 직후에는 인터셉터가 바로 반영되지 않을 수 있음
+      // → 직접 Authorization 헤더를 넣어서 안전하게 호출
+      const { data } = await api.get('/api/mypage/main/', {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      });
       setUser(data);
-      return data; // 사용자 정보를 반환하여 후속 처리에 사용
+      return data;
     } catch (error) {
       console.error("로그인 후 사용자 정보 가져오기 실패:", error);
       // 실패해도 로그인은 유지
       setUser(null);
-      return null; // throw 대신 null 반환
+      return null;
     }
   };
 
