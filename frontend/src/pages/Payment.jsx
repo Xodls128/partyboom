@@ -92,12 +92,12 @@ export default function Payment() {
         </div>
         <div className="payment-info-row">
           <span className="payment-info-label">예약금</span>
-          <span className="payment-info-value">2000p</span>
+          <span className="payment-info-value">{deposit}p</span>
         </div>
         <div className="payment-divider"></div>
         <div className="payment-info-total">
           <span className="payment-info-label">합계</span>
-          <span className="payment-info-value">2000p</span>
+          <span className="payment-info-value">{deposit}p</span>
         </div>
       </div>
 
