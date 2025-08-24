@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
@@ -7,26 +7,36 @@ import DateIcon from '../assets/date.svg';
 import Check from '../assets/check.svg';
 import Apply from '../assets/apply.svg';
 import Location from '../assets/location.svg';
-import PopupImg from '../assets/bell.svg';
+import LoginRequest from "../components/LoginRequest";
 import './home.css';
 
 const API_BASE = import.meta.env.VITE_API_URL;
 
+async function safeGetErrorText(res) {
+  try {
+    const data = await res.clone().json();
+    return data.detail || Object.values(data).join('\n');
+  } catch {
+    return await res.text();
+  }
+}
+
 export default function Home() {
   const [partyList, setPartyList] = useState([]);
-  const [showPopup, setShowPopup] = useState(false);
-  const [username, setUsername] = useState("게스트"); // 기본값 게스트
-  
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [username, setUsername] = useState("게스트");
+  const [isLoading, setIsLoading] = useState(false); // 로딩 상태 추가
+  const navigate = useNavigate();
+  const location = useLocation();
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("access"); // 로그인 시 저장한 토큰
-        if (!token) return; // 토큰 없으면 게스트 유지
-
+        const token = localStorage.getItem("access");
+        if (!token) return;
         const response = await fetch(`${API_BASE}/api/user/me/`, {
           headers: { "Authorization": `Bearer ${token}` }
         });
-
         if (response.ok) {
           const data = await response.json();
           setUsername(data.nickname || data.username || "게스트");
@@ -35,7 +45,6 @@ export default function Home() {
         console.error("유저 정보를 불러오는 중 오류:", error);
       }
     };
-
     fetchUser();
   }, []);
 
@@ -45,28 +54,56 @@ export default function Home() {
         const response = await fetch(`${API_BASE}/api/homemap/home/`);
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         const data = await response.json();
-
         const formatted = data.map(p => ({
           id: p.id,
           image: p.place_photo || Party,
           name: "#" + p.title,
-          date: new Date(p.start_time).toLocaleString("ko-KR", {
-            month: "2-digit",
-            day: "2-digit",
-            hour: "2-digit",
-            minute: "2-digit",
-          }),
+          date: new Date(p.start_time).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit" }),
           person: `${p.applied_count}/${p.max_participants}`,
           location: p.place_name,
+          tags: p.tags ?? [],
         }));
         setPartyList(formatted);
       } catch (error) {
         console.error("파티 데이터를 불러오는 중 오류 발생:", error);
       }
     };
-
     fetchParties();
   }, []);
+
+  // ---로딩 상태 처리가 추가된 handleApply 함수---
+  const handleApply = async (partyId) => {
+    if (isLoading) return; // 이미 로딩 중이면 중복 실행 방지
+
+    const token = localStorage.getItem("access");
+    if (!token) {
+      setShowLoginModal(true);
+      return;
+    }
+
+    setIsLoading(true); // 로딩 시작
+    try {
+      const res = await fetch(`${API_BASE}/api/reserve/join/${partyId}/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      });
+
+      if (!res.ok) {
+        const errorMsg = await safeGetErrorText(res);
+        throw new Error(errorMsg || "참가 신청에 실패했습니다.");
+      }
+
+      const data = await res.json();
+      navigate("/payment", { state: { participationId: data.id } });
+
+    } catch (err) {
+      console.error(err);
+      alert(err.message);
+    } finally {
+      setIsLoading(false); // 로딩 종료 (성공/실패 무관)
+    }
+  };
+  
 
   return (
     <>
@@ -86,6 +123,11 @@ export default function Home() {
           </Link>
 
           <div className='partyName'>{party.name}</div>
+          <div className="party-tags-list">
+            {party.tags.map(tag => (
+              <span key={tag.id} className="party-tag-item">#{tag.name}</span>
+            ))}
+          </div>
           <div className='date'>
             <img src={DateIcon} alt="" />
             <span className="dateText">{party.date}</span>
@@ -97,19 +139,25 @@ export default function Home() {
 
           <button
             className="apply-btn"
-            onClick={() => setShowPopup(true)}
-            aria-label="팝업 띄우기"
+            onClick={() => handleApply(party.id)}
+            disabled={isLoading} // 로딩 중일 때 비활성화
+            aria-label="참가하기"
           >
-            <img src={Apply} alt="버튼" />
+            {isLoading ? (
+              <span className="loading-text">신청 중...</span>
+            ) : (
+              <img src={Apply} alt="버튼" />
+            )}
           </button>
-          
-          {showPopup && (
-            <div className="popup-overlay" onClick={() => setShowPopup(false)}>
-              <img src={PopupImg} alt="팝업" className="popup-img" />
-            </div>
-          )}
         </div>
       ))}
+
+      <LoginRequest 
+        isOpen={showLoginModal} 
+        onClose={() => setShowLoginModal(false)} 
+        redirectTo={location.pathname} 
+      />
+
       <div className='spaceExpansion'></div>
       <NavBar />
     </>

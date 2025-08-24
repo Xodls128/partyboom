@@ -8,6 +8,7 @@ export default function PartySmall(props) {
     placeImageUrl = props.thumbnailUrl, 
     attendees     = props.current ?? 0,   // 현재 참여인원
     capacity      = props.capacity ?? 0,  // 제한 인원 
+    tags          = props.tags ?? [],     // 태그 배열 추가
     onClickDetail = props.onClick,
   } = props;
 
@@ -30,6 +31,14 @@ export default function PartySmall(props) {
 
       <div className="party-item__content">
         <h3 className="party-item__title">{eventTitle}</h3>
+
+      
+        <div className="party-item__tags">
+          {tags.map(tag => (
+            <span key={tag.id} className="party-item__tag">#{tag.name}</span>
+          ))}
+        </div>
+   
 
         <div className="party-item__meta">
           <i className="material-icons-outlined">event</i>
