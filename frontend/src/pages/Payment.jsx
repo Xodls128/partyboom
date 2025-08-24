@@ -38,7 +38,7 @@ export default function Payment() {
     return () => {
       if (!paymentCompleted.current && participationId) {
         console.log('Cancelling participation...');
-        api.post(`/api/detailview/parties/{party_id}/leave/${participationId}/`)
+        api.post(`/api/detailview/parties/${partyId}/`)
           .catch(err => console.error("참가 신청 취소 실패:", err));
       }
     };
