@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import api from "@/api/axios"; 
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
 import Party from '../assets/party.jpg';
