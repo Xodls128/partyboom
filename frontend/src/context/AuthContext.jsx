@@ -19,7 +19,7 @@ export const AuthProvider = ({ children }) => {
       const token = localStorage.getItem('access');
       if (token) {
         try {
-          const { data } = await api.get('/api/mypage/');
+          const { data } = await api.get('/api/mypage/main/');
           setUser(data);
         } catch (error) {
           console.error("자동 로그인 실패:", error);
@@ -37,7 +37,7 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('access', accessToken);
     localStorage.setItem('refresh', refreshToken);
     try {
-      const { data } = await api.get('/api/mypage/');
+      const { data } = await api.get('/api/mypage/main/');
       setUser(data);
       // 추가 정보 입력 여부에 따라 적절한 페이지로 이동시키는 로직은
       // 로그인 컴포넌트(Login, KakaoCallbackPage)에서 처리하는 것이 더 적합합니다.
