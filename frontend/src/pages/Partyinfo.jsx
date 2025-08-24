@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import api from '../api/axios'; // axios 인스턴스 가져오기
 import Back from "../assets/left_white.svg";
 import UserIcon from '../assets/profilesmall.svg';
 import DefaultPartyImage from '../assets/party.jpg';
@@ -8,18 +9,6 @@ import CheckIcon from '../assets/check.svg';
 import "./partyinfo.css";
 
 import LoginRequest from "../components/LoginRequest";
-
-const API_BASE = import.meta.env.VITE_API_URL;
-
-// 안전한 에러 메시지 추출 헬퍼
-async function safeGetErrorText(res) {
-  try {
-    const data = await res.clone().json();
-    return data.detail || Object.values(data).join('\n');
-  } catch {
-    return await res.text();
-  }
-}
 
 export default function Partyinfo() {
   const { partyId } = useParams();
@@ -31,19 +20,19 @@ export default function Partyinfo() {
   // 로그인 요청 모달 상태
   const [showLoginRequest, setShowLoginRequest] = useState(false);
 
-  // 로딩 상태 (참가 버튼 전용)
-  const [isJoining, setIsJoining] = useState(false);
+  // 로딩 상태 (참가 버튼 전용) - Home.jsx와 통일
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchPartyDetails = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`${API_BASE}/api/detailview/parties/${partyId}/`);
-        if (!response.ok) throw new Error('파티 정보를 불러오는데 실패했습니다.');
-        const data = await response.json();
+        // axios를 사용하여 API 호출
+        const { data } = await api.get(`/api/detailview/parties/${partyId}/`);
         setParty(data);
       } catch (err) {
-        setError(err.message);
+        // axios는 에러 객체에 응답 정보를 포함하므로 더 쉽게 처리 가능
+        setError(err.response?.data?.detail || '파티 정보를 불러오는데 실패했습니다.');
       } finally {
         setLoading(false);
       }
@@ -53,7 +42,7 @@ export default function Partyinfo() {
   }, [partyId]);
 
   const handleJoin = async () => {
-    if (isJoining) return; // 중복 실행 방지
+    if (isLoading) return; // 중복 실행 방지
 
     const token = localStorage.getItem("access");
     if (!token) {
@@ -61,29 +50,18 @@ export default function Partyinfo() {
       return;
     }
 
-    setIsJoining(true);
+    setIsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/api/reserve/join/${partyId}/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        }
-      });
-
-      if (!res.ok) {
-        const errorMsg = await safeGetErrorText(res);
-        throw new Error(errorMsg || "참가 신청 실패");
-      }
-
-      const data = await res.json();
+      // axios를 사용하면 인증 헤더를 자동으로 추가해줌
+      const { data } = await api.post(`/api/reserve/join/${partyId}/`);
       navigate("/payment", { state: { participationId: data.id } });
 
     } catch (err) {
       console.error(err);
-      alert(err.message || "참가 신청 중 오류가 발생했습니다.");
+      // axios 에러 메시지 사용
+      alert(err.response?.data?.detail || "참가 신청 중 오류가 발생했습니다.");
     } finally {
-      setIsJoining(false);
+      setIsLoading(false);
     }
   };
 
@@ -187,9 +165,9 @@ export default function Partyinfo() {
           <button 
             className="join-button" 
             onClick={handleJoin} 
-            disabled={isJoining} // 로딩 중 비활성화
+            disabled={isLoading} // 로딩 중 비활성화
           >
-            {isJoining ? "신청 중..." : "참가신청"}
+            {isLoading ? "신청 중..." : "참가신청"}
           </button>
         </section>
       </main>

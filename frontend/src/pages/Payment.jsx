@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import api from "../api/axios";
 import Back from '../assets/left_black.svg';
@@ -30,6 +30,18 @@ export default function Payment() {
   }
 
   const [deposit, setDeposit] = useState(null);
+  const paymentCompleted = useRef(false); // 결제 완료 상태를 추적하기 위한 ref
+
+  // 페이지 이탈 시 결제가 완료되지 않았다면 참가 신청 자동 취소
+  useEffect(() => {
+    return () => {
+      if (!paymentCompleted.current && participationId) {
+        console.log('Cancelling participation...');
+        api.post(`/api/reserve/cancel/${participationId}/`)
+          .catch(err => console.error("참가 신청 취소 실패:", err));
+      }
+    };
+  }, [participationId]);
 
   // 페이지 진입 시 participationId 유효성 검사 및 유저 정보 로딩
   useEffect(() => {
@@ -63,6 +75,7 @@ export default function Payment() {
         payment_method: "point",
       });
 
+      paymentCompleted.current = true; // 결제 완료 상태로 변경
       alert("결제 완료! 사용 포인트: " + data.amount);
       setPoints(data.remaining_points); // 응답으로 받은 남은 포인트 갱신
       navigate("/paymentfinish"); // 결제 완료 후 이동
