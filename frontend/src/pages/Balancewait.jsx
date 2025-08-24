@@ -5,7 +5,6 @@ import NavBar from '../components/NavBar';
 import Profilesmall from '../assets/profilesmall.svg';
 import './balancewait.css';
 
-const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Balancewait() {
   const [standbyCount, setStandbyCount] = useState(0);
