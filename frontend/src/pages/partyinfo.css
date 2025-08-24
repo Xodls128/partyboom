@@ -162,3 +162,17 @@
   margin: 8px 0 0 var(--side-gap);
 }
 .count-icon{ width:18.33px; height:18.33px; }
+
+/* 참가 버튼 - disabled 상태 (모집마감) */
+.join-button:disabled {
+  background: #ccc;
+  color: #666;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+/* 참가 버튼 - 신청 중 상태 */
+.join-button.joining {
+  background: linear-gradient(90deg, #ccc 0%, #aaa 100%);
+  cursor: wait;
+}
