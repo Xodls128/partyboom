@@ -25,13 +25,8 @@ export default function LoginRequest({ isOpen, onClose, redirectTo }) {
     window.location.href = kakaoAuthUrl;
   };
 
-  const handleEmailLogin = () => {
+  const handleLoginSignup = () => {
     navigate('/login');
-    onClose();
-  };
-
-  const handleSignup = () => {
-    navigate('/signup');
     onClose();
   };
 
@@ -45,11 +40,11 @@ export default function LoginRequest({ isOpen, onClose, redirectTo }) {
           <button className="loginrequest-kakao-btn" onClick={handleKakaoLogin}>
             카카오로 1초 만에 시작하기
           </button>
-          <button className="loginrequest-email-btn" onClick={handleEmailLogin}>
-            이메일로 로그인
-          </button>
-          <button className="loginrequest-signup-btn" onClick={handleSignup}>
-            회원가입
+          <button 
+            className="loginrequest-signup-btn" 
+            onClick={handleLoginSignup} // 함수 이름을 변경하고 경로를 /login으로 수정
+          >
+            로그인 / 회원가입
           </button>
         </div>
       </div>

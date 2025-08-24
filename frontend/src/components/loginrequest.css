@@ -80,22 +80,6 @@
   cursor: pointer;
 }
 
-/* 이메일 로그인 버튼 (파란색) */
-.loginrequest-email-btn {
-  padding: 12px;
-  border-radius: 8px;
-  background: #3B88C3;
-  color: #FFF;
-  font-family: Pretendard;
-  font-size: 20px;
-  font-style: normal;
-  font-weight: 600;
-  line-height: 150%;
-  letter-spacing: -0.38px;
-  border: none;
-  cursor: pointer;
-}
-
 /* 회원가입 버튼 (빨간색) */
 .loginrequest-signup-btn {
   padding: 12px;
