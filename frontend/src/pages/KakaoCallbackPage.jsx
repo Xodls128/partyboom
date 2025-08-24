@@ -1,76 +1,57 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-
-const API_BASE = import.meta.env.VITE_API_URL;
-
-const KAKAO_REDIRECT_URI = import.meta.env.VITE_KAKAO_REDIRECT_URI;
-const BACKEND_KAKAO_LOGIN_URL = `${API_BASE}/api/signup/auth/kakao/`;
+import api from '../api/axios';
+import { useAuth } from '../context/AuthContext'; // useAuth 훅 임포트
 
 function KakaoCallbackPage() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [message, setMessage] = useState('카카오 로그인 처리 중...');
+  const { login } = useAuth(); // AuthContext의 login 함수 사용
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const code = params.get('code');
-    const error = params.get('error');
 
-    if (error) {
-      setMessage(`카카오 로그인 오류: ${error}`);
-      return;
-    }
+    const handleKakaoLogin = async (authCode) => {
+      try {
+        const res = await api.post('/api/signup/kakao/callback/', {
+          code: authCode,
+          redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI,
+        });
+        
+        const { access, refresh, is_additional_info_provided } = res.data;
+
+        // localStorage에 직접 저장하는 대신, context의 login 함수 호출
+        await login(access, refresh);
+
+        // login 함수가 사용자 정보를 context에 저장하면,
+        // is_additional_info_provided 값에 따라 페이지 이동
+        if (is_additional_info_provided) {
+          navigate("/");
+        } else {
+          navigate("/mypage/extra");
+        }
+      } catch (err) {
+        console.error("카카오 로그인 처리 중 에러 발생:", err);
+        alert("로그인에 실패했습니다. 문제가 지속되면 관리자에게 문의하세요.");
+        navigate("/login");
+      }
+    };
 
     if (code) {
-      // 추가: 어떤 주소로 요청 나가는지 확인
-      console.log("카카오 로그인 요청 URL:", BACKEND_KAKAO_LOGIN_URL);
-      console.log("보내는 redirect_uri:", KAKAO_REDIRECT_URI);
-      console.log("받은 code:", code);
-
-      fetch(BACKEND_KAKAO_LOGIN_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code: code, redirect_uri: KAKAO_REDIRECT_URI }),
-      })
-        .then(async (response) => {
-          // 추가: 응답 상태와 원본 텍스트도 확인
-          console.log("응답 status:", response.status);
-          const text = await response.text();
-          console.log("응답 raw text:", text);
-
-          try {
-            return JSON.parse(text); // 직접 파싱 시도
-          } catch (err) {
-            throw new Error(`JSON 파싱 실패: ${err.message}`);
-          }
-        })
-        .then(data => {
-          console.log("파싱된 응답 데이터:", data); // 추가
-
-          if (data.access && data.refresh) {
-            localStorage.setItem('accessToken', data.access);
-            localStorage.setItem('refreshToken', data.refresh);
-            setMessage('카카오 로그인 성공!');
-            navigate("/");
-          } else {
-            setMessage(`로그인 실패: ${data.detail || JSON.stringify(data)}`);
-          }
-        })
-        .catch(error => {
-          setMessage(`백엔드 통신 오류: ${error.message}`);
-          console.error('백엔드 통신 오류:', error);
-        });
+      handleKakaoLogin(code);
     } else {
-      setMessage('카카오 인증 코드를 받지 못했습니다.');
+      const error = params.get('error');
+      console.error("카카오 인증 실패:", error);
+      alert("카카오 인증에 실패했습니다. 로그인 페이지로 돌아갑니다.");
+      navigate("/login");
     }
-  }, [location, navigate]);
+  }, [location, navigate, login]); // login 함수를 의존성 배열에 추가
 
   return (
     <div>
-      <h1>카카오 로그인 콜백</h1>
-      <p>{message}</p>
+      <h1>카카오 로그인 처리 중...</h1>
+      <p>잠시만 기다려주세요.</p>
     </div>
   );
 }

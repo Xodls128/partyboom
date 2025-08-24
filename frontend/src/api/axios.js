@@ -5,11 +5,47 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  const token = localStorage.getItem("access");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
   return config;
 });
+
+// 응답 인터셉터 (401 → refresh로 토큰 재발급)
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = localStorage.getItem("refresh");
+        const { data } = await axios.post(
+          `${import.meta.env.VITE_API_URL}/api/signup/auth/refresh/`,
+          { refresh: refreshToken }
+        );
+
+        // 새 accessToken 저장
+        localStorage.setItem("access", data.access);
+
+        // 실패했던 요청 다시 보내기
+        api.defaults.headers.Authorization = `Bearer ${data.access}`;
+        originalRequest.headers.Authorization = `Bearer ${data.access}`;
+        return api(originalRequest);
+      } catch (refreshError) {
+        // refresh도 만료 → 로그아웃 처리
+        localStorage.removeItem("access");
+        localStorage.removeItem("refresh");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default api;

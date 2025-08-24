@@ -1,18 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
+import api from "../api/axios";
 import Back from '../assets/left_black.svg';
 import Vs from '../assets/vs.svg';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import 'swiper/css';
 import './balancegame.css';
 
-const API_BASE = import.meta.env.VITE_API_URL;
-
 export default function Balancegame() {
   const navigate = useNavigate();
   const { roundId } = useParams();
-  const token = localStorage.getItem("access");
+  const token = (typeof window !== "undefined") 
+  ? localStorage.getItem("access") 
+  : null;
   const wsRef = useRef(null);
   const intervalRef = useRef(null);
 
@@ -21,12 +21,11 @@ export default function Balancegame() {
 
   const fetchRound = async () => {
     try {
-      const res = await axios.get(`${API_BASE}/api/v1/game/rounds/${roundId}/`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setQuestions(res.data.questions || []);
+      // api 인스턴스 사용 → Authorization 자동 처리
+      const { data } = await api.get(`/api/v1/game/rounds/${roundId}/`);
+      setQuestions(data.questions || []);
     } catch (err) {
-      console.error("라운드 조회 실패:", err);
+      console.error("라운드 조회 실패:", err.response?.data || err.message);
     }
   };
 

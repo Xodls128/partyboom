@@ -6,8 +6,8 @@ import PartySmallImages from '../assets/partysmall.jpg';
 import Header from '../components/Header.jsx';
 import NavBar from '../components/NavBar.jsx';
 import { useNavigate } from 'react-router-dom'; // useNavigate 추가
+import api from "../api/axios";
 
-const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Map() {
   // useRef - 리렌더 없이 값 기억 
@@ -50,13 +50,8 @@ export default function Map() {
     const fetchParties = async () => {
       try {
         // 백엔드 API 엔드포인트 (배포환경에 맞게 수정)
-        const response = await fetch(`${API_BASE}/api/detailview/parties/`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const { data } = await api.get("/api/detailview/parties/");
         
-        // API 데이터를 프론트엔드 컴포넌트 props에 맞게 변환
         const formattedParties = data.map(p => ({
           id: p.id,
           eventTitle: p.title,
@@ -64,15 +59,14 @@ export default function Map() {
           placeName: p.place_name,
           attendees: p.applied_count,
           capacity: p.max_participants,
-          placeImageUrl: p.place_photo || PartySmallImages, // 백엔드 이미지가 없으면 기본 이미지 사용
+          placeImageUrl: p.place_photo || PartySmallImages, 
           place_x_norm: p.place_x_norm,   
           place_y_norm: p.place_y_norm,
         }));
 
         setParties(formattedParties);
       } catch (error) {
-        console.error("Failed to fetch parties:", error);
-        // 에러 발생 시 사용자에게 알릴 수 있는 UI 처리 (옵션)
+        console.error("파티 데이터를 불러오는 중 오류:", error.response?.data || error.message);
       }
     };
 

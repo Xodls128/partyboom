@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext'; // useAuth 훅 임포트
 import './LoginSignup.css';
 import LeftIcon from '../assets/left_black.svg';
 import EyeIcon from '../assets/visibility.svg';
 import BombMark from '../assets/boomb.svg';
 import Wordmark from '../assets/logo.svg';
+import api from "../api/axios";
 
 export default function Login(){
   const nav = useNavigate();
   const location = useLocation();
   const from = location.state?.from || '/';
+  const { login } = useAuth(); // AuthContext의 login 함수 사용
 
   const [id, setId] = useState('');
   const [pw, setPw] = useState('');
@@ -22,34 +25,19 @@ export default function Login(){
 
     try {
       setLoading(true);
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/signup/auth/login/`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          username: id,   // 백엔드 로그인 필드는 username/password
-          password: pw,
-        }),
+      const { data } = await api.post("/api/signup/auth/login/", {
+        username: id,
+        password: pw,
       });
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.detail || "로그인 실패");
-      }
-
-      const data = await res.json();
-      console.log("로그인 성공:", data);
-
-      // 토큰과 유저정보를 localStorage에 저장
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
-      localStorage.setItem("user", JSON.stringify(data.user));
+      // context의 login 함수를 호출하여 로그인 처리
+      await login(data.access, data.refresh);
 
       alert("로그인 성공");
       nav(from, { replace: true }); // 로그인 전 페이지 or 홈으로 이동
-    } catch (e) {
-      alert(e.message);
+    } catch (err) {
+      const errorMsg = err.response?.data?.detail || "아이디 또는 비밀번호가 일치하지 않습니다.";
+      alert(errorMsg);
     } finally {
       setLoading(false);
     }
@@ -101,6 +89,10 @@ export default function Login(){
           <button className="auth-btn auth-btn--primary" onClick={submit} disabled={loading}>
             {loading ? "로그인 중..." : "로그인"}
           </button>
+        </div>
+
+        <div className="switch-auth-prompt" style={{ marginTop: '20px', textAlign: 'center', fontSize: '14px' }}>
+          회원이 아니신가요? <Link to="/signup" style={{ color: '#FF3B77', textDecoration: 'underline' }}>이메일로 회원가입</Link>
         </div>
       </main>
     </div>

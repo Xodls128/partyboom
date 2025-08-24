@@ -38,17 +38,10 @@ export default function App() {
       <AppFrame>
         <Routes>
           <Route index element={<Home />} />
-          <Route 
-            path="/notifications" 
-            element={
-              isLoggedIn ? <Notifications /> : <KakaoLoginPage />
-            } 
-          />
+          <Route path="/notifications" element={<Notifications />} />
           {/* <Route path="/assist" element={<Assist />} /> */}
-          <Route path="/mypage" element={<Mypage />} />
           <Route path="/map" element={<Map />} />
           <Route path="/mypage" element={<Mypage />} /> 
-          <Route path="/mypage" element={<Mypage />} />
           <Route path="/mypage/history" element={<PartyHistory />} />
           <Route path="/mypage/edit" element={<ProfileEdit />} />
           <Route path="/mypage/extra" element={<ProfileExtra/>} />
@@ -63,9 +56,6 @@ export default function App() {
           <Route path="/balancewait/:partyId" element={<Balancewait />} />
           <Route path="/balancegame/:partyId" element={<Balancegame />} />
           <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
-          <Route path="/assist" element={<Assist />} />
-          <Route path="/participants/:partyId" element={<Participants />} />
-          <Route path="/report/:userId" element={<ReportUser />} /> 
         </Routes>
       </AppFrame>
     </BrowserRouter>
