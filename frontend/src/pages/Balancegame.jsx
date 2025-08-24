@@ -10,7 +10,6 @@ import './balancegame.css';
 export default function Balancegame() {
   const navigate = useNavigate();
   const { roundId } = useParams();
-  const token = localStorage.getItem("access");
   const wsRef = useRef(null);
   const intervalRef = useRef(null);
 
