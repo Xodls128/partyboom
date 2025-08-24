@@ -32,7 +32,7 @@ export default function Home() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await api.get("/api/mypage/");
+        const { data } = await api.get("/api/mypage/main");
         setUsername(data.name || "게스트");
 
       } catch (error) {
@@ -75,24 +75,13 @@ export default function Home() {
 
     setIsLoading(true); // 로딩 시작
     try {
-      const res = await fetch(`${API_BASE}/api/reserve/join/${partyId}/`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      });
-
-      if (!res.ok) {
-        const errorMsg = await safeGetErrorText(res);
-        throw new Error(errorMsg || "참가 신청에 실패했습니다.");
-      }
-
-      const data = await res.json();
+      const { data } = await api.post(`/api/reserve/join/${partyId}/`);
       navigate("/payment", { state: { participationId: data.id } });
-
     } catch (err) {
-      console.error(err);
-      alert(err.message);
+      console.error("참가 신청 실패:", err.response?.data || err.message);
+      alert(err.response?.data?.detail || "참가 신청에 실패했습니다.");
     } finally {
-      setIsLoading(false); // 로딩 종료 (성공/실패 무관)
+      setIsLoading(false);
     }
   };
   
