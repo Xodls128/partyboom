@@ -1,5 +1,6 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { useAuth } from "../context/AuthContext"; // AuthContext 사용
 import api from "../api/axios"; 
 import Header from '../components/Header';
 import NavBar from '../components/NavBar';
@@ -12,26 +13,15 @@ import LoginRequest from "../components/LoginRequest";
 import './home.css';
 
 export default function Home() {
+  const { user, isLoggedIn } = useAuth(); // AuthContext에서 사용자 정보와 로그인 상태 가져오기
   const [partyList, setPartyList] = useState([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [username, setUsername] = useState("게스트");
   const [isLoading, setIsLoading] = useState(false); 
   const navigate = useNavigate();
   const location = useLocation();
 
-  // 유저 정보 가져오기
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        // ✅ 엔드포인트 수정: /api/mypage/
-        const { data } = await api.get("/api/mypage/");
-        setUsername(data.name || "게스트");
-      } catch (error) {
-        console.error("유저 정보를 불러오는 중 오류:", error.response?.data || error.message);
-      }
-    };
-    fetchUser();
-  }, []);
+  // 사용자 정보를 가져오는 useEffect는 이제 필요 없으므로 삭제합니다.
+  // AuthContext가 이 역할을 대신합니다.
 
   // 파티 목록 가져오기
   useEffect(() => {
@@ -64,8 +54,8 @@ export default function Home() {
   const handleApply = async (partyId) => {
     if (isLoading) return;
 
-    const token = localStorage.getItem("access"); // ✅ access 그대로 사용
-    if (!token) {
+    // localStorage를 직접 확인하는 대신, AuthContext의 로그인 상태를 사용
+    if (!isLoggedIn) {
       setShowLoginModal(true);
       return;
     }
@@ -85,7 +75,8 @@ export default function Home() {
   return (
     <>
       <Header />
-      <div className='title'>{username}님께 추천하는 파티🥳</div>
+      {/* Optional Chaining(user?.name)으로 안전하게 사용자 이름에 접근 */}
+      <div className='title'>{user?.name || '게스트'}님께 추천하는 파티🥳</div>
 
       {partyList.map((party) => (
         <div className="party-block" key={party.id}>
@@ -100,11 +91,6 @@ export default function Home() {
           </Link>
 
           <div className='partyName'>{party.name}</div>
-          <div className="party-tags-list">
-            {party.tags.map(tag => (
-              <span key={tag.id} className="party-tag-item">#{tag.name}</span>
-            ))}
-          </div>
           <div className='date'>
             <img src={DateIcon} alt="" />
             <span className="dateText">{party.date}</span>

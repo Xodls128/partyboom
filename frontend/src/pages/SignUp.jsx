@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './LoginSignup.css';
 import LeftIcon from '../assets/left_black.svg';
 import EyeIcon from '../assets/visibility.svg';
@@ -233,6 +233,9 @@ export default function Signup() {
             <button className="auth-btn auth-btn--sign" onClick={submit} disabled={loading}>
               가입하기
             </button>
+        </div>
+        <div className="switch-auth-prompt" style={{ marginTop: '20px', textAlign: 'center', fontSize: '14px' }}>
+          이미 계정이 있으신가요? <Link to="/login" style={{ color: '#FF3B77', textDecoration: 'underline' }}>로그인</Link>
         </div>
       </section>
     </div>
