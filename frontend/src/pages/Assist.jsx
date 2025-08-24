@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Assistbomb from '../assets/assistbomb.svg';
 import Location from '../assets/location.svg';
-import Date from '../assets/date.svg';
+import DateIcon from '../assets/date.svg';
 import Check from '../assets/check.svg';
 import Profilesmall from '../assets/profilesmall.svg';
 import './assist.css';
@@ -23,7 +23,7 @@ export default function Assist() {
   // 파티 데이터 불러오기
   const fetchParties = async () => {
     try {
-      const token = localStorage.getItem("accessToken");
+      const token = localStorage.getItem("access");
       if (!token) {
         setShowLoginPopup(true);
         return;
@@ -295,7 +295,7 @@ export default function Assist() {
 
               <div className='assist-partyName'>{currentParty.title}</div>
               <div className='assist-date'>
-                <img src={Date} alt="" />
+                <img src={DateIcon} alt="" />
                 <span className="assist-dateText">
                   {new Date(currentParty.start_time).toLocaleString('ko-KR', {
                     month: '2-digit',
