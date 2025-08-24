@@ -83,7 +83,8 @@ export default function Partyinfo() {
     description, 
     tags, 
     participations, 
-    place_photo 
+    place_photo,
+    place_map 
   } = party;
 
   return (
@@ -131,7 +132,15 @@ export default function Partyinfo() {
         </section>
 
         <section className="party-map">
-          <div className="map-placeholder" aria-label="지도 자리(준비중)" /> {/* 이부분 이미지로 가져올 수 있도록 하기*/}
+          {place_map ? (
+            <img 
+              src={resolveImg(place_map)} 
+              alt={`${title} 지도`} 
+              className="party-map-image" 
+            />
+          ) : (
+            <div className="map-placeholder" aria-label="지도 준비중" />
+          )}
         </section>
 
         <section className="party-description">
