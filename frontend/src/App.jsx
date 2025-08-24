@@ -48,9 +48,14 @@ export default function App() {
           <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
           <Route path="/kakao-login" element={<KakaoLoginPage />} />
           <Route path="/oauth/kakao/callback" element={<KakaoCallbackPage />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/payment" element={<Payment />} />
+          <Route path="/paymentfinish" element={<PaymentFinish />} />
+          <Route path="/balancewait/:partyId" element={<Balancewait />} />
+          <Route path="/balancegame/:partyId" element={<Balancegame />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
   );
 }
-
