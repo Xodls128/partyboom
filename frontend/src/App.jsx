@@ -20,6 +20,7 @@ import Balancewait from './pages/Balancewait.jsx';
 import Balancegame from "./pages/Balancegame.jsx";
 import Assist from "./pages/Assist.jsx";
 
+import Participants from './pages/Participants.jsx';
 
 export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/balancegame/:partyId" element={<Balancegame />} />
           <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
           <Route path="/assist" element={<Assist />} />
+          <Route path="/participants" element={<Participants />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
