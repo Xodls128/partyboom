@@ -117,15 +117,16 @@
 
 /* 하단 CTA */
 .party-cta {
-  position: sticky;      /* 뷰포트 기준이 아니라 컨테이너 안에서 고정 */
+  position: fixed;        /* 화면(viewport) 하단에 고정 */
   bottom: 0;
-  width: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: var(--frame-w);
   background: #fff;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
   padding: 12px var(--side-gap) calc(12px + var(--safe-bottom));
-  z-index: 100;
+  z-index: 1000;
 }
-
 
 .partyinfo-attendees-summary{
   display:flex; align-items:center; justify-content:space-between;
