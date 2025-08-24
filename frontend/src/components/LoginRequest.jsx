@@ -20,6 +20,8 @@ export default function LoginRequest({ isOpen, onClose, redirectTo }) {
     const kakaoAuthUrl = 
       `https://kauth.kakao.com/oauth/authorize?client_id=${KAKAO_REST_API_KEY}&redirect_uri=${KAKAO_REDIRECT_URI}&response_type=code`;
     
+    console.log("카카오 로그인 URL:", kakaoAuthUrl);
+
     window.location.href = kakaoAuthUrl;
   };
 
