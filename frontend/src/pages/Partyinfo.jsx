@@ -47,7 +47,7 @@ export default function Partyinfo() {
     const fetchParticipations = async () => {
       try {
         const { data } = await api.get(`/api/reserve/participations/${partyId}/`);
-        setParticipations(data);
+        fetchParticipations(data);
       } catch (err) {
         console.error("참석자 불러오기 실패:", err.response?.data || err.message);
       }
@@ -87,12 +87,12 @@ export default function Partyinfo() {
   const { 
     title, 
     start_time, 
-    place_name, // API 응답에 맞게 수정
-    applied_count, // participant_count 대신 사용
+    place_name, 
+    applied_count, 
     max_participants, 
     description, 
     tags, 
-    place_photo // place_photo 직접 구조 분해
+    place_photo 
   } = party;
 
 
@@ -150,10 +150,10 @@ export default function Partyinfo() {
 
         <section className="party-attendees" aria-labelledby="attendees-title">
           <div className="attendees-grid">
-            {(participations || []).map(p => (
-              <div key={p.user.id} className="attendee">
-                <img src={p.user.profile_image || UserIcon} alt={p.user.username} className="attendee-img" />
-                <span className="attendee-name">{p.user.username}</span>
+            {(participations || []).map((p, index) => (
+              <div key={p.user?.id ?? index} className="attendee">
+                <img src={p.user?.profile_image || UserIcon} alt={p.user?.username || "익명"} className="attendee-img" />
+                <span className="attendee-name">{p.user?.username || "익명"}</span>
               </div>
             ))}
           </div>
