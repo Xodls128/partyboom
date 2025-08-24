@@ -25,9 +25,10 @@ export default function LoginRequest({ isOpen, onClose, redirectTo }) {
     window.location.href = kakaoAuthUrl;
   };
 
-  const handleLoginSignup = () => {
-    navigate('/login');
+  // window.location을 사용하여 로그인 페이지로 직접 이동
+  const goToLoginPage = () => {
     onClose();
+    window.location.href = '/login';
   };
 
   return (
@@ -42,7 +43,7 @@ export default function LoginRequest({ isOpen, onClose, redirectTo }) {
           </button>
           <button 
             className="loginrequest-signup-btn" 
-            onClick={handleLoginSignup} // 함수 이름을 변경하고 경로를 /login으로 수정
+            onClick={goToLoginPage}
           >
             로그인 / 회원가입
           </button>
