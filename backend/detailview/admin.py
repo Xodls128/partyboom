@@ -78,7 +78,7 @@ class PartyAdmin(admin.ModelAdmin):
     )
     list_filter = ('is_approved', 'place', 'start_time', 'tags')
     search_fields = ('title', 'place__name', 'tags__name')
-    autocomplete_fields = ('place', 'tags')
+    autocomplete_fields = ('place', 'tags', 'map')
     inlines = [ParticipationInline]
 
     def get_applied_count(self, obj):
