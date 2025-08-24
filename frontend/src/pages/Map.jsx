@@ -6,7 +6,7 @@ import PartySmallImages from '../assets/partysmall.jpg';
 import Header from '../components/Header.jsx';
 import NavBar from '../components/NavBar.jsx';
 import { useNavigate } from 'react-router-dom'; // useNavigate 추가
-import api from "@/api/axios";
+import api from "../api/axios";
 
 
 export default function Map() {

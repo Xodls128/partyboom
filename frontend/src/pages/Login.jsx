@@ -39,18 +39,9 @@ export default function Login(){
       alert("로그인 성공");
       nav(from, { replace: true }); // 로그인 전 페이지 or 홈으로 이동
     } catch (err) {
-      let message = "로그인 실패";
-      if (err.response) {
-        // 서버가 응답했지만 상태 코드가 실패인 경우
-        message = err.response.data?.detail || JSON.stringify(err.response.data);
-      } else if (err.request) {
-        // 요청을 보냈는데 응답이 없는 경우
-        message = "서버 응답이 없습니다. 네트워크를 확인해주세요.";
-      } else {
-        // 그 외 (코드 오류 등)
-        message = err.message || "알 수 없는 오류가 발생했습니다.";
-      }
-      alert(message);
+      alert(e.message);
+    } finally {
+      setLoading(false);
     }
   };
 

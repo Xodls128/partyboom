@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from "@/api/axios";
+import api from "../api/axios";
 import Back from '../assets/left_black.svg';
 import Vs from '../assets/vs.svg';
 import { Swiper, SwiperSlide } from 'swiper/react';
