@@ -10,7 +10,7 @@ class Place(models.Model): # 장소에 대한 기본 정보 저장
     longitude = models.DecimalField(max_digits=9, decimal_places=6, default=0)
     capacity = models.PositiveIntegerField(default=1)
     photo = models.ImageField(upload_to="places/", blank=True, null=True)
-    map = models.ImageField(upload_to="maps/", blank=False, null=False)
+    map = models.ImageField(upload_to="maps/", blank=True, null=True)
 
     # 정적 지도 이미지 기준 정규화 좌표
     x_norm = models.FloatField(default=0.5, validators=[MinValueValidator(0.0), MaxValueValidator(1.0)])
