@@ -14,6 +14,7 @@ export default function Partyinfo() {
   const { partyId } = useParams();
   const navigate = useNavigate();
   const [party, setParty] = useState(null);
+  const [participations, setParticipations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
