@@ -42,8 +42,8 @@ export default function Login(){
       console.log("로그인 성공:", data);
 
       // 토큰과 유저정보를 localStorage에 저장
-      localStorage.setItem("access", data.access);
-      localStorage.setItem("refresh", data.refresh);
+      localStorage.setItem("accessToken", data.access); // 토큰 변수명 통일
+      localStorage.setItem("refreshToken", data.refresh);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       alert("로그인 성공");
