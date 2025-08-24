@@ -34,7 +34,6 @@ export default function LoginRequest({ isOpen, onClose, redirectTo }) {
         <div className="loginrequest-buttons">
           <div className="login-request-actions">
         <button className="kakao-login-btn" onClick={handleKakaoLogin}>
-          <img src={KakaoIcon} alt="" />
           카카오로 1초 만에 시작하기
         </button>
         {/* 이메일 버튼: 로그인 페이지로 연결 */}
