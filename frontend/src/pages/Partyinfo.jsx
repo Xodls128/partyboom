@@ -131,7 +131,7 @@ export default function Partyinfo() {
         </section>
 
         <section className="party-map">
-          <div className="map-placeholder" aria-label="지도 자리(준비중)" />
+          <div className="map-placeholder" aria-label="지도 자리(준비중)" /> {/* 이부분 이미지로 가져올 수 있도록 하기*/}
         </section>
 
         <section className="party-description">
