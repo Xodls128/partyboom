@@ -66,8 +66,7 @@ export default function Map() {
 
         setParties(formattedParties);
       } catch (error) {
-        console.error("Failed to fetch parties:", error);
-        // 에러 발생 시 사용자에게 알릴 수 있는 UI 처리 (옵션)
+        console.error("파티 데이터를 불러오는 중 오류:", error.response?.data || error.message);
       }
     };
 
