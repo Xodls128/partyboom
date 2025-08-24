@@ -95,7 +95,7 @@ export default function Partyinfo() {
           alt={title} 
           className="party-main-image" 
         />
-        
+
         <h1 className="party-name">{title}</h1>
         
         <div className="party-info-card">
@@ -109,7 +109,7 @@ export default function Partyinfo() {
           </div>
           <div className="party-info-row">
             <span className="info-label">장소</span>
-            <span className="info-value">{place?.name}</span>
+            <span className="info-value">{place_name}</span>
           </div>
           <div className="party-info-row">
             <span className="info-label">참여인원</span>
