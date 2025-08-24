@@ -39,7 +39,7 @@ export default function Payment() {
       return;
     }
 
-    const fetchUser = async () => {
+    const fetchParticipation = async () => {
       try {
       const { data } = await api.get(`/api/reserve/participation/${participationId}/`);
       setPoints(data.user.points);
