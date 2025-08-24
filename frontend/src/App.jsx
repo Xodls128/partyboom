@@ -18,6 +18,7 @@ import Payment from './pages/Payment.jsx';
 import PaymentFinish from "./pages/PaymentFinish.jsx";
 import Balancewait from './pages/Balancewait.jsx';
 import Balancegame from "./pages/Balancegame.jsx";
+import Assist from "./pages/Assist.jsx";
 
 
 export default function App() {
@@ -37,7 +38,7 @@ export default function App() {
         <Routes>
           <Route index element={<Home />} />
           <Route path="/notifications" element={<Notifications />} />
-          {/* <Route path="/assist" element={<Assist />} /> */}
+          <Route path="/assist" element={<Assist />} />
           <Route path="/map" element={<Map />} />
           <Route path="/mypage" element={<Mypage />} /> 
           <Route path="/mypage/history" element={<PartyHistory />} />
