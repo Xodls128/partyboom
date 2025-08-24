@@ -125,7 +125,12 @@ export default function Partyinfo() {
         <section className="party-tags">
           <div className="tags-container">
             {(tags || []).map((tag, index) => (
-              <span key={`${tag.id}-${index}`} className="tag">#{tag.name}</span>
+              <span
+                key={`${tag.id ?? index}-${index}`}
+                className="tag"
+              >
+                {tag.name}
+              </span>
             ))}
           </div>
         </section>
