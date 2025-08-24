@@ -38,10 +38,8 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="/notifications" element={<Notifications />} />
           {/* <Route path="/assist" element={<Assist />} /> */}
-          <Route path="/mypage" element={<Mypage />} />
           <Route path="/map" element={<Map />} />
           <Route path="/mypage" element={<Mypage />} /> 
-          <Route path="/mypage" element={<Mypage />} />
           <Route path="/mypage/history" element={<PartyHistory />} />
           <Route path="/mypage/edit" element={<ProfileEdit />} />
           <Route path="/mypage/extra" element={<ProfileExtra/>} />
@@ -55,7 +53,6 @@ export default function App() {
           <Route path="/paymentfinish" element={<PaymentFinish />} />
           <Route path="/balancewait/:partyId" element={<Balancewait />} />
           <Route path="/balancegame/:partyId" element={<Balancegame />} />
-          <Route path="/partyinfo/:partyId" element={<Partyinfo />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
