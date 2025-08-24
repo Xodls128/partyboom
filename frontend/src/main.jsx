@@ -3,6 +3,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
+import { AuthProvider } from './context/AuthContext.jsx';
 
 // (선택) 혹시 index.html에 뷰포트 메타가 없을 때 보완
 (function ensureViewport() {
@@ -18,7 +19,9 @@ import './index.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <AuthProvider>
+      <App />
+    </AuthProvider>
   </StrictMode>
 );
 

@@ -1,30 +1,31 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import api from '../api/axios'; // 올바른 api 인스턴스 임포트
+import api from '../api/axios';
+import { useAuth } from '../context/AuthContext'; // useAuth 훅 임포트
 
 function KakaoCallbackPage() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { login } = useAuth(); // AuthContext의 login 함수 사용
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const code = params.get('code');
 
-    // useEffect 내에서 사용할 async 함수 선언
     const handleKakaoLogin = async (authCode) => {
       try {
-        // 백엔드에 인증 코드와 redirect_uri를 함께 전송
         const res = await api.post('/api/signup/kakao/callback/', {
           code: authCode,
-          // 환경 변수(.env)에 저장된 고정된 URI 값을 사용합니다.
           redirect_uri: import.meta.env.VITE_KAKAO_REDIRECT_URI,
         });
         
         const { access, refresh, is_additional_info_provided } = res.data;
 
-        localStorage.setItem("access", access);
-        localStorage.setItem("refresh", refresh);
+        // localStorage에 직접 저장하는 대신, context의 login 함수 호출
+        await login(access, refresh);
 
+        // login 함수가 사용자 정보를 context에 저장하면,
+        // is_additional_info_provided 값에 따라 페이지 이동
         if (is_additional_info_provided) {
           navigate("/");
         } else {
@@ -45,9 +46,8 @@ function KakaoCallbackPage() {
       alert("카카오 인증에 실패했습니다. 로그인 페이지로 돌아갑니다.");
       navigate("/login");
     }
-  }, [location, navigate]);
+  }, [location, navigate, login]); // login 함수를 의존성 배열에 추가
 
-  // 처리 중임을 사용자에게 보여주는 UI
   return (
     <div>
       <h1>카카오 로그인 처리 중...</h1>
