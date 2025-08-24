@@ -52,6 +52,10 @@ export default function Home() {
 
   // 참가 신청
   const handleApply = async (partyId) => {
+    // --- 디버깅 코드 ---
+    console.log("참여하기 버튼 클릭 시점의 로그인 상태(isLoggedIn):", isLoggedIn);
+    // --- 디버깅 코드 끝 ---
+
     if (isLoading) return;
 
     // localStorage를 직접 확인하는 대신, AuthContext의 로그인 상태를 사용

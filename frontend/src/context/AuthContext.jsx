@@ -39,8 +39,13 @@ export const AuthProvider = ({ children }) => {
     try {
       const { data } = await api.get('/api/mypage/');
       setUser(data);
+      // 추가 정보 입력 여부에 따라 적절한 페이지로 이동시키는 로직은
+      // 로그인 컴포넌트(Login, KakaoCallbackPage)에서 처리하는 것이 더 적합합니다.
+      return data; // 사용자 정보를 반환하여 후속 처리에 사용
     } catch (error) {
       console.error("로그인 후 사용자 정보 가져오기 실패:", error);
+      setUser(null); // 실패 시 확실하게 null로 설정
+      throw error; // 에러를 다시 던져서 호출한 쪽에서 처리하도록 함
     }
   };
 
