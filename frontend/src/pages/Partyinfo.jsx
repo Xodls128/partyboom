@@ -113,7 +113,7 @@ export default function Partyinfo() {
           </div>
           <div className="party-info-row">
             <span className="info-label">참여인원</span>
-            <span className="info-value">{participant_count ?? 0} / {max_participants}</span>
+            <span className="info-value">{applied_count ?? 0} / {max_participants}</span>
           </div>
         </div>
 
