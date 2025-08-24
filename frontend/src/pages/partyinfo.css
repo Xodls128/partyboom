@@ -91,12 +91,13 @@
   overflow: hidden;
   margin-top: 12px;
 }
-.map-placeholder::after{
+.map-placeholder::after {
   content: "지도 이미지 넣고 변경";
   position:absolute; inset:0;
   display:flex; align-items:center; justify-content:center;
   color:#777; font-size:14px; font-weight:600;
 }
+
 
 /* 설명 */
 .party-description{ width: calc(100% - 24px); margin: 0 auto 16px; }
