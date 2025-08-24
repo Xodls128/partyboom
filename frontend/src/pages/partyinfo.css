@@ -117,16 +117,14 @@
 
 /* 하단 참가신청 바 (항상 보이기) */
 .party-cta {
-  position: fixed; /* 페이지 하단에 고정 */
+  position: sticky;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: var(--frame-w);
-  height: var(--cta-h);
+  width: 100%;
+  max-width: var(--frame-max);
+  margin: 0 auto;
   background: #fff;
-  box-shadow: 0 -2px 6px rgba(0,0,0,0.1); /* 살짝 그림자 */
-  z-index: 1000;
-  padding-bottom: var(--safe-bottom);
+  box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
+  z-index: 100;
 }
 
 
