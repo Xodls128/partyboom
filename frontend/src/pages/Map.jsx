@@ -274,7 +274,7 @@ export default function Map() {
             <li key={p.id}>
               <PartySmall
                 {...p}
-                onClick={() => navigate(`/parties/${p.id}`)} // 상세보기 버튼 클릭 시 이동
+                onClick={() => navigate(`/partyinfo/${p.id}`)} // 상세보기 버튼 클릭 시 이동
               />
             </li>
           ))}
