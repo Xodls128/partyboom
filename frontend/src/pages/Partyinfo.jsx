@@ -7,9 +7,19 @@ import DateIcon from '../assets/date.svg';
 import CheckIcon from '../assets/check.svg';
 import "./partyinfo.css";
 
-import LoginRequest from "../components/LoginRequest";; // 추가
+import LoginRequest from "../components/LoginRequest";
 
 const API_BASE = import.meta.env.VITE_API_URL;
+
+// 안전한 에러 메시지 추출 헬퍼
+async function safeGetErrorText(res) {
+  try {
+    const data = await res.clone().json();
+    return data.detail || Object.values(data).join('\n');
+  } catch {
+    return await res.text();
+  }
+}
 
 export default function Partyinfo() {
   const { partyId } = useParams();
@@ -20,6 +30,9 @@ export default function Partyinfo() {
 
   // 로그인 요청 모달 상태
   const [showLoginRequest, setShowLoginRequest] = useState(false);
+
+  // 로딩 상태 (참가 버튼 전용)
+  const [isJoining, setIsJoining] = useState(false);
 
   useEffect(() => {
     const fetchPartyDetails = async () => {
@@ -40,13 +53,15 @@ export default function Partyinfo() {
   }, [partyId]);
 
   const handleJoin = async () => {
+    if (isJoining) return; // 중복 실행 방지
+
     const token = localStorage.getItem("access");
     if (!token) {
-      // 로그인 안 된 경우 → 모달 띄우기
       setShowLoginRequest(true);
       return;
     }
 
+    setIsJoining(true);
     try {
       const res = await fetch(`${API_BASE}/api/reserve/join/${partyId}/`, {
         method: "POST",
@@ -57,15 +72,18 @@ export default function Partyinfo() {
       });
 
       if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData?.detail || "참가 신청 실패");
+        const errorMsg = await safeGetErrorText(res);
+        throw new Error(errorMsg || "참가 신청 실패");
       }
 
       const data = await res.json();
       navigate("/payment", { state: { participationId: data.id } });
+
     } catch (err) {
       console.error(err);
       alert(err.message || "참가 신청 중 오류가 발생했습니다.");
+    } finally {
+      setIsJoining(false);
     }
   };
 
@@ -166,12 +184,17 @@ export default function Partyinfo() {
             </div>
           </div>
 
-          <button className="join-button" onClick={handleJoin}>참가신청</button>
+          <button 
+            className="join-button" 
+            onClick={handleJoin} 
+            disabled={isJoining} // 로딩 중 비활성화
+          >
+            {isJoining ? "신청 중..." : "참가신청"}
+          </button>
         </section>
       </main>
 
-      
-      {showLoginRequest && (// 로그인 모달
+      {showLoginRequest && (
         <LoginRequest 
           isOpen={true} 
           onClose={() => setShowLoginRequest(false)} 
