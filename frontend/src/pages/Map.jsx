@@ -6,8 +6,8 @@ import PartySmallImages from '../assets/partysmall.jpg';
 import Header from '../components/Header.jsx';
 import NavBar from '../components/NavBar.jsx';
 import { useNavigate } from 'react-router-dom'; // useNavigate 추가
+import api from "@/api/axios";
 
-const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Map() {
   // useRef - 리렌더 없이 값 기억 
