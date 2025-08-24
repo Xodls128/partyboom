@@ -72,13 +72,14 @@ export default function Partyinfo() {
   const { 
     title, 
     start_time, 
-    place, 
-    participant_count, 
+    place_name, // API 응답에 맞게 수정
+    applied_count, // participant_count 대신 사용
     max_participants, 
     description, 
     tags, 
-    participations 
+    place_photo // place_photo 직접 구조 분해
   } = party;
+
 
   return (
     <div className="party-info-container">
