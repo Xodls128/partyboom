@@ -29,12 +29,12 @@ function KakaoCallbackPage() {
       } catch (err) {
         console.error("카카오 로그인 처리 중 에러 발생:", err);
 
-        // 응답은 왔지만 상태 코드가 200이 아닌 경우만 로그인 실패 처리
-        if (err.response && err.response.status >= 400) {
-          alert("로그인에 실패했습니다. 다시 시도해주세요.");
+        // 진짜 서버 오류(500 이상)일 때만 로그인 실패 처리
+        if (err.response && err.response.status >= 500) {
+          alert("서버 오류로 로그인에 실패했습니다. 잠시 후 다시 시도해주세요.");
           navigate("/login");
         } else {
-          // 혹시 토큰은 저장됐는데 네트워크 에러만 발생한 경우 → 홈으로 보내기
+          // 그 외의 경우는 토큰이 저장됐을 가능성이 있으므로 홈으로 이동
           navigate("/");
         }
       }
