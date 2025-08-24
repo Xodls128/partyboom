@@ -3,7 +3,9 @@ from django.db import transaction
 from django.utils import timezone
 from detailview.models import Participation, Party
 from .models import Payment
+from django.contrib.auth import get_user_model
 
+User = get_user_model()
 
 class ReserveJoinSerializer(serializers.Serializer):
     party_id = serializers.IntegerField()
@@ -41,6 +43,24 @@ class ReserveJoinSerializer(serializers.Serializer):
         )
         return participation
 
+
+class UserSimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["id", "points"]   # 프론트에서 필요한 필드만 노출
+
+class PartySimpleSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Party
+        fields = ["id", "deposit"]  # 프론트에서 필요한 필드만 노출
+
+class ParticipationDetailSerializer(serializers.ModelSerializer):
+    user = UserSimpleSerializer(read_only=True)
+    party = PartySimpleSerializer(read_only=True)
+
+    class Meta:
+        model = Participation
+        fields = ["id", "user", "party", "status", "created_at", "paid_at"]
 
 class ParticipationSerializer(serializers.ModelSerializer):
     class Meta:
