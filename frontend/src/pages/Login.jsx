@@ -28,7 +28,7 @@ export default function Login(){
         username: id,   // 백엔드 로그인 필드는 username/password
         password: pw,
       });
-      
+
       console.log("로그인 성공:", data);
 
       // 토큰과 유저정보를 localStorage에 저장
@@ -38,8 +38,10 @@ export default function Login(){
 
       alert("로그인 성공");
       nav(from, { replace: true }); // 로그인 전 페이지 or 홈으로 이동
-    } catch (e) {
-      alert(e.message);
+    } catch (err) {
+      // axios는 실패 시 err.response.data 안에 detail이 있음
+      const message = err.response?.data?.detail || "로그인 실패";
+      alert(message);
     } finally {
       setLoading(false);
     }
