@@ -39,7 +39,7 @@ export default function Payment() {
       return;
     }
 
-    const fetchParticipation = async () => {
+    const fetchUser = async () => {
       try {
       const { data } = await api.get(`/api/reserve/participation/${participationId}/`);
       setPoints(data.user.points);
@@ -48,7 +48,7 @@ export default function Payment() {
       console.error("예약 정보 불러오기 실패:", err.response?.data || err.message);
     }
   };
-  fetchParticipation();
+  fetchUser();
 }, [participationId, navigate]);
 
   // 결제 처리
