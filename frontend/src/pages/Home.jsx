@@ -143,7 +143,11 @@ export default function Home() {
             disabled={isLoading} // 로딩 중일 때 비활성화
             aria-label="참가하기"
           >
-            <img src={Apply} alt="버튼" />
+            {isLoading ? (
+              <span className="loading-text">신청 중...</span>
+            ) : (
+              <img src={Apply} alt="버튼" />
+            )}
           </button>
         </div>
       ))}
