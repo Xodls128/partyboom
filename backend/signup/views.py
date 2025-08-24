@@ -80,14 +80,12 @@ def kakao_callback_debug(request):
     error = request.GET.get("error", "")
     return HttpResponse(f"code={code}<br>error={error}")
 
-
 class KakaoLoginAPIView(APIView):
     permission_classes = [AllowAny]
 
     def post(self, request):
         if not settings.ENABLE_AUTH:
-            # 인증 비활성화 모드 → 그냥 더미 토큰과 유저 반환
-            user = User.objects.first()  # 첫 번째 유저를 가짜 로그인으로 사용
+            user = User.objects.first()
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token
             return Response({
@@ -96,7 +94,7 @@ class KakaoLoginAPIView(APIView):
                 "user": {
                     "id": user.id,
                     "email": user.email,
-                    "name": user.name,  # nickname 대신 name
+                    "name": user.name,
                 }
             }, status=200)
 
@@ -145,12 +143,8 @@ class KakaoLoginAPIView(APIView):
         kakao_id = payload.get("id")
         account = (payload.get("kakao_account") or {})
         profile = (account.get("profile") or {})
-        email = account.get("email")  # 동의 안 하면 None
+        email = account.get("email")
         nickname = profile.get("nickname") or f"kakao_{kakao_id}"
-
-        print("DEBUG >>> kakao payload:", payload)
-        print("DEBUG >>> kakao_id:", kakao_id)
-        print("DEBUG >>> email:", email)
 
         if not kakao_id:
             return Response({"detail": "invalid kakao payload"}, status=400)
@@ -162,38 +156,40 @@ class KakaoLoginAPIView(APIView):
                 if email:
                     user = User.objects.filter(email=email).first()
 
-                print("DEBUG >>> user before create:", user)
-
-                # username 중복 방지
                 if not user:
+                    # username = nickname (중복 방지 처리)
+                    base_username = nickname
+                    final_username = base_username
+                    counter = 1
+                    while User.objects.filter(username=final_username).exists():
+                        final_username = f"{base_username}_{counter}"
+                        counter += 1
+
                     user, created = User.objects.get_or_create(
-                        username=f"kakao_{kakao_id}",
-                        defaults={"email": email or ""}
+                        username=final_username,
+                        defaults={
+                            "email": email or "",
+                            "name": nickname,
+                            "points": 10000,  # 신규 가입자만 기본 포인트 지급
+                        }
                     )
                     if created:
                         user.set_unusable_password()
-                        user.save(update_fields=["password"])
-                
-                print("DEBUG >>> user after create/get:", user)
+                        user.save()
+                else:
+                    # 기존 유저 → 포인트는 그대로 두고, 닉네임만 보정
+                    if not user.name and nickname:
+                        user.name = nickname
+                        user.save()
 
-                #  안전장치 추가: user가 None이면 여기서 바로 반환
-                if not user:
-                    return Response({"detail": "User creation failed"}, status=500)
-
-                print("DEBUG >>> nickname:", nickname, "user.name before:", user.name)
-
-                # nickname 업데이트
-                if nickname and not user.name:
-                    user.name = nickname
-                    user.save(update_fields=["name"])
-
-                print("DEBUG >>> about to create/get SocialAccount for user:", user)
+                # 소셜 계정 연결
                 SocialAccount.objects.get_or_create(
                     user=user, provider="kakao", social_id=str(kakao_id)
                 )
 
             if not user:
                 return Response({"detail": "User creation failed"}, status=500)
+
         except Exception as e:
             import traceback
             print("DEBUG >>> user upsert exception:", e)
@@ -204,15 +200,15 @@ class KakaoLoginAPIView(APIView):
         refresh = RefreshToken.for_user(user)
         access = refresh.access_token
 
-        # 응답
         out = {
             "access": str(access),
             "refresh": str(refresh),
             "user": {
                 "id": user.id,
+                "username": user.username,  # 카카오 닉네임
+                "name": user.name,
                 "email": user.email,
-                "name": user.name,  # name 필드 통일
+                "points": user.points,
             }
         }
         return Response(TokenPairResponseSerializer(out).data, status=200)
-    

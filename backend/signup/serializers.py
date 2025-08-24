@@ -21,6 +21,7 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer): # 일반 로�
             "username": self.user.username,
             "name": self.user.name,
             "email": self.user.email,
+            "points": self.user.points,
         }
 
         return data
@@ -76,8 +77,10 @@ class KakaoLoginRequestSerializer(serializers.Serializer):
 
 class UserBriefSerializer(serializers.Serializer):
     id = serializers.IntegerField()
+    username = serializers.CharField(required=False)  # username 추가
     email = serializers.EmailField(allow_blank=True, allow_null=True, required=False)
     name = serializers.CharField(allow_blank=True, required=False)
+    points = serializers.IntegerField(required=False)  # points 추가
 
 class TokenPairResponseSerializer(serializers.Serializer):
     access = serializers.CharField()
