@@ -11,7 +11,6 @@ import Location from '../assets/location.svg';
 import PopupImg from '../assets/bell.svg';
 import './home.css';
 
-const API_BASE = import.meta.env.VITE_API_URL;
 
 export default function Home() {
   const [partyList, setPartyList] = useState([]);
@@ -21,17 +20,8 @@ export default function Home() {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem("access"); // 로그인 시 저장한 토큰
-        if (!token) return; // 토큰 없으면 게스트 유지
-
-        const response = await fetch(`${API_BASE}/api/user/me/`, {
-          headers: { "Authorization": `Bearer ${token}` }
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUsername(data.nickname || data.username || "게스트");
-        }
+        const { data } = await api.get("/api/mypage/");
+        setUsername(data.name || "게스트");
       } catch (error) {
         console.error("유저 정보를 불러오는 중 오류:", error);
       }
