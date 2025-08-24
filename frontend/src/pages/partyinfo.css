@@ -1,44 +1,46 @@
 @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+
 :root{
-  --frame-max: 393px;          
-  --side-gap: 16px;            
+  --frame-max: 393px;
+  --frame-w: min(100vw, var(--frame-max));  
+  --side-gap: 16px;
+  --cta-h: 130px;                          
 }
 
 /* 페이지 프레임 */
 .party-info-container{
-  width: 393px;
+  width: var(--frame-w);                   
   margin: 0 auto;
   background:#fff;
   border-radius: 16px;
   overflow: hidden;
-  padding-bottom: 112px;        
+  padding-bottom: calc(var(--cta-h) + env(safe-area-inset-bottom, 0px));  /* UPDATED */
 }
 
 /* 상단 파티 이미지 */
 .party-main-image{
-  width: 393px;
+  width: 100%;                             
   height: 279px;
   object-fit: cover;
   display: block;
 }
 
-/* 뒤로가기 버튼 */
 .party-info-header{
-  position: fixed;
-  top: -10px;
+  position: fixed;                         
+  top: -20px;
   left: 50%;
-  transform: translateX(-196.5px); 
-  z-index: 20;
+  transform: translateX(-50%);
+  width: var(--frame-w);
+  padding-left: var(--side-gap);
+  z-index: 1000;
 }
 .back-button img{ 
-  width:17px; 
-  height:29px; 
+  width:17px; height:29px;
 }
 
 /* 타이틀 */
 .party-name::before{
   content: "#";
-
   font-family: Pretendard;
   font-size:18px; 
   font-weight:600; 
@@ -62,7 +64,7 @@
   gap:10px;
   margin-left: 10px;
 }
-.meta-icon img{ 
+.meta-icon{ 
   width:16.5px; 
   height:18.33px; 
 }
@@ -98,7 +100,7 @@
   font-size:18px; 
   font-weight:600; 
   letter-spacing:-0.019em; 
-  line-height:1.5;
+  line-height:1.5;             
   color: #000000;
 }
 
@@ -168,43 +170,48 @@
 }
 .attendee-name{ font-size:12px; color:#333; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* 하단 인원 및 참석자 프로필, 참가신청 바  */
+/* 하단 인원/프로필 + 참가신청 바*/
 .party-cta {
-  position: fixed;
-  left: 0; right: 0; bottom: 0;
-  width: 393px;
-  height: 154px;
-  margin: 0 auto;               
+  position: fixed;                           
+  left: 50%; 
+  transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom, 0px));
+  width: 392px;                   
+  height: var(--cta-h);
+  margin: 0 ;
   background: #fff;
-  box-shadow: 0 -16px 40px rgba(0,0,0,.16);
-  border-radius: 16px 16px 0 0;
   z-index: 1000;
 }
+
 .partyinfo-attendees-summary{
-  display:flex; align-items:center; 
+  display:flex; 
+  align-items:center; 
   justify-content:space-between;
   margin-bottom:10px;
 }
 .profile-icons{ 
   display:flex; 
   align-items:center; 
+  transform: translateX(-150px);
+  margin-top: 15px; 
 }
 .profile-icon{
-  width:42px; 
-  height:42px; 
+  width:35px; 
+  height:35px; 
   border-radius:50%; 
   object-fit:cover;
-  border:2px solid #fff; 
   margin-left:-8px;
+  position: relative;
 }
 .profile-icon:first-child{ margin-left:0; }
 
 .join-button{
-  width:354px; 
-  height:46px; 
+  width: calc(100% - 2 * var(--side-gap));  /* 프레임에 맞춤 */
+  max-width: 354px;
+  height:42px; 
   border:0; 
   border-radius:8px;
-
+  
   font-family: Pretendard;
   font-size:20px; 
   font-weight:600; 
@@ -214,19 +221,17 @@
   background: linear-gradient(90deg, #FFCD50 0%, #FF2824 100%);
   cursor:pointer;
   display:block;
-  margin: 12px auto 0;   
-  margin-top: 25px;
-  max-width: 100%; 
+  margin: 25px auto 0;   
 }
 .join-button:active{ transform: translateY(1px); }
-.join-button:active{ transform: translateY(1px); }
 
-/* 참석자 요약 줄 좌측: 아이콘 + 인원수 */
+/* 참석자 요약 줄 좌측: 원형 아이콘 + 인원수 */
 .partyinfo-left{
   display: flex;
   align-items: center;
-  gap: 8px;               
-  margin-top: 25px;
+  gap: 8px;
+  margin-top: 20px; 
+  margin-left: 8px
 }
 .count-icon{
   width: 18.33px;
@@ -240,7 +245,7 @@
 .partyinfo-personText{
   font-family: Pretendard;
   font-size:16px; 
-  font-weight:400; 
+  font-weight:400;               
   letter-spacing:-0.019em; 
   line-height:1.5;
   color: #000000;
