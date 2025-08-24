@@ -104,6 +104,33 @@
   color: #000000;
 }
 
+.party-map-wrap {
+  position: relative;   /* 배지를 이미지 위에 올리기 위해 필요 */
+  width: 100%;
+}
+.location-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 50px;
+  padding: 4px 10px;
+}
+
+.location-badge img {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+}
+
+.location-badge span {
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  color: black;
+}
 /* 지도 영역 컨테이너 */
 .party-map { 
   width: calc(100% - 24px);

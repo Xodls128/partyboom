@@ -8,6 +8,7 @@ import DateIcon from '../assets/date.svg';
 import CheckIcon from '../assets/check.svg';
 import "./partyinfo.css";
 import LoginRequest from "../components/LoginRequest";
+import Location from "../assets/location.svg";
 
 const MAX_PROFILES = 5;
 const API_BASE = import.meta.env.VITE_API_URL;
@@ -77,7 +78,7 @@ export default function Partyinfo() {
   const { 
     title, 
     start_time, 
-    place, 
+    place_name, 
     participant_count, 
     max_participants, 
     description, 
@@ -115,7 +116,7 @@ export default function Partyinfo() {
           </div>
           <div className="party-info-row">
             <span className="info-label">장소</span>
-            <span className="info-value">{place?.name}</span>
+            <span className="info-value">{place_name}</span>
           </div>
           <div className="party-info-row">
             <span className="info-label">참여인원</span>
@@ -132,15 +133,24 @@ export default function Partyinfo() {
         </section>
 
         <section className="party-map">
-          {place_map ? (
-            <img 
-              src={resolveImg(place_map)} 
-              alt={`${title} 지도`} 
-              className="party-map-image" 
-            />
-          ) : (
-            <div className="map-placeholder" aria-label="지도 준비중" />
-          )}
+          <div className="party-map-wrap">
+            {place_map ? (
+              <img 
+                src={resolveImg(place_map)} 
+                alt={`${title} 지도`} 
+                className="party-map-image" 
+                draggable="false"
+              />
+            ) : (
+              <div className="map-placeholder" aria-label="지도 준비중" />
+            )}
+
+            {/* ✅ 장소명 배지 추가 */}
+            <div className="location-badge">
+              <img src={Location} alt="위치 아이콘" />
+              <span>{place_name}</span>
+            </div>
+          </div>
         </section>
 
         <section className="party-description">
