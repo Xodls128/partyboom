@@ -149,7 +149,7 @@ export default function Partyinfo() {
             <div className="partyinfo-left">
               <img className="count-icon" src={CheckIcon} alt="" />
               <span className="partyinfo-personText">
-                {participant_count ?? 0}/{max_participants}
+                {applied_count ?? 0}/{max_participants}
               </span>
             </div>
 
