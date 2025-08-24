@@ -6,8 +6,6 @@ import './payment.css';
 
 import LoginRequest from "../components/LoginRequest"; // 로그인 모달 임포트
 
-const API_BASE = import.meta.env.VITE_API_URL;
-
 export default function Payment() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,14 +39,10 @@ export default function Payment() {
 
     const fetchUser = async () => {
       try {
-        const res = await fetch(`${API_BASE}/api/users/me/`, {
-          headers: { Authorization: `Bearer ${localStorage.getItem("access")}` }
-        });
-        if (!res.ok) throw new Error("유저 정보 불러오기 실패");
-        const data = await res.json();
+        const { data } = await api.get("/api/users/me/");
         setPoints(data.points);
       } catch (err) {
-        console.error(err);
+        console.error("유저 정보 불러오기 실패:", err.response?.data || err.message);
       }
     };
     fetchUser();
