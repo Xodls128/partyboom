@@ -50,13 +50,8 @@ export default function Map() {
     const fetchParties = async () => {
       try {
         // 백엔드 API 엔드포인트 (배포환경에 맞게 수정)
-        const response = await fetch(`${API_BASE}/api/detailview/parties/`);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
+        const { data } = await api.get("/api/detailview/parties/");
         
-        // API 데이터를 프론트엔드 컴포넌트 props에 맞게 변환
         const formattedParties = data.map(p => ({
           id: p.id,
           eventTitle: p.title,
@@ -64,7 +59,7 @@ export default function Map() {
           placeName: p.place_name,
           attendees: p.applied_count,
           capacity: p.max_participants,
-          placeImageUrl: p.place_photo || PartySmallImages, // 백엔드 이미지가 없으면 기본 이미지 사용
+          placeImageUrl: p.place_photo || PartySmallImages, 
           place_x_norm: p.place_x_norm,   
           place_y_norm: p.place_y_norm,
         }));
