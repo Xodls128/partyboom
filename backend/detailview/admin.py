@@ -12,6 +12,7 @@ from utils.partyAI import generate_party_by_ai
 class PlaceAdmin(admin.ModelAdmin):
     list_display = ('id', 'name', 'address', 'capacity')
     search_fields = ('name', 'address')
+    fields = ('name', 'address', 'capacity', 'photo', 'map')
 
     # 상단에 커스텀 버튼 추가
     change_list_template = "admin/detailview/place/change_list.html"
@@ -78,7 +79,7 @@ class PartyAdmin(admin.ModelAdmin):
     )
     list_filter = ('is_approved', 'place', 'start_time', 'tags')
     search_fields = ('title', 'place__name', 'tags__name')
-    autocomplete_fields = ('place', 'tags', 'map')
+    autocomplete_fields = ('place', 'tags')
     inlines = [ParticipationInline]
 
     def get_applied_count(self, obj):
