@@ -106,7 +106,7 @@ export default function Balancewait() {
     };
 
     initialize();
-  }, [partyId, navigate, token, navigating]);
+  }, [partyId, navigate, navigating]); // 차이 (7) token 의존성 제거
 
   return (
     <>
