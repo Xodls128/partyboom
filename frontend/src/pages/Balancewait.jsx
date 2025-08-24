@@ -21,16 +21,12 @@ export default function Balancewait() {
   // standby 토글
   const handleJoin = async () => {
     try {
-      const res = await axios.post(
-        `${API_BASE}/api/partyassist/standby/${partyId}/toggle/`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setIsStandby(res.data.is_standby);
-      setStandbyCount(res.data.standby_count);
-      setParticipantCount(res.data.participation_count);
+      const { data } = await api.post(`/api/partyassist/standby/${partyId}/toggle/`);
+      setIsStandby(data.is_standby);
+      setStandbyCount(data.standby_count);
+      setParticipantCount(data.participation_count);
     } catch (err) {
-      console.error("참여 실패:", err);
+      console.error("참여 실패:", err.response?.data || err.message);
     }
   };
 
