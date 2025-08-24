@@ -5,7 +5,7 @@ import LeftIcon from '../assets/left_black.svg';
 import EyeIcon from '../assets/visibility.svg';
 import BombMark from '../assets/boomb.svg';
 import Wordmark from '../assets/logo.svg';
-import api from "@/api/axios"; // axios 인스턴스 사용
+import api from "../api/axios"; // axios 인스턴스 사용
 
 export default function Login(){
   const nav = useNavigate();
