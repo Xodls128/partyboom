@@ -124,3 +124,63 @@
 .participants-spaceExpansion {
   margin-top: 180px; /*아래로 끝까지 스크롤 해도 요소들이 다 보일 수 있도록 공간을 띄움*/
 }
+
+/* 로딩 및 에러 상태 스타일 */
+.participants-loading, 
+.participants-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  text-align: center;
+}
+
+.participants-loading .loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #FF2824;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.participants-error button {
+  margin-top: 16px;
+  background-color: #FF2824;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+/* 신고 불가 버튼 스타일 */
+.participant-report-disabled {
+  background-color: #ccc !important;
+  cursor: not-allowed !important;
+  opacity: 0.7;
+}
+
+/* 준비 완료 상태 표시 */
+.participant-standby {
+  display: inline-block;
+  background-color: #FFCD50;
+  color: #222;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 4px;
+  margin-top: 6px;
+}
+
+.participant-tag-empty {
+  background-color: #f0f0f0;
+  color: #777;
+}
