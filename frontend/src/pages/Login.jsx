@@ -38,7 +38,7 @@ export default function Login(){
 
       alert("로그인 성공");
       nav(from, { replace: true }); // 로그인 전 페이지 or 홈으로 이동
-    } catch (err) {
+    } catch (e) {
       alert(e.message);
     } finally {
       setLoading(false);
