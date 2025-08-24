@@ -153,7 +153,7 @@ export default function ProfileExtra() {
 
       const payload = {
         extra: {
-          grade: form.grade,V
+          grade: form.grade,
           college: form.college,
           personality: form.trait,
           mbti: {
