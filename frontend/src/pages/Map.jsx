@@ -130,7 +130,10 @@ export default function Map() {
 
   // 포인터 이벤트 핸들러 (마우스/터치 공통)
   const onPointer = (e) => {
-    // 이벤트가 지도까지 전파되는 것을 막아 드래그 기능 충돌 방지
+    // 버튼이나 내부 interactive 요소라면 막지 않음
+    if (e.target.closest("button") || e.target.closest("a") || e.target.closest("input")) {
+      return;
+    }
     e.stopPropagation();
 
     const scrollEl = sheetScrollRef.current; // 스크롤 가능한 요소 참조
@@ -264,7 +267,7 @@ export default function Map() {
         className="sheet-scroll"
         // 접혀있을 땐 시트만 드래그해야 하므로 내부 상호작용 차단
         style={{ 
-          pointerEvents: (heightPct >= MAX_PCT) ? 'auto' : 'none',
+          pointerEvents: 'auto',
           touchAction: 'none',
         }}
       >
@@ -274,7 +277,7 @@ export default function Map() {
             <li key={p.id}>
               <PartySmall
                 {...p}
-                onClick={() => navigate(`/partyinfo/${p.id}`)} // 상세보기 버튼 클릭 시 이동
+                onClick={() => window.location.href = `/partyinfo/${p.id}`}
               />
             </li>
           ))}

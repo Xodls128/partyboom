@@ -14,7 +14,6 @@ export default function Partyinfo() {
   const { partyId } = useParams();
   const navigate = useNavigate();
   const [party, setParty] = useState(null);
-  const [participations, setParticipations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -41,20 +40,6 @@ export default function Partyinfo() {
 
     fetchPartyDetails();
   }, [partyId]);
-
-  // 참여자 목록 가져오기
-    useEffect(() => {
-    const fetchParticipations = async () => {
-      try {
-        const { data } = await api.get(`/api/reserve/participations/${partyId}/`);
-        fetchParticipations(data);
-      } catch (err) {
-        console.error("참석자 불러오기 실패:", err.response?.data || err.message);
-      }
-    };
-    fetchParticipations();
-  }, [partyId]);
-
 
   const handleJoin = async () => {
     if (isLoading) return; // 중복 실행 방지
@@ -87,14 +72,13 @@ export default function Partyinfo() {
   const { 
     title, 
     start_time, 
-    place_name, 
-    applied_count, 
+    place, 
+    participant_count, 
     max_participants, 
     description, 
     tags, 
-    place_photo 
+    participations 
   } = party;
-
 
   return (
     <div className="party-info-container">
@@ -105,12 +89,9 @@ export default function Partyinfo() {
       </header>
 
       <main className="party-info-main">
-        <img 
-          src={place_photo || DefaultPartyImage} 
-          alt={title} 
-          className="party-main-image" 
-        />
-
+        {party.place_photo && (
+          <img src={party.place_photo || DefaultPartyImage} alt={title} className="party-main-image" />
+        )}
         <h1 className="party-name">{title}</h1>
         
         <div className="party-info-card">
@@ -124,11 +105,11 @@ export default function Partyinfo() {
           </div>
           <div className="party-info-row">
             <span className="info-label">장소</span>
-            <span className="info-value">{place_name}</span>
+            <span className="info-value">{place?.name}</span>
           </div>
           <div className="party-info-row">
             <span className="info-label">참여인원</span>
-            <span className="info-value">{applied_count ?? 0} / {max_participants}</span>
+            <span className="info-value">{participant_count ?? 0} / {max_participants}</span>
           </div>
         </div>
 
@@ -150,10 +131,10 @@ export default function Partyinfo() {
 
         <section className="party-attendees" aria-labelledby="attendees-title">
           <div className="attendees-grid">
-            {(participations || []).map((p, index) => (
-              <div key={p.user?.id ?? index} className="attendee">
-                <img src={p.user?.profile_image || UserIcon} alt={p.user?.username || "익명"} className="attendee-img" />
-                <span className="attendee-name">{p.user?.username || "익명"}</span>
+            {(participations || []).map(p => (
+              <div key={p.user.id} className="attendee">
+                <img src={p.user.profile_image || UserIcon} alt={p.user.username} className="attendee-img" />
+                <span className="attendee-name">{p.user.username}</span>
               </div>
             ))}
           </div>
@@ -164,7 +145,7 @@ export default function Partyinfo() {
             <div className="partyinfo-left">
               <img className="count-icon" src={CheckIcon} alt="" />
               <span className="partyinfo-personText">
-                {applied_count ?? 0}/{max_participants}
+                {participant_count ?? 0}/{max_participants}
               </span>
             </div>
 
