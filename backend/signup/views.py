@@ -20,9 +20,6 @@ from django.templatetags.static import static
 User = get_user_model()
 
 
-# -------------------------
-# 일반 로그인
-# -------------------------
 class CustomLoginAPIView(TokenObtainPairView):
     """일반 로그인 뷰"""
     permission_classes = [AllowAny]
@@ -40,9 +37,6 @@ class CustomLoginAPIView(TokenObtainPairView):
             )
 
 
-# -------------------------
-# 일반 회원가입
-# -------------------------
 class UserSignupAPIView(APIView):
     """회원가입 뷰"""
     permission_classes = [AllowAny]
@@ -71,9 +65,6 @@ class UserSignupAPIView(APIView):
         )
 
 
-# -------------------------
-# 카카오 로그인
-# -------------------------
 class KakaoLoginAPIView(APIView):
     """카카오 로그인 API"""
     permission_classes = [AllowAny]
@@ -85,7 +76,6 @@ class KakaoLoginAPIView(APIView):
         redirect_uri = serializer.validated_data["redirect_uri"]
 
         try:
-            # 1) 카카오 토큰 교환
             token_url = "https://kauth.kakao.com/oauth/token"
             data = {
                 "grant_type": "authorization_code",
@@ -99,7 +89,6 @@ class KakaoLoginAPIView(APIView):
             kakao_token = token_res.json()
             access_token = kakao_token.get("access_token")
 
-            # 2) 카카오 사용자 정보 조회
             profile_url = "https://kapi.kakao.com/v2/user/me"
             headers = {"Authorization": f"Bearer {access_token}"}
             profile_res = requests.get(profile_url, headers=headers)
@@ -110,10 +99,8 @@ class KakaoLoginAPIView(APIView):
             kakao_account = kakao_profile.get("kakao_account", {})
             profile = kakao_account.get("profile", {})
             nickname = profile.get("nickname", f"user_{kakao_id}")
-            profile_image_url = profile.get("profile_image_url", "")
             email = kakao_account.get("email")
 
-            # 3) User & SocialAccount 처리
             with transaction.atomic():
                 social_account = SocialAccount.objects.filter(
                     provider="kakao", social_id=kakao_id
@@ -125,32 +112,30 @@ class KakaoLoginAPIView(APIView):
                     user = User.objects.create(
                         username=f"kakao_{kakao_id}",
                         email=email or f"{kakao_id}@kakao.com",
-                        name=nickname,       # 카카오 닉네임
-                        school="국민대",     # 기본값 국민대
+                        name=nickname,
+                        school="국민대",
                     )
                     SocialAccount.objects.create(
                         user=user, provider="kakao", social_id=kakao_id
                     )
 
-            # 4) JWT 발급
             refresh = RefreshToken.for_user(user)
             access = refresh.access_token
 
-            # 5) 응답 데이터 구성
             out = {
                 "access": str(access),
                 "refresh": str(refresh),
                 "user": {
                     "id": user.id,
                     "username": user.username,
-                    "name": user.name,
+                    "name": user.name or "",
                     "profile_image": (
                         user.profile_image.url
                         if user.profile_image
                         else static("icons/default_profile.png")
                     ),
                     "intro": user.intro or "",
-                    "school": user.school,
+                    "school": user.school or "",
                     "points": user.points,
                     "warnings": user.warnings,
                 },
