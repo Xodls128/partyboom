@@ -7,7 +7,8 @@ import DateIcon from '../assets/date.svg';
 import CheckIcon from '../assets/check.svg';
 import "./partyinfo.css";
 
-const API_BASE = import.meta.env.VITE_API_URL;
+const API_BASE = import.meta.env.VITE_API_URL; 
+const MAX_PROFILES = 5;
 
 export default function Partyinfo() {
   const { partyId } = useParams();
@@ -15,6 +16,14 @@ export default function Partyinfo() {
   const [party, setParty] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const resolveImg = (url) => {
+    if (!url) return '';
+    if (/^(https?:)?\/\//i.test(url) || url.startsWith('data:') || url.startsWith('blob:')) return url;
+    const base = API_BASE ; 
+    const path = String(url).replace(/^\/+/, '');      // 앞 슬래시 제거
+    return base ? `${base}/${path}` : `/${path}`;
+  };
 
   useEffect(() => {
     const fetchPartyDetails = async () => {
@@ -51,7 +60,7 @@ export default function Partyinfo() {
       });
 
       if (!res.ok) {
-        const errData = await res.json();
+        const errData = await res.json().catch(() => ({}));
         throw new Error(errData?.detail || "참가 신청 실패");
       }
 
@@ -75,7 +84,8 @@ export default function Partyinfo() {
     max_participants, 
     description, 
     tags, 
-    participations 
+    participations, 
+    place_photo,
   } = party;
 
   return (
@@ -87,9 +97,12 @@ export default function Partyinfo() {
       </header>
 
       <main className="party-info-main">
-        {party.place_photo && (
-          <img src={party.place_photo || DefaultPartyImage} alt={title} className="party-main-image" />
-        )}
+        <img
+          src={resolveImg(place_photo) || DefaultPartyImage}
+          alt={title}
+          className="party-main-image"
+        />
+
         <h1 className="party-name">{title}</h1>
         
         <div className="party-info-card">
@@ -129,9 +142,13 @@ export default function Partyinfo() {
 
         <section className="party-attendees" aria-labelledby="attendees-title">
           <div className="attendees-grid">
-            {(participations || []).map(p => (
-              <div key={p.user.id} className="attendee">
-                <img src={p.user.profile_image || UserIcon} alt={p.user.username} className="attendee-img" />
+            {(participations || []).slice(0, MAX_PROFILES).map((p, i) => (
+              <div key={p.user.id ?? i} className="attendee">
+                <img
+                  src={resolveImg(p.user?.profile_image) || UserIcon}
+                  alt={p.user.username}
+                  className="attendee-img"
+                />
                 <span className="attendee-name">{p.user.username}</span>
               </div>
             ))}
@@ -139,28 +156,29 @@ export default function Partyinfo() {
         </section>
 
         <section className="party-cta" aria-label="참가 신청">
-          <div className="partyinfo-attendees-summary">
-            <div className="partyinfo-left">
-              <img className="count-icon" src={CheckIcon} alt="" />
-              <span className="partyinfo-personText">
-                {participant_count ?? 0}/{max_participants}
-              </span>
+          <div className="cta-sheet">
+            <div className="partyinfo-attendees-summary">
+               <div className="partyinfo-left">
+                <img src={CheckIcon} alt="" className="count-icon" />
+                <span className="partyinfo-personText">
+                  {participant_count ?? 0}/{max_participants}
+                </span>
+              </div>
+
+              <div className="profile-icons">
+                {(participations || []).slice(0, MAX_PROFILES).map((p, i) => (
+                  <img
+                    key={p.user?.id ?? i}
+                    src={resolveImg(p.user?.profile_image) || UserIcon}
+                    alt={p.user?.username || '참석자'}
+                    className="profile-icon"
+                  />
+                ))}
+              </div>
             </div>
 
-            <div className="profile-icons">
-              {(participations || []).slice(0, 5).map((p, i) => (
-                <img
-                  key={p.user?.id ?? i}
-                  src={p.user?.profile_image || UserIcon}
-                  alt={p.user?.username || '참석자'}
-                  className="profile-icon"
-                  style={{ zIndex: 10 - i }}
-                />
-              ))}
-            </div>
+            <button className="join-button" onClick={handleJoin}>참가신청</button>
           </div>
-
-          <button className="join-button" onClick={handleJoin}>참가신청</button>
         </section>
       </main>
     </div>
