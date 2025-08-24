@@ -91,11 +91,6 @@ export default function Home() {
           </Link>
 
           <div className='partyName'>{party.name}</div>
-          <div className="party-tags-list">
-            {party.tags.map(tag => (
-              <span key={tag.id} className="party-tag-item">#{tag.name}</span>
-            ))}
-          </div>
           <div className='date'>
             <img src={DateIcon} alt="" />
             <span className="dateText">{party.date}</span>
