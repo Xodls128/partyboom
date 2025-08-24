@@ -1,0 +1,360 @@
+.assist-countdown {
+  margin-top: 71px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  margin-bottom: 45px;
+}
+
+.assist-countdown-text {
+  color: #000;
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 16px;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 150%; /* 24px */
+  letter-spacing: -0.304px;
+  white-space: pre-line;
+}
+
+.assist-countdown-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 8px 0;
+  width: 100%;
+}
+
+.assist-countdown-time {
+  margin: 0 auto;
+  color: #000;
+  text-align: center;
+  font-family: Pretendard;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 140%;
+  letter-spacing: -0.456px;
+  width: fit-content;
+}
+
+.assist-bomb {
+  position: absolute;
+  left: 58%;
+  top: 30%;
+  transform: translateY(-50%) translateX(30px);
+  height: 112px; /* 필요시 조정 */
+}
+
+.assist-party-block {
+  display: flex;
+  width: 354px;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  border-radius: 8px;
+  background: var(--Grayscale0, #FFF);
+  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  margin: 0 auto; /* 가운데 정렬 */
+}
+
+.assist-party-img-wrap {
+  position: relative;
+  margin-top: 12px;
+  margin-left: 12px;
+}
+
+
+.assist-party-img {
+  width: 330px;
+  height: 251px;
+  border-radius: 8px;
+}
+
+.assist-location-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 50px;
+  padding: 4px 10px;
+}
+
+.assist-location-badge img {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+}
+
+.assist-location-badge span {
+  margin-top: 4px;
+  margin-right: 6px;
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  color: black;
+}
+
+.assist-partyName {
+  margin-left: 19.5px;
+  font-family: Pretendard;
+  font-weight: 600; /* SemiBold weight */
+  font-size: 18px;
+  line-height: 150%; /* 1.5배 */
+  letter-spacing: -1.9%;
+  margin-bottom: 5px;
+}
+
+.assist-date {
+  margin-left: 19.5px;
+  margin-bottom: 3px;
+}
+
+.assist-dateText {
+  margin-left: 10px;
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  line-height: 150%;
+  letter-spacing: -1.9%;
+  position: relative;
+  top: -3px;
+}
+
+.assist-person {
+  margin-left: 19.5px;
+}
+
+.assist-profile-icons {
+  display: flex;
+  margin-left: 19px;
+  margin-bottom: 14px;
+}
+
+.assist-profile-icon {
+  width: 42px;
+  height: 42px;
+  margin-left: -10px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 0 0 1px #eee;
+}
+
+.assist-party-container {
+  width: 100%;
+  touch-action: pan-y;
+}
+
+.assist-indicators {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  margin-bottom: 23px;
+}
+
+.assist-indicator {
+  width: 40px;
+  height: 6px;
+  background-color: #E0E0E0;
+  margin: 0 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.assist-indicator-active {
+  background-color: #FF2824;
+}
+
+.assist-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+  color: #333;
+}
+
+.loading-spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #FF2824;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.assist-error {
+  text-align: center;
+  padding: 40px 20px;
+  color: #FF2824;
+}
+
+.assist-error button {
+  background-color: #FF2824;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-top: 20px;
+  cursor: pointer;
+}
+
+.assist-no-parties {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 80vh;
+}
+
+.assist-no-parties p {
+  font-size: 18px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  color: #333;
+}
+
+.assist-no-parties button {
+  background-color: #FFCD50;
+  color: #222;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.assist-standby {
+  margin-top: 16px;
+  display: flex;
+  justify-content: center;
+}
+
+.assist-standby-button {
+  background-color: #E0E0E0;
+  color: #333;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.assist-standby-button.active {
+  background-color: #FFCD50;
+  color: #222;
+}
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.popup-box {
+  width: 80%;
+  max-width: 320px;
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+}
+
+.popup-box p {
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.popup-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.login-btn {
+  background-color: #FFCD50;
+  color: #222;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.back-btn {
+  background-color: #E0E0E0;
+  color: #333;
+  border: none;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.start-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.start-modal {
+  width: 280px;
+  background-color: white;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.start-modal-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #FFCD50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 16px;
+}
+
+.start-modal p:first-of-type {
+  color: #000;
+  font-family: Pretendard;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.start-modal p:last-of-type {
+  color: #666;
+  font-family: Pretendard;
+  font-size: 14px;
+}
