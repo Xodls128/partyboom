@@ -22,8 +22,6 @@ class BalanceRound(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     closed_at = models.DateTimeField(null=True, blank=True)
-    # 롱폴링을 위한 마지막 업데이트 시간 필드 추가
-    last_updated_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.party.title} 파티 라운드"

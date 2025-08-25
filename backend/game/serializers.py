@@ -23,8 +23,8 @@ class BalanceRoundReadSerializer(serializers.ModelSerializer):
         model = BalanceRound
         fields = (
             "id", "party", "created_by", "model_used",
+            "safety_blocked", "safety_reason",
             "is_active", "created_at", "closed_at", "questions",
-            "last_updated_at",  # 클라이언트에 전달할 필드 추가
         )
 
 

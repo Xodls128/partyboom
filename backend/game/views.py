@@ -1,20 +1,20 @@
-import time
-from datetime import datetime, timezone
-
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from django.utils import timezone as django_timezone
 
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import BalanceRound
+from .models import BalanceRound, BalanceQuestion
 from .serializers import (
     BalanceRoundReadSerializer,
     BalanceQuestionReadSerializer,
     VoteCreateSerializer,
 )
+
+# WebSocket 관련 임포트
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
 
 class RoundRetrieveView(APIView):
@@ -43,61 +43,24 @@ class VoteCreateView(APIView):
         vote = ser.save()
 
         q = vote.question
-        
-        # 라운드의 last_updated_at을 갱신하여 변경 알림
-        round_obj = q.round
-        round_obj.last_updated_at = django_timezone.now()
-        round_obj.save(update_fields=['last_updated_at'])
-
         q.refresh_from_db(fields=["vote_a_count", "vote_b_count"])
 
+        # 투표 집계 결과를 WebSocket으로 브로드캐스트
+        channel_layer = get_channel_layer()
+        async_to_sync(channel_layer.group_send)(
+            f"round_{q.round_id}",
+            {
+                "type": "vote_update",
+                "data": {
+                    "question_id": q.id,
+                    "round_id": str(q.round_id),
+                    "vote_a_count": q.vote_a_count,
+                    "vote_b_count": q.vote_b_count,
+                }
+            }
+        )
+
         return Response(BalanceQuestionReadSerializer(q).data, status=status.HTTP_201_CREATED)
-
-
-class RoundPollView(APIView):
-    """
-    GET /api/v1/game/rounds/<round_id>/poll/
-    → Long-polling으로 라운드 데이터의 변경사항을 확인
-    """
-    permission_classes = [permissions.IsAuthenticated]
-
-    def get(self, request, round_id):
-        last_seen_str = request.query_params.get("last_seen_timestamp")
-        last_seen_dt = None
-
-        if last_seen_str:
-            try:
-                # 클라이언트가 보낸 timestamp를 UTC 기준으로 파싱
-                last_seen_dt = datetime.fromisoformat(last_seen_str.replace("Z", "+00:00"))
-            except ValueError:
-                return Response({"error": "잘못된 타임스탬프 형식입니다."}, status=status.HTTP_400_BAD_REQUEST)
-
-        round_obj = get_object_or_404(BalanceRound, pk=round_id)
-
-        # 롱폴링 타임아웃 설정 (예: 25초)
-        timeout = 25
-        start_time = time.time()
-
-        while time.time() - start_time < timeout:
-            round_obj.refresh_from_db(fields=['last_updated_at'])
-
-            # 클라이언트가 본 시간보다 최신 업데이트가 있는 경우
-            if not last_seen_dt or round_obj.last_updated_at > last_seen_dt:
-                # 최신 라운드 데이터를 직렬화하여 반환
-                full_round_data = (
-                    BalanceRound.objects
-                    .select_related("party", "created_by")
-                    .prefetch_related("questions")
-                    .get(pk=round_id)
-                )
-                serializer = BalanceRoundReadSerializer(full_round_data)
-                return Response(serializer.data, status=status.HTTP_200_OK)
-
-            # DB 부하를 줄이기 위해 짧은 시간 대기
-            time.sleep(1)
-
-        # 타임아웃까지 변경사항이 없으면 204 No Content 응답
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ActiveRoundCheckView(APIView):

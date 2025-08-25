@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 import Back from "../assets/left_black.svg";
@@ -10,78 +10,77 @@ import "./balancegame.css";
 export default function Balancegame() {
   const navigate = useNavigate();
   const { roundId } = useParams();
-  
+  const wsRef = useRef(null);
+  const intervalRef = useRef(null);
+
   const [questions, setQuestions] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [votingMap, setVotingMap] = useState(new Map());
+  const [votingMap, setVotingMap] = useState(new Map()); // 각 질문별 투표 중 상태
   const [errorMsg, setErrorMsg] = useState("");
-  
-  // 롱폴링 관리를 위한 상태와 Ref
-  const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
-  const isMounted = useRef(true);
 
-  // 컴포넌트 언마운트 시 폴링 중단하기 위한 설정
-  useEffect(() => {
-    isMounted.current = true;
-    return () => {
-      isMounted.current = false;
-    };
-  }, []);
-
-  // 롱폴링으로 데이터 업데이트를 확인하는 함수
-  const pollForUpdates = useCallback(async (timestamp) => {
-    if (!isMounted.current) return; // 컴포넌트가 언마운트되면 중단
-
+  // 라운드 데이터 불러오기
+  const fetchRound = async () => {
     try {
-      // 타임스탬프가 있으면 쿼리 파라미터로 추가
-      const url = `/api/v1/game/rounds/${roundId}/poll/${timestamp ? `?last_seen_timestamp=${timestamp}` : ''}`;
-      const response = await api.get(url);
-
-      if (!isMounted.current) return;
-
-      if (response.status === 200) {
-        // 200 OK: 새 데이터 수신
-        const { questions: newQuestions, last_updated_at: newTimestamp } = response.data;
-        setQuestions(newQuestions || []);
-        setLastUpdatedAt(newTimestamp);
-        // 새 타임스탬프로 즉시 다음 폴링 시작
-        pollForUpdates(newTimestamp);
-      } else if (response.status === 204) {
-        // 204 No Content: 타임아웃, 변경 없음
-        // 이전 타임스탬프로 즉시 다음 폴링 시작
-        pollForUpdates(timestamp);
-      }
+      const { data } = await api.get(`/api/v1/game/rounds/${roundId}/`);
+      // 서버에서 내려주는 질문들 + 이미 투표했는지 여부는 서버에서 못주니까 UI는 로컬 관리
+      setQuestions(data.questions || []);
     } catch (err) {
       const status = err.response?.status;
       if (status === 404) setErrorMsg("라운드를 찾을 수 없거나 종료되었습니다.");
       else if (status === 403) setErrorMsg("이 파티의 참가자만 게임에 접근할 수 있습니다.");
-      else {
-        setErrorMsg("데이터 동기화 오류. 5초 후 재시도합니다.");
-        // 에러 발생 시 5초 후 재시도
-        setTimeout(() => pollForUpdates(timestamp), 5000);
-      }
+      else setErrorMsg("게임 데이터를 불러올 수 없습니다.");
     }
+  };
+
+  useEffect(() => {
+    fetchRound();
+
+    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const wsUrl = `${wsProtocol}://${window.location.host}/ws/game/round/${roundId}/`;
+    const ws = new WebSocket(wsUrl);
+    wsRef.current = ws;
+
+    ws.onmessage = (event) => {
+      try {
+        const msg = JSON.parse(event.data);
+        if (msg.type === "vote_update") {
+          const d = msg.data;
+          setQuestions((prev) =>
+            prev.map((q) =>
+              q.id === d.question_id
+                ? { ...q, vote_a_count: d.vote_a_count, vote_b_count: d.vote_b_count }
+                : q
+            )
+          );
+        }
+      } catch (e) {
+        console.error("WS parse error", e);
+      }
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket closed, fallback polling ON");
+      intervalRef.current = setInterval(fetchRound, 10000);
+    };
+
+    return () => {
+      ws.close();
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [roundId]);
 
-  // 컴포넌트 마운트 시 최초 롱폴링 시작
-  useEffect(() => {
-    pollForUpdates(null);
-  }, [pollForUpdates]);
-
-  // 투표하기 (HTTP POST) - 이 함수는 변경 없음
+  // 투표하기 (HTTP POST)
   const handleVote = async (questionId, choice) => {
-    if (votingMap.get(questionId)) return;
+    if (votingMap.get(questionId)) return; // 이미 투표 중
     setVotingMap((m) => new Map(m).set(questionId, true));
 
     try {
       await api.post(`/api/v1/game/questions/${questionId}/vote/`, { choice });
-      // UI 즉시 반응성을 위해 로컬 상태 우선 변경
       setQuestions((prev) =>
         prev.map((q) =>
           q.id === questionId ? { ...q, has_voted: true } : q
         )
       );
-      // 서버의 last_updated_at이 변경되었으므로 다음 롱폴링에서 최신 투표 결과가 반영됨
     } catch (err) {
       const status = err.response?.status;
       if (status === 403) setErrorMsg("파티 참가자만 투표할 수 있습니다.");
@@ -96,7 +95,6 @@ export default function Balancegame() {
   if (questions.length === 0) return <div>로딩 중...</div>;
 
   return (
-    // JSX 렌더링 부분은 변경사항 없음
     <>
       <div className="balancegame-header">
         <button
@@ -127,6 +125,8 @@ export default function Balancegame() {
               <div className="balancegame-title">
                 {idx + 1} / {questions.length} : 둘 중 하나만 선택해야 한다면?!
               </div>
+
+              {/* 선택지 A */}
               <div className="balancegame-block-red">
                 <button
                   className="balancegame-btn-red"
@@ -138,9 +138,12 @@ export default function Balancegame() {
                   </span>
                 </button>
               </div>
+
               <div className="balancegame-vs-wrap">
                 <img src={Vs} alt="VS" className="balancegame-vs-img" />
               </div>
+
+              {/* 선택지 B */}
               <div className="balancegame-block-yellow">
                 <button
                   className="balancegame-btn-yellow"
@@ -152,6 +155,8 @@ export default function Balancegame() {
                   </span>
                 </button>
               </div>
+
+              {/* 집계 현황 */}
               <div className="balancegame-status">밸런스 현황</div>
               <div className="balancegame-gauge-wrap">
                 <div className="balancegame-gauge-bar">
@@ -176,6 +181,8 @@ export default function Balancegame() {
           );
         })}
       </Swiper>
+
+      {/* Progress Bar */}
       <div className="balancegame-progress">
         <div
           className="balancegame-progress-bar"
