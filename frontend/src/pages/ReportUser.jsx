@@ -3,6 +3,7 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './ReportUser.css';
 import LeftIcon from '../assets/left_black.svg';
 import BelowArrow from '../assets/below_arrow.svg';
+import api from "../api/axios";
 
 const REPORT_CATEGORIES = [
   { value: "FAKE_INFO", display_name: "개인정보 허위 기재" },
@@ -85,9 +86,20 @@ export default function ReportUser() {
       });
 
       if (!response.ok) {
-        const err = await response.text();
-        console.error('신고 실패:', err);
-        setToast({ text: err.detail || "❌ 신고 중 오류가 발생했습니다.", type: "error" });
+        const text = await response.text();   // (수정 #1) 텍스트로 받기
+        let err = null;
+
+        // (수정 #2) 응답이 비어있지 않을 때만 JSON 파싱
+        if (text) {
+          try {
+            err = JSON.parse(text);
+          } catch (e) {
+            console.error("에러 응답 JSON 파싱 실패:", e);
+          }
+        }
+
+        console.error('신고 실패:', err || text);
+        setToast({ text: err?.detail || "❌ 신고 중 오류가 발생했습니다.", type: "error" });
         setTimeout(() => setToast(null), 1500);
         return;
       }
