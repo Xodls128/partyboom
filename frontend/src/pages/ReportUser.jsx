@@ -3,6 +3,16 @@ import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import './ReportUser.css';
 import LeftIcon from '../assets/left_black.svg';
 import BelowArrow from '../assets/below_arrow.svg';
+import api from "../api/axios";
+import ParticiProfile from '../assets/partici_profile.svg';
+
+const REPORT_CATEGORIES = [
+  { value: "FAKE_INFO", display_name: "개인정보 허위 기재" },
+  { value: "UNPLEASANT", display_name: "파티 현장에서의 불쾌감 형성" },
+  { value: "INAPPROPRIATE_ACT", display_name: "파티 현장에서의 부적절한 행위" },
+  { value: "BAD_PHOTO", display_name: "부적절한 프로필 사진" },
+  { value: "OTHER", display_name: "기타" },
+];
 
 export default function ReportUser() {
   const nav = useNavigate();
@@ -22,27 +32,10 @@ export default function ReportUser() {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState(''); 
   const [detail, setDetail] = useState('');
-  const [categories, setCategories] = useState([]); 
+  const [categories] = useState(REPORT_CATEGORIES);
   const [toast, setToast] = useState(null); 
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-  // 신고 유형 목록 불러오기
-  useEffect(() => {
-    fetch(`${API_BASE}/api/mypage/reports/`, {
-      method: 'OPTIONS',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access')}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.actions?.POST?.category?.choices) {
-          setCategories(data.actions.POST.category.choices);
-        }
-      })
-      .catch((err) => console.error('신고 유형 불러오기 실패', err));
-  }, []);
 
   const submit = async () => {
     if (!reason) {
@@ -62,37 +55,28 @@ export default function ReportUser() {
     }
 
     try {
-      const response = await fetch(`${API_BASE}/api/mypage/reports/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access')}`, 
-        },
-        body: JSON.stringify({
-          party: user.partyId,
-          reported_user: user.id,
-          category: reason,
-          content: detail,
-        }),
+      // (수정 #1) fetch → axios.post
+      const response = await api.post("/api/mypage/reports/", {
+        party: user.partyId,
+        reported_user: user.id,
+        category: reason,
+        content: detail,
       });
 
-      if (!response.ok) {
-        const err = await response.json();
-        console.error('신고 실패:', err);
-        setToast({ text: err.detail || "❌ 신고 중 오류가 발생했습니다.", type: "error" });
-        setTimeout(() => setToast(null), 1500);
-        return;
-      }
-
-      // 성공
+      // (수정 #2) axios는 ok 여부 대신 catch로 에러 잡음 → 성공 처리
       setToast({ text: "✅ 신고가 접수되었습니다.", type: "success" });
       setTimeout(() => {
         setToast(null);
         nav(-1);
       }, 1500);
     } catch (err) {
-      console.error(err);
-      setToast({ text: "❌ 신고 중 오류가 발생했습니다.", type: "error" });
+      // (수정 #3) axios 에러 구조
+      const detailMsg =
+        err.response?.data?.detail ||
+        err.response?.data?.non_field_errors?.[0] ||
+        "❌ 신고 중 오류가 발생했습니다.";
+      console.error("신고 실패:", err.response?.data || err);
+      setToast({ text: detailMsg, type: "error" });
       setTimeout(() => setToast(null), 1500);
     }
   };
@@ -113,15 +97,11 @@ export default function ReportUser() {
 
       <main className="ru-main" onClick={(e) => e.stopPropagation()}>
         <div className="ru-profile">
-          {user.photo ? (
-            <img
-              className="ru-avatar"
-              src={user.photo}
-              alt={`${user.name} 프로필`}
-            />
-          ) : (
-            <div className="ru-avatar ru-avatar--placeholder" />
-          )}
+          <img
+            className="ru-avatar"
+            src={user.photo || ParticiProfile}   // (수정) 유저 사진 없으면 fallback
+            alt={`${user.name} 프로필`}
+          />
           <div className="ru-name">{user.name}</div>
         </div>
 
