@@ -31,7 +31,7 @@ export default function Map() {
   const dyAccum = useRef(0);
 
   // 두 상태 스냅(최소/전체)
-  const MIN_PCT = 22;                     // 시트 최저 높이(%)
+  const MIN_PCT = 25;                     // 시트 최저 높이(%)
   const MAX_PCT = 76;                    // 시트 최고 높이(%)
   const MAX_DRAG_PCT = 90;                // 시트가 최대로 드래그될 수 있는 높이(%)
   const MID_THRESHOLD = (MIN_PCT + MAX_PCT) / 2; // 중앙 임계치(기본 65)
