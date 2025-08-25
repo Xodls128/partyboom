@@ -4,6 +4,7 @@ import './ReportUser.css';
 import LeftIcon from '../assets/left_black.svg';
 import BelowArrow from '../assets/below_arrow.svg';
 import api from "../api/axios";
+import ParticiProfile from '../assets/partici_profile.svg';
 
 const REPORT_CATEGORIES = [
   { value: "FAKE_INFO", display_name: "개인정보 허위 기재" },
@@ -96,15 +97,11 @@ export default function ReportUser() {
 
       <main className="ru-main" onClick={(e) => e.stopPropagation()}>
         <div className="ru-profile">
-          {user.photo ? (
-            <img
-              className="ru-avatar"
-              src={user.photo}
-              alt={`${user.name} 프로필`}
-            />
-          ) : (
-            <div className="ru-avatar ru-avatar--placeholder" />
-          )}
+          <img
+            className="ru-avatar"
+            src={user.photo || ParticiProfile}   // (수정) 유저 사진 없으면 fallback
+            alt={`${user.name} 프로필`}
+          />
           <div className="ru-name">{user.name}</div>
         </div>
 
