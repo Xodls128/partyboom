@@ -23,4 +23,18 @@
   border: none;
   cursor: pointer;
   margin-right: 8px;
+  /* 상대적 위치 설정으로 배지 위치 조정을 위함 */
+  position: relative;
+}
+
+/* 알림 배지 스타일 */
+.notification-badge {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 10px;
+  height: 10px;
+  background-color: #FF2824;  /* 빨간색 */
+  border-radius: 50%;         /* 원형 */
+  display: block;
 }

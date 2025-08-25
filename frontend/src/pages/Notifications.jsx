@@ -38,17 +38,32 @@ export default function Notifications() {
     checkLoginAndFetch();
   }, []);
 
+  // handleNoticeClick 함수 수정
   const handleNoticeClick = async (noticeId) => {
     const notice = notices.find(n => n.id === noticeId);
     if (notice && notice.is_read) return;
 
     try {
       await api.patch(`/api/notice/${noticeId}/`, { is_read: true });
+      
+      // 알림 목록 업데이트
       setNotices((prevNotices) =>
         prevNotices.map((n) =>
           n.id === noticeId ? { ...n, is_read: true } : n
         )
       );
+      
+      // 모든 알림이 읽혔는지 확인
+      const updatedNotices = notices.map((n) =>
+        n.id === noticeId ? { ...n, is_read: true } : n
+      );
+      const allRead = updatedNotices.every(notice => notice.is_read);
+      
+      // 모든 알림이 읽혀진 경우, Header 컴포넌트에 알림
+      if (allRead) {
+        // 커스텀 이벤트를 발생시켜 Header 컴포넌트에 알림
+        window.dispatchEvent(new Event('notificationUpdate'));
+      }
     } catch (error) {
       console.error("알림 읽음 처리 중 오류 발생:", error);
     }
