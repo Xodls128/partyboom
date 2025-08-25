@@ -102,13 +102,52 @@ html, body { overflow-x: hidden; }
   color:#000;
 }
 
-/* 지도 틀 */
-.party-map{ width: calc(100% - 24px); margin: 0 auto 12px; }
-.map-placeholder{
-  width: 100%;            
+.party-map-wrap {
+  position: relative;   /* 배지를 이미지 위에 올리기 위해 필요 */
+  width: 100%;
+}
+.location-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  background: white;
+  border-radius: 50px;
+  padding: 4px 10px;
+}
+
+.location-badge img {
+  width: 20px;
+  height: 20px;
+  margin-right: 6px;
+}
+
+.location-badge span {
+  font-family: Pretendard;
+  font-weight: 400;
+  font-size: 16px;
+  color: black;
+}
+/* 지도 영역 컨테이너 */
+.party-map { 
+  width: calc(100% - 24px);
+  margin: 0 auto 12px;
+}
+/* 지도 이미지 */
+.party-map-image {
+  width: 100%;
   height: 186px;
   border-radius: 8px;
-  border: 0;
+  object-fit: cover;   /* 이미지를 꽉 채우게 */
+  display: block;
+  margin-top: 12px;
+}
+/* 지도 placeholder */
+.map-placeholder {
+  width: 100%;
+  height: 186px;
+  border-radius: 8px;
   background: linear-gradient(180deg,#fafafa, #f6f6f6);
   position: relative;
   overflow: hidden;
@@ -116,12 +155,11 @@ html, body { overflow-x: hidden; }
 }
 .map-placeholder::after {
   content: "지도 이미지 넣고 변경";
-  position:absolute; inset:0;
-  display:flex; align-items:center; justify-content:center;
-  color:#777; font-size:14px; font-weight:600;
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  color: #777; font-size: 14px; font-weight: 600;
 }
 
-/* 설명 */
 .party-description{ width: calc(100% - 24px); margin: 0 auto 16px; }
 .party-description p{
   font-family:Pretendard; font-size:16px; font-weight:400; letter-spacing:-0.019em; line-height:1.5; color:#000;
