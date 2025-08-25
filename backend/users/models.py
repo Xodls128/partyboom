@@ -4,7 +4,7 @@ from django.conf import settings
 from django.templatetags.static import static
 
 class User(AbstractUser):
-    # 일반 회원가입과 카카오 로그인 nickname이 동일하게 저장되도록 할 예정
+    # 일반 회원가입/카카오 닉네임을 동일 슬롯에 담아 표시 일관성 확보
     name = models.CharField("이름", max_length=50, blank=True, null=True)
 
     # 연락처
@@ -27,17 +27,40 @@ class User(AbstractUser):
         return self.username or f"user-{self.pk}"
 
     def get_photo_url(self):
-        if self.profile_image:  
+        if self.profile_image:
             return self.profile_image.url
-        return static("icons/default_profile.png") 
+        return static("icons/default_profile.png")
+
+    @property
+    def display_name(self) -> str:
+        """UI에서 사용할 표기 이름(없으면 username로 폴백)"""
+        return self.name or self.username
+
 
 class SocialAccount(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="social_accounts",  # 편의상 추가
+    )
     provider = models.CharField(max_length=20, default="kakao")
-    social_id = models.CharField(max_length=255, unique=True, db_index=True)
+    # 단독 unique 제거: (provider, social_id) 조합으로 유니크 보장
+    social_id = models.CharField(max_length=191, db_index=True)  # 인덱싱 효율 위해 길이 조정
+
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        unique_together = ("provider", "social_id")
+        # Django 5 권장 방식
+        constraints = [
+            models.UniqueConstraint(
+                fields=("provider", "social_id"),
+                name="uniq_provider_social",
+            )
+        ]
+        indexes = [
+            models.Index(fields=("provider", "social_id")),
+            models.Index(fields=("user",)),
+        ]
 
     def __str__(self):
         return f"{self.provider}:{self.social_id} -> {self.user_id}"
