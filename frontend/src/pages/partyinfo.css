@@ -4,7 +4,7 @@
   --frame-max: 393px;
   --frame-w: min(100vw, var(--frame-max));
   --side-gap: 16px;
-  --cta-h: 130px;
+  --cta-h: 80px;
   --safe-bottom: env(safe-area-inset-bottom, 0px);
 }
 
@@ -15,7 +15,9 @@
   margin: 0 auto;
   background:#fff;
   border-radius: 16px;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* 화면 꽉 채우기 */
 }
 
 /* 상단 파티 이미지 */
@@ -98,7 +100,6 @@
   color:#777; font-size:14px; font-weight:600;
 }
 
-
 /* 설명 */
 .party-description{ width: calc(100% - 24px); margin: 0 auto 16px; }
 .party-description p{
@@ -115,25 +116,25 @@
 }
 .attendee-name{ font-size:12px; color:#333; text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
-/* 하단 CTA */
+/* 하단 CTA (footer처럼 페이지 일부) */
 .party-cta {
-  position: fixed;        /* 화면(viewport) 하단에 고정 */
+  flex-shrink: 0;
+  position: sticky;
   bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: var(--frame-w);
+  width: 100%;
+  max-width: var(--frame-max);
+  margin: 0 auto;
   background: #fff;
   box-shadow: 0 -2px 6px rgba(0,0,0,0.1);
   padding: 12px var(--side-gap) calc(12px + var(--safe-bottom));
-  z-index: 1000;
+  z-index: 100;
 }
 
 .partyinfo-attendees-summary{
   display:flex; align-items:center; justify-content:space-between;
-  padding: 10px var(--side-gap) 0;
-  margin: 0;
+  padding: 6px 0;
 }
-.profile-icons{ display:flex; align-items:center; margin-top: 15px; }
+.profile-icons{ display:flex; align-items:center; }
 .profile-icon{
   width:35px; height:35px; border-radius:50%; object-fit:cover;
   margin-left:-8px; position:relative;
@@ -141,11 +142,7 @@
 .profile-icon:first-child{ margin-left:0; }
 
 .join-button {
-  position: fixed;           /* viewport 하단에 고정 */
-  bottom: calc(12px + var(--safe-bottom)); /* 아이폰 safe area 고려 */
-  left: 50%;
-  transform: translateX(-50%);
-  width: 354px;              /* 네가 쓰는 카드 너비에 맞춤 */
+  width: 100%;
   height: 46px;
   background: linear-gradient(90deg, #FFCD50 0%, #FF2824 100%);
   border: none;
@@ -156,14 +153,13 @@
   color: #fff;
   text-align: center;
   cursor: pointer;
-  z-index: 1000;             /* 다른 요소 위에 올라오게 */
+  display: block;
 }
 .join-button:active{ transform: translateY(1px); }
 
 /* 좌측 체크 + 인원수 */
 .partyinfo-left{
   display:flex; align-items:center; gap:8px;
-  margin: 8px 0 0 var(--side-gap);
 }
 .count-icon{ width:18.33px; height:18.33px; }
 
