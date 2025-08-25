@@ -1,3 +1,4 @@
+// src/pages/Partyinfo.jsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
@@ -64,8 +65,13 @@ export default function Partyinfo() {
       const { data } = await api.post(`/api/reserve/join/${partyId}/`);
       navigate("/payment", { state: { participationId: data.id } });
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.detail || "참가 신청 중 오류가 발생했습니다.");
+      if (err.response?.status === 409) {
+        alert("이미 참가한 파티입니다. 마이페이지에서 확인해 주세요.");
+      } else if (err.response?.status === 401) {
+        setShowLoginRequest(true);
+      } else {
+        alert(err.response?.data?.detail || "참가 신청 중 오류가 발생했습니다.");
+      }
     } finally {
       setJoining(false);
     }
@@ -88,6 +94,9 @@ export default function Partyinfo() {
     place_map 
   } = party;
 
+  // 정원 초과 여부 계산
+  const isFull = (participant_count ?? 0) >= (max_participants ?? 0);
+
   return (
     <div className="party-info-container">
       <header className="party-info-header">
@@ -101,6 +110,7 @@ export default function Partyinfo() {
           src={resolveImg(place_photo) || DefaultPartyImage} 
           alt={title} 
           className="party-main-image" 
+          onError={(e) => { e.currentTarget.src = DefaultPartyImage; }}
         />
 
         <h1 className="party-name">{title}</h1>
@@ -110,7 +120,13 @@ export default function Partyinfo() {
             <img className="meta-icon" src={DateIcon} alt="" />
             <span className="info-value">
               {new Intl.DateTimeFormat('ko-KR', {
-                month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false,
+                timeZone: 'Asia/Seoul'
               }).format(new Date(start_time))}
             </span>
           </div>
@@ -145,6 +161,7 @@ export default function Partyinfo() {
                 alt={`${title} 지도`} 
                 className="party-map-image" 
                 draggable="false"
+                onError={(e) => { e.currentTarget.style.display = 'none'; }}
               />
             ) : (
               <div className="map-placeholder" aria-label="지도 준비중" />
@@ -170,6 +187,7 @@ export default function Partyinfo() {
                   src={resolveImg(p.user?.profile_image) || UserIcon} 
                   alt={p.user?.username || '참석자'} 
                   className="attendee-img" 
+                  onError={(e) => { e.currentTarget.src = UserIcon; }}
                 />
                 <span className="attendee-name">{p.user?.username}</span>
               </div>
@@ -194,17 +212,19 @@ export default function Partyinfo() {
                   alt={p.user?.username || '참석자'}
                   className="profile-icon"
                   style={{ zIndex: 10 - i }}
+                  onError={(e) => { e.currentTarget.src = UserIcon; }}
                 />
               ))}
             </div>
           </div>
 
+          {/* 참가 버튼 */}
           <button 
             className="join-button" 
             onClick={handleJoin} 
-            disabled={joining}
+            disabled={joining || isFull}
           >
-            {joining ? "신청 중..." : "참가신청"}
+            {isFull ? "모집마감" : (joining ? "신청 중..." : "참가신청")}
           </button>
         </section>
       </main>
