@@ -8,7 +8,7 @@
 .bottom-sheet{
   z-index: 1000; /* 지도보다 항상 위에 있도록 보장 */
   position: absolute;
-  left: 0; right: 0; bottom: 100px;
+  left: 0; right: 0; bottom: 85px;
   background: #fff;
   border-radius: 16px 16px 0 0;
   box-shadow: 0 -4px 16px rgba(0,0,0,.12);
