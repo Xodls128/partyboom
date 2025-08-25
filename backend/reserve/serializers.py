@@ -26,10 +26,6 @@ class ReserveJoinSerializer(serializers.Serializer):
             party__start_time__date=party.start_time.date()
         ).exists()
 
-        if same_day_exists:
-            # 프론트에서 구분하기 쉽게 special key 추가
-            raise serializers.ValidationError({"daily_limit": True})
-
         # 정원 체크
         confirmed_count = party.participations.filter(
             status=Participation.Status.CONFIRMED

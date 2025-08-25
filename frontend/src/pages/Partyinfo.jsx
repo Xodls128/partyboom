@@ -85,6 +85,7 @@ export default function Partyinfo() {
       const data = err.response?.data || {};
 
       if (data.daily_limit === true) {
+        // ✅ 여기서 바로 PartyCount 모달 열림
         setShowPartyCount(true);
       } else if (status === 409) {
         alert("이미 참가한 파티입니다. 마이페이지에서 확인해 주세요.");
@@ -93,7 +94,7 @@ export default function Partyinfo() {
       } else {
         alert(data.detail || "참가 신청 중 오류가 발생했습니다.");
       }
-  };
+    }
   }
 
   if (loadingParty) return <div className="party-info-container">로딩 중...</div>;
