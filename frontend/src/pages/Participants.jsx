@@ -53,22 +53,19 @@ export default function Participants() {
   // 유저의 추가 설정에서 태그 정보 추출
   const extractTags = (extraSetting) => {
     if (!extraSetting) return [];
-    
     try {
       // extra_setting이 문자열로 왔을 경우 파싱
       const extraData = typeof extraSetting === 'string' 
         ? JSON.parse(extraSetting) 
         : extraSetting;
-        
+
       // extra 객체 안에 태그 정보가 있음
       const extra = extraData.extra || {};
       const tags = [];
-      
       // 각 태그 정보가 있으면 배열에 추가
       if (extra.grade) tags.push(extra.grade);
       if (extra.college) tags.push(extra.college);
       if (extra.personality) tags.push(extra.personality);
-      
       // MBTI 정보 처리
       if (extra.mbti) {
         const mbti = extra.mbti;
@@ -79,14 +76,13 @@ export default function Participants() {
             (mbti.n_s || '') + 
             (mbti.f_t || '') + 
             (mbti.p_j || '');
-          
+
           if (mbtiString) tags.push(mbtiString);
         } else if (typeof mbti === 'string') {
           // MBTI가 문자열로 왔을 경우
           tags.push(mbti);
         }
       }
-      
       return tags;
     } catch (e) {
       console.error("태그 파싱 오류:", e);
@@ -125,7 +121,7 @@ export default function Participants() {
           const user = participant.user;
           const tags = extractTags(user.extra_setting);
           const isCurrentUser = user.id === currentUserId;
-          
+
           return (
             <div className="participant-block" key={participant.id}>
               <div className="participant-profile-col">
@@ -186,3 +182,4 @@ export default function Participants() {
     </>
   );
 }
+
