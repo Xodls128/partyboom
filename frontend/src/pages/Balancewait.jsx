@@ -13,10 +13,26 @@ export default function Balancewait() {
   const [isStandby, setIsStandby] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [navigating, setNavigating] = useState(false);
+  const [partyTitle, setPartyTitle] = useState(''); // 파티 제목 상태 추가
 
   const navigate = useNavigate();
   const { partyId } = useParams();
   const token = localStorage.getItem("access");
+
+  // 파티 정보 가져오기
+  const fetchPartyInfo = async () => {
+    try {
+      // 모든 내 파티를 가져와서 현재 partyId와 일치하는 파티 찾기
+      const { data } = await api.get('/api/partyassist/myparties/');
+      const currentParty = data.find(party => party.id === parseInt(partyId));
+      
+      if (currentParty) {
+        setPartyTitle(currentParty.title);
+      }
+    } catch (err) {
+      console.error("파티 정보 불러오기 실패:", err.response?.data || err.message);
+    }
+  };
 
   // standby 토글
   const handleJoin = async () => {
@@ -40,8 +56,11 @@ export default function Balancewait() {
     }
   };
 
-    // WebSocket 연결
+  // WebSocket 연결
   useEffect(() => {
+    // 초기화 시 파티 정보 가져오기
+    fetchPartyInfo();
+
     // --- 활성 게임 여부 확인 ---
     const checkForActiveGame = async () => {
       try {
@@ -106,12 +125,12 @@ export default function Balancewait() {
     };
 
     initialize();
-  }, [partyId, navigate, token ,navigating]); 
+  }, [partyId, navigate, token, navigating]); 
 
   return (
     <>
       <div className="balancewait-title">
-        <div className="balancewait-partyname">#유학생과_언어교류</div>
+        <div className="balancewait-partyname">#{partyTitle}</div>
         <div className="balancewait-partyname">파티가 진행 중이에요!</div>
       </div>
 
