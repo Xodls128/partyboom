@@ -5,69 +5,20 @@ from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from detailview.models import Party
 from .models import BalanceRound, BalanceQuestion
 from .serializers import (
     BalanceRoundReadSerializer,
     BalanceQuestionReadSerializer,
-    RoundCreateAIRequestSerializer,
     VoteCreateSerializer,
 )
-# Party 컨텍스트 기반 밸런스 문항 생성 유틸 함수
-from utils.gameAI import generate_balance_by_ai
 
 # WebSocket 관련 임포트
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 
 
-class RoundAICreateView(APIView):
-    """POST /api/v1/game/rounds/ai-create"""
-    permission_classes = [permissions.IsAuthenticated]
-
-    @transaction.atomic
-    def post(self, request):
-        ser = RoundCreateAIRequestSerializer(data=request.data)
-        ser.is_valid(raise_exception=True)
-
-        party_id = ser.validated_data["party_id"]
-        count = ser.validated_data["count"]
-
-        party = get_object_or_404(
-            Party.objects.select_related("place").prefetch_related("tags"),
-            pk=party_id
-        )
-
-        result = generate_balance_by_ai(party, count=count)
-        items = result.get("items", [])
-
-        round_obj = BalanceRound.objects.create(
-            party=party,
-            created_by=request.user if request.user.is_authenticated else None,
-            model_used="gpt-4o-mini",
-            is_active=True,
-        )
-        BalanceQuestion.objects.bulk_create([
-            BalanceQuestion(
-                round=round_obj,
-                order=i + 1,
-                a_text=it["a"],
-                b_text=it["b"],
-            )
-            for i, it in enumerate(items)
-        ])
-
-        round_obj = (
-            BalanceRound.objects
-            .select_related("party", "created_by")
-            .prefetch_related("questions")
-            .get(pk=round_obj.pk)
-        )
-        return Response(BalanceRoundReadSerializer(round_obj).data, status=status.HTTP_201_CREATED)
-
-
 class RoundRetrieveView(APIView):
-    """GET /api/v1/game/rounds/<round_uuid>/"""
+    """GET /api/v1/game/rounds/<round_id>/"""
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, round_id):
@@ -94,6 +45,7 @@ class VoteCreateView(APIView):
         q = vote.question
         q.refresh_from_db(fields=["vote_a_count", "vote_b_count"])
 
+        # 투표 집계 결과를 WebSocket으로 브로드캐스트
         channel_layer = get_channel_layer()
         async_to_sync(channel_layer.group_send)(
             f"round_{q.round_id}",
