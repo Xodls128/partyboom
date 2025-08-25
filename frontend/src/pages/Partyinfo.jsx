@@ -95,7 +95,7 @@ export default function Partyinfo() {
   } = party;
 
   // 정원 초과 여부 계산
-  const isFull = (participant_count ?? 0) >= (max_participants ?? 0);
+  const isFull = (applied_count ?? 0) >= (max_participants ?? 0);
 
   return (
     <div className="party-info-container">
