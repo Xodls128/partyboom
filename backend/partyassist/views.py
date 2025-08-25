@@ -16,7 +16,7 @@ from utils.gameAI import generate_balance_by_ai  # AI 문항 생성 유틸
 
 class MyPartyViewSet(viewsets.ReadOnlyModelViewSet):
     """내가 참여한 파티 목록"""
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = MyPartySerializer
 
     def get_queryset(self):
