@@ -30,7 +30,7 @@ export default function ReportUser() {
   const [open, setOpen] = useState(false);
   const [reason, setReason] = useState(''); 
   const [detail, setDetail] = useState('');
-  const [categories, setCategories] = useState([]); 
+  const [categories] = useState(REPORT_CATEGORIES);
   const [toast, setToast] = useState(null); 
 
   const API_BASE = import.meta.env.VITE_API_BASE_URL;
