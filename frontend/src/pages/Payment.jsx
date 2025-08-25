@@ -5,6 +5,7 @@ import Back from '../assets/left_black.svg';
 import './payment.css';
 
 import LoginRequest from "../components/LoginRequest"; // 로그인 모달 임포트
+import FinishPoint from "../components/FinishPoint"; // 추가
 
 export default function Payment() {
   const navigate = useNavigate();
@@ -14,7 +15,8 @@ export default function Payment() {
   const [paymentMethod, setPaymentMethod] = useState('point'); // 현재는 포인트만 사용
   const [points, setPoints] = useState(0);
   const [agree, setAgree] = useState(false);
-  
+  const [showFinishPoint, setShowFinishPoint] = useState(false);
+  const [usedAmount, setUsedAmount] = useState(0);
   
   // 로그인 상태 체크
   const token = localStorage.getItem("access");
@@ -76,10 +78,11 @@ export default function Payment() {
         payment_method: "POINT",
       });
 
-      paymentCompleted.current = true; // 결제 완료 상태로 변경
-      alert("결제 완료! 사용 포인트: " + data.amount);
-      setPoints(data.remaining_points); // 응답으로 받은 남은 포인트 갱신
-      navigate("/paymentfinish"); // 결제 완료 후 이동
+      paymentCompleted.current = true;
+      setPoints(data.remaining_points);
+      setUsedAmount(data.amount);
+      setShowFinishPoint(true); // 모달 표시
+      // navigate("/paymentfinish"); // 모달에서 확인 버튼으로 이동
     } catch (err) {
       console.error("결제 실패:", err.response?.data || err.message);
       alert(err.response?.data?.detail || "결제 중 오류가 발생했습니다.");
@@ -154,6 +157,12 @@ export default function Payment() {
           결제하기
         </button>
       </div>
+
+      <FinishPoint
+        isOpen={showFinishPoint}
+        amount={usedAmount}
+        onConfirm={() => navigate("/paymentfinish")}
+      />
     </>
   );
 }
