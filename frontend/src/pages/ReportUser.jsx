@@ -34,24 +34,7 @@ export default function ReportUser() {
   const [categories] = useState(REPORT_CATEGORIES);
   const [toast, setToast] = useState(null); 
 
-  const API_BASE = import.meta.env.VITE_API_BASE_URL;
 
-  // 신고 유형 목록 불러오기
-  useEffect(() => {
-    fetch(`${API_BASE}/api/mypage/reports/`, {
-      method: 'OPTIONS',
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('access')}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.actions?.POST?.category?.choices) {
-          setCategories(data.actions.POST.category.choices);
-        }
-      })
-      .catch((err) => console.error('신고 유형 불러오기 실패', err));
-  }, []);
 
   const submit = async () => {
     if (!reason) {
@@ -71,48 +54,28 @@ export default function ReportUser() {
     }
 
     try {
-      const response = await fetch(`${API_BASE}/api/mypage/reports/`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('access')}`, 
-        },
-        body: JSON.stringify({
-          party: user.partyId,
-          reported_user: user.id,
-          category: reason,
-          content: detail,
-        }),
+      // (수정 #1) fetch → axios.post
+      const response = await api.post("/api/mypage/reports/", {
+        party: user.partyId,
+        reported_user: user.id,
+        category: reason,
+        content: detail,
       });
 
-      if (!response.ok) {
-        const text = await response.text();   // (수정 #1) 텍스트로 받기
-        let err = null;
-
-        // (수정 #2) 응답이 비어있지 않을 때만 JSON 파싱
-        if (text) {
-          try {
-            err = JSON.parse(text);
-          } catch (e) {
-            console.error("에러 응답 JSON 파싱 실패:", e);
-          }
-        }
-
-        console.error('신고 실패:', err || text);
-        setToast({ text: err?.detail || "❌ 신고 중 오류가 발생했습니다.", type: "error" });
-        setTimeout(() => setToast(null), 1500);
-        return;
-      }
-
-      // 성공
+      // (수정 #2) axios는 ok 여부 대신 catch로 에러 잡음 → 성공 처리
       setToast({ text: "✅ 신고가 접수되었습니다.", type: "success" });
       setTimeout(() => {
         setToast(null);
         nav(-1);
       }, 1500);
     } catch (err) {
-      console.error(err);
-      setToast({ text: "❌ 신고 중 오류가 발생했습니다.", type: "error" });
+      // (수정 #3) axios 에러 구조
+      const detailMsg =
+        err.response?.data?.detail ||
+        err.response?.data?.non_field_errors?.[0] ||
+        "❌ 신고 중 오류가 발생했습니다.";
+      console.error("신고 실패:", err.response?.data || err);
+      setToast({ text: detailMsg, type: "error" });
       setTimeout(() => setToast(null), 1500);
     }
   };
