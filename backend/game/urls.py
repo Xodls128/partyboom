@@ -1,11 +1,14 @@
 from django.urls import path
-from .views import RoundRetrieveView, VoteCreateView, ActiveRoundCheckView
+from .views import RoundRetrieveView, VoteCreateView, ActiveRoundCheckView, RoundStateView
 
 app_name = "game"
 
 urlpatterns = [
     # 특정 라운드 조회
     path("rounds/<uuid:round_id>/", RoundRetrieveView.as_view(), name="round-retrieve"),
+
+    # 특정 라운드 상태 조회 (롱폴링)
+    path("rounds/<uuid:round_id>/state/", RoundStateView.as_view(), name="round-state"),
 
     # 특정 문항에 투표
     path("questions/<int:question_id>/vote/", VoteCreateView.as_view(), name="vote-create"),
