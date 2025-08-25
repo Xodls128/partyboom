@@ -9,6 +9,7 @@ import Check from '../assets/check.svg';
 import Profilesmall from '../assets/profilesmall.svg';
 import './assist.css';
 import api from '../api/axios'; // axios 인스턴스 사용
+import LoginRequest from "../components/LoginRequest"; //
 
 export default function Assist() {
   const navigate = useNavigate();
@@ -19,6 +20,24 @@ export default function Assist() {
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const [showStartModal, setShowStartModal] = useState(false);
   const [startingPartyId, setStartingPartyId] = useState(null);
+
+  const token =
+    localStorage.getItem("access") ||
+    localStorage.getItem("accessToken") ||
+    localStorage.getItem("token") ||
+    sessionStorage.getItem("access");
+  const isLoggedIn = !!token;
+
+  // 로그인 안 됐으면 팝업 띄우기
+  if (!isLoggedIn) {
+    return (
+      <LoginRequest 
+        isOpen={true} 
+        onClose={() => navigate("/")} 
+        redirectTo="/assist"   // 로그인 성공 후 Assist로 복귀
+      />
+    );
+  }
 
   // 파티 데이터 불러오기
   const fetchParties = async () => {
