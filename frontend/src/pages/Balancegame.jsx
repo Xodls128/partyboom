@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 import Back from "../assets/left_black.svg";
@@ -10,68 +10,62 @@ import "./balancegame.css";
 export default function Balancegame() {
   const navigate = useNavigate();
   const { roundId } = useParams();
-  const wsRef = useRef(null);
-  const intervalRef = useRef(null);
-
+  
   const [questions, setQuestions] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [votingMap, setVotingMap] = useState(new Map()); // 각 질문별 투표 중 상태
+  const [votingMap, setVotingMap] = useState(new Map());
   const [errorMsg, setErrorMsg] = useState("");
-
-  // 라운드 데이터 불러오기
-  const fetchRound = async () => {
-    try {
-      const { data } = await api.get(`/api/v1/game/rounds/${roundId}/`);
-      // 서버에서 내려주는 질문들 + 이미 투표했는지 여부는 서버에서 못주니까 UI는 로컬 관리
-      setQuestions(data.questions || []);
-    } catch (err) {
-      const status = err.response?.status;
-      if (status === 404) setErrorMsg("라운드를 찾을 수 없거나 종료되었습니다.");
-      else if (status === 403) setErrorMsg("이 파티의 참가자만 게임에 접근할 수 있습니다.");
-      else setErrorMsg("게임 데이터를 불러올 수 없습니다.");
-    }
-  };
+  const [version, setVersion] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchRound();
-
-    const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const wsUrl = `${wsProtocol}://${window.location.host}/ws/party/${roundId}/`;
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
-
-    ws.onmessage = (event) => {
+    const fetchInitialData = async () => {
       try {
-        const msg = JSON.parse(event.data);
-        if (msg.type === "vote_update") {
-          const d = msg.data;
-          setQuestions((prev) =>
-            prev.map((q) =>
-              q.id === d.question_id
-                ? { ...q, vote_a_count: d.vote_a_count, vote_b_count: d.vote_b_count }
-                : q
-            )
-          );
+        const { data } = await api.get(`/api/v1/game/rounds/${roundId}/`);
+        setQuestions(data.questions || []);
+        setVersion(data.state?.version || 0);
+      } catch (err) {
+        const status = err.response?.status;
+        if (status === 404) setErrorMsg("라운드를 찾을 수 없거나 종료되었습니다.");
+        else if (status === 403) setErrorMsg("이 파티의 참가자만 게임에 접근할 수 있습니다.");
+        else setErrorMsg("게임 데이터를 불러올 수 없습니다.");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInitialData();
+  }, [roundId]);
+
+  useEffect(() => {
+    if (loading) return;
+    let isMounted = true;
+
+    const poll = async () => {
+      if (!isMounted) return;
+      try {
+        const { data, status } = await api.get(`/api/v1/game/rounds/${roundId}/state/?version=${version}`);
+        if (isMounted && status === 200) {
+          setQuestions(data.data.questions || []);
+          setVersion(data.version);
         }
-      } catch (e) {
-        console.error("WS parse error", e);
+      } catch (error) {
+        console.error("Polling error:", error);
+        await new Promise(resolve => setTimeout(resolve, 5000));
+      }
+      if(isMounted) {
+        setTimeout(poll, 1000);
       }
     };
 
-    ws.onclose = () => {
-      console.log("WebSocket closed, fallback polling ON");
-      intervalRef.current = setInterval(fetchRound, 10000);
-    };
+    poll();
 
     return () => {
-      ws.close();
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      isMounted = false;
     };
-  }, [roundId]);
+  }, [roundId, version, loading]);
 
-  // 투표하기 (HTTP POST)
   const handleVote = async (questionId, choice) => {
-    if (votingMap.get(questionId)) return; // 이미 투표 중
+    if (votingMap.get(questionId)) return;
     setVotingMap((m) => new Map(m).set(questionId, true));
 
     try {
@@ -92,21 +86,20 @@ export default function Balancegame() {
     }
   };
 
-  if (questions.length === 0) return <div>로딩 중...</div>;
+  if (loading) return <div className="balancegame-loader"></div>;
+  if (errorMsg) return <div className="balancegame-error-message">{errorMsg}</div>;
 
   return (
-    <>
+    <div className="balancegame-container">
       <div className="balancegame-header">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate(-1)} // 이전 페이지로
           className="balancegame-back-button"
           aria-label="뒤로가기"
         >
           <img src={Back} alt="뒤로가기 아이콘" className="balancegame-back-icon" />
         </button>
       </div>
-
-      {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
 
       <Swiper
         spaceBetween={30}
@@ -126,7 +119,6 @@ export default function Balancegame() {
                 {idx + 1} / {questions.length} : 둘 중 하나만 선택해야 한다면?!
               </div>
 
-              {/* 선택지 A */}
               <div className="balancegame-block-red">
                 <button
                   className="balancegame-btn-red"
@@ -143,7 +135,6 @@ export default function Balancegame() {
                 <img src={Vs} alt="VS" className="balancegame-vs-img" />
               </div>
 
-              {/* 선택지 B */}
               <div className="balancegame-block-yellow">
                 <button
                   className="balancegame-btn-yellow"
@@ -156,7 +147,6 @@ export default function Balancegame() {
                 </button>
               </div>
 
-              {/* 집계 현황 */}
               <div className="balancegame-status">밸런스 현황</div>
               <div className="balancegame-gauge-wrap">
                 <div className="balancegame-gauge-bar">
@@ -182,13 +172,12 @@ export default function Balancegame() {
         })}
       </Swiper>
 
-      {/* Progress Bar */}
       <div className="balancegame-progress">
         <div
           className="balancegame-progress-bar"
           style={{ width: `${((activeIndex + 1) / questions.length) * 100}%` }}
         ></div>
       </div>
-    </>
+    </div>
   );
 }

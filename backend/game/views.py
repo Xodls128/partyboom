@@ -1,21 +1,18 @@
 from django.db import transaction
+from django.db.models import F
 from django.shortcuts import get_object_or_404
+import time
 
 from rest_framework import permissions, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from .models import BalanceRound, BalanceQuestion
+from .models import BalanceRound, BalanceQuestion, RoundState
 from .serializers import (
     BalanceRoundReadSerializer,
     BalanceQuestionReadSerializer,
     VoteCreateSerializer,
 )
-
-# WebSocket 관련 임포트
-from channels.layers import get_channel_layer
-from asgiref.sync import async_to_sync
-
 
 class RoundRetrieveView(APIView):
     """GET /api/v1/game/rounds/<round_id>/"""
@@ -29,7 +26,6 @@ class RoundRetrieveView(APIView):
             .get(pk=round_id)
         )
         return Response(BalanceRoundReadSerializer(round_obj).data, status=status.HTTP_200_OK)
-
 
 class VoteCreateView(APIView):
     """POST /api/v1/game/questions/<question_id>/vote/"""
@@ -45,23 +41,10 @@ class VoteCreateView(APIView):
         q = vote.question
         q.refresh_from_db(fields=["vote_a_count", "vote_b_count"])
 
-        # 투표 집계 결과를 WebSocket으로 브로드캐스트
-        channel_layer = get_channel_layer()
-        async_to_sync(channel_layer.group_send)(
-            f"round_{q.round_id}",
-            {
-                "type": "vote_update",
-                "data": {
-                    "question_id": q.id,
-                    "round_id": str(q.round_id),
-                    "vote_a_count": q.vote_a_count,
-                    "vote_b_count": q.vote_b_count,
-                }
-            }
-        )
+        # RoundState 버전 업데이트
+        RoundState.objects.filter(round_id=q.round_id).update(version=F("version") + 1)
 
         return Response(BalanceQuestionReadSerializer(q).data, status=status.HTTP_201_CREATED)
-
 
 class ActiveRoundCheckView(APIView):
     """
@@ -80,3 +63,35 @@ class ActiveRoundCheckView(APIView):
                 {"detail": "진행 중인 게임이 없습니다."},
                 status=status.HTTP_404_NOT_FOUND
             )
+
+class RoundStateView(APIView):
+    """GET /api/v1/game/rounds/<round_id>/state/"""
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, round_id):
+        client_version = request.query_params.get("version", 0)
+        try:
+            client_version = int(client_version)
+        except (ValueError, TypeError):
+            client_version = 0
+
+        # 30초 동안 1초 간격으로 상태 변화 확인
+        for _ in range(30):
+            try:
+                round_state = RoundState.objects.get(round_id=round_id)
+                if round_state.version > client_version:
+                    round_obj = (
+                        BalanceRound.objects.select_related("party", "created_by")
+                        .prefetch_related("questions")
+                        .get(pk=round_id)
+                    )
+                    return Response({
+                        "version": round_state.version,
+                        "data": BalanceRoundReadSerializer(round_obj).data
+                    }, status=status.HTTP_200_OK)
+                else:
+                    time.sleep(1)
+            except RoundState.DoesNotExist:
+                return Response({"detail": "라운드를 찾을 수 없습니다."}, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
