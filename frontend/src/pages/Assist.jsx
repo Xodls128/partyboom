@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Assistbomb from '../assets/assistbomb.svg';
 import Location from '../assets/location.svg';
-import DateIcon from '../assets/date.svg';
+import Date from '../assets/date.svg';
 import Check from '../assets/check.svg';
 import Profilesmall from '../assets/profilesmall.svg';
 import './assist.css';
@@ -23,7 +23,7 @@ export default function Assist() {
   // 파티 데이터 불러오기
   const fetchParties = async () => {
     try {
-      const token = localStorage.getItem("access");
+      const token = localStorage.getItem("accessToken");
       if (!token) {
         setShowLoginPopup(true);
         return;
@@ -104,7 +104,7 @@ export default function Assist() {
     return `${days}일 ${hours}시간 ${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  // Standby 상태 토글
+  // Standby 상태 토글 함수도 지우면 좋지만, 다른 곳에서 참조할 수 있어 남겨둠
   const toggleStandby = async (partyId) => {
     try {
       const response = await api.post(`/api/partyassist/standby/${partyId}/toggle/`);
@@ -295,7 +295,7 @@ export default function Assist() {
 
               <div className='assist-partyName'>{currentParty.title}</div>
               <div className='assist-date'>
-                <img src={DateIcon} alt="" />
+                <img src={Date} alt="" />
                 <span className="assist-dateText">
                   {new Date(currentParty.start_time).toLocaleString('ko-KR', {
                     month: '2-digit',
@@ -329,15 +329,6 @@ export default function Assist() {
                       draggable="false" 
                     />
                   ))}
-              </div>
-
-              <div className="assist-standby">
-                <button 
-                  className={`assist-standby-button ${currentParty.is_standby ? 'active' : ''}`}
-                  onClick={() => toggleStandby(currentParty.id)}
-                >
-                  {currentParty.is_standby ? '준비 완료!' : '준비하기'}
-                </button>
               </div>
             </div>
           </div>
