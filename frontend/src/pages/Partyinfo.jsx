@@ -85,7 +85,7 @@ export default function Partyinfo() {
     title, 
     start_time, 
     place_name, 
-    participant_count, 
+    applied_count, 
     max_participants, 
     description, 
     tags, 
@@ -136,7 +136,7 @@ export default function Partyinfo() {
           </div>
           <div className="party-info-row">
             <span className="info-label">참여인원</span>
-            <span className="info-value">{participant_count ?? 0} / {max_participants}</span>
+            <span className="info-value">{applied_count ?? 0} / {max_participants}</span>
           </div>
         </div>
 
@@ -200,7 +200,7 @@ export default function Partyinfo() {
             <div className="partyinfo-left">
               <img src={CheckIcon} alt="" className="count-icon" />
               <span className="partyinfo-personText">
-                {participant_count ?? 0}/{max_participants}
+                {applied_count ?? 0}/{max_participants}
               </span>
             </div>
 
