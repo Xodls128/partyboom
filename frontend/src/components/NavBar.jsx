@@ -21,7 +21,7 @@ export default function NavBar() {
   return (
     <div className="footer-wrap" style={{
       width: '393px',
-      height: '101px',
+      height: '85px',
       position: 'absolute', // fixed → absolute
       left: 0,
       bottom: 0,
