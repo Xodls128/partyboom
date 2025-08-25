@@ -40,29 +40,32 @@ export default function Balancegame() {
     if (loading) return;
     let isMounted = true;
 
-    const poll = async () => {
+    const poll = async (currentVersion) => {
       if (!isMounted) return;
       try {
-        const { data, status } = await api.get(`/api/v1/game/rounds/${roundId}/state/?version=${version}`);
+        const { data, status } = await api.get(`/api/v1/game/rounds/${roundId}/state/?version=${currentVersion}`);
         if (isMounted && status === 200) {
           setQuestions(data.data.questions || []);
           setVersion(data.version);
+          setTimeout(() => poll(data.version), 1000);
+        } else {
+          setTimeout(() => poll(currentVersion), 1000);
         }
       } catch (error) {
         console.error("Polling error:", error);
         await new Promise(resolve => setTimeout(resolve, 5000));
-      }
-      if(isMounted) {
-        setTimeout(poll, 1000);
+        if(isMounted) poll(currentVersion);
       }
     };
 
-    poll();
+    // 초기 버전(version)으로 첫 폴링 시작
+    poll(version);
 
     return () => {
       isMounted = false;
     };
-  }, [roundId, version, loading]);
+    // 여기도 version 의존성을 제거합니다.
+  }, [roundId, loading]); // loading이 false가 되면 최초 1회만 실행
 
   const handleVote = async (questionId, choice) => {
     if (votingMap.get(questionId)) return;
