@@ -1,20 +1,15 @@
 .participants-back-btn {
-  position: fixed;
-  top: 39px;
-  left: 50%;
-  transform: translateX(-192px);
-  background: transparent;
-  border: none;
-  padding: 0;
-  cursor: pointer;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background-color: rgba(255,255,255,0);
-  display: flex;
+  position: absolute;
+  left: var(--side-gap);
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  pointer-events: auto;          
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* 다른 요소 위에 표시 */
+  width: 36px; height: 36px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.35);    
+  backdrop-filter: saturate(120%) blur(2px);
 }
 
 .participants-spaceExpansion-top {
