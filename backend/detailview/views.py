@@ -9,6 +9,8 @@ from detailview.serializers import PartyListSerializer, PartyDetailSerializer
 from django.db import transaction
 from detailview.models import Party, Place, Tag
 from utils.partyAI import generate_party_by_ai
+from django.utils import timezone
+from rest_framework import generics
 
 
 class PartyViewSet(viewsets.ReadOnlyModelViewSet):
@@ -24,6 +26,7 @@ class PartyViewSet(viewsets.ReadOnlyModelViewSet):
             .select_related("place")
             .prefetch_related("tags", "participations__user")
             .annotate(applied_count=Count("participations",distinct=True))
+            .filter(start_time__gte=timezone.now())   # ✅ 지난 파티 제외
         )
 
         # 필터링 옵션
