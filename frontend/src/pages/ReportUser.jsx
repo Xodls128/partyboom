@@ -4,6 +4,14 @@ import './ReportUser.css';
 import LeftIcon from '../assets/left_black.svg';
 import BelowArrow from '../assets/below_arrow.svg';
 
+const REPORT_CATEGORIES = [
+  { value: "FAKE_INFO", display_name: "개인정보 허위 기재" },
+  { value: "UNPLEASANT", display_name: "파티 현장에서의 불쾌감 형성" },
+  { value: "INAPPROPRIATE_ACT", display_name: "파티 현장에서의 부적절한 행위" },
+  { value: "BAD_PHOTO", display_name: "부적절한 프로필 사진" },
+  { value: "OTHER", display_name: "기타" },
+];
+
 export default function ReportUser() {
   const nav = useNavigate();
   const location = useLocation();
