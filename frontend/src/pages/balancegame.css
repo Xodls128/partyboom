@@ -22,7 +22,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000; /* 다른 요소 위에 표시 */
+  z-index: 1000;
 }
 
 .balancegame-back-icon {
@@ -37,9 +37,8 @@
   text-align: center;
   font-family: "PyeongChang Peace";
   font-size: 24px;
-  font-style: normal;
   font-weight: 700;
-  line-height: 150%; /* 36px */
+  line-height: 150%;
   letter-spacing: -0.456px;
   width: 100%;
   padding: 8px 0;
@@ -79,23 +78,26 @@
   padding: 58px 32px;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
   border-radius: 8px;
   background: var(--main_red, #FF2824);
   border: none;
   margin: 32px auto 0 auto;
   cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.balancegame-btn-red:not(:disabled):hover {
+  transform: scale(1.05);
+  background: #ff4d4f;
 }
 
 .balancegame-red-text {
-  color: var(--Grayscale0, #FFF);
+  color: #fff;
   text-align: center;
   font-family: "PyeongChang Peace";
   font-size: 24px;
-  font-style: normal;
   font-weight: 700;
-  line-height: 140%; /* 33.6px */
+  line-height: 140%;
   letter-spacing: -0.456px;
   white-space: pre-line;
 }
@@ -125,23 +127,26 @@
   padding: 58px 32px;
   justify-content: center;
   align-items: center;
-  gap: 10px;
-  flex-shrink: 0;
   border-radius: 8px;
-  background: var(--main_red, #FFCD50);
+  background: #FFCD50;
   border: none;
   margin: 32px auto 0 auto;
   cursor: pointer;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+.balancegame-btn-yellow:not(:disabled):hover {
+  transform: scale(1.05);
+  background: #ffe58f;
 }
 
 .balancegame-yellow-text {
-  color: var(--Grayscale0, #000);
+  color: #000;
   text-align: center;
   font-family: "PyeongChang Peace";
   font-size: 24px;
-  font-style: normal;
   font-weight: 700;
-  line-height: 140%; /* 33.6px */
+  line-height: 140%;
   letter-spacing: -0.456px;
   white-space: pre-line;
 }
@@ -152,13 +157,10 @@
   margin-left: 30px;
   font-family: Pretendard;
   font-size: 18px;
-  font-style: normal;
   font-weight: 600;
-  line-height: 150%; /* 27px */
+  line-height: 150%;
   letter-spacing: -0.342px;
 }
-
-
 
 .balancegame-gauge-wrap {
   width: 341px;
@@ -177,12 +179,12 @@
 }
 
 .balancegame-gauge-red {
-  background: var(--main_red, #FF2824);
+  background: #FF2824;
   display: flex;
   align-items: center;
   justify-content: flex-start;
   height: 100%;
-  transition: width 0.3s;
+  transition: width 0.6s ease-in-out;
   color: #fff;
   font-weight: 700;
   font-size: 16px;
@@ -195,7 +197,7 @@
   align-items: center;
   justify-content: flex-end;
   height: 100%;
-  transition: width 0.3s;
+  transition: width 0.6s ease-in-out;
   color: #222;
   font-weight: 700;
   font-size: 16px;
@@ -203,35 +205,26 @@
 }
 
 .balancegame-gauge-text {
-  color: var(--Grayscale0, #FFF);
+  color: #fff;
   text-align: center;
   font-family: "PyeongChang Peace";
   font-size: 20px;
-  font-style: normal;
   font-weight: 700;
-  line-height: 140%; /* 28px */
+  line-height: 140%;
   letter-spacing: -0.38px;
 }
 
 .balancegame-gauge-total {
-  color: var(--Grayscale0, #000);
+  color: #000;
   text-align: center;
   font-family: "PyeongChang Peace";
   font-size: 20px;
-  font-style: normal;
   font-weight: 700;
-  line-height: 140%; /* 28px */
+  line-height: 140%;
   letter-spacing: -0.38px;
   margin-top: 4px;
 }
 
-/* 집계 막대 애니메이션 */
-.balancegame-gauge-red,
-.balancegame-gauge-yellow {
-  transition: width 0.6s ease-in-out;
-}
-
-/* 슬라이드 progress bar */
 .balancegame-progress {
   width: 100%;
   height: 6px;
@@ -247,3 +240,10 @@
   transition: width 0.4s ease;
 }
 
+/* 버튼 비활성화 상태 */
+.balancegame-btn-red:disabled,
+.balancegame-btn-yellow:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
