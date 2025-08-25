@@ -1,4 +1,3 @@
-// src/pages/Partyinfo.jsx
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
@@ -10,6 +9,7 @@ import CheckIcon from '../assets/check.svg';
 import "./partyinfo.css";
 import LoginRequest from "../components/LoginRequest";
 import Location from "../assets/location.svg";
+import PartyCount from '../components/PartyCount';
 
 const MAX_PROFILES = 5;
 const API_BASE = import.meta.env.VITE_API_URL;
@@ -24,6 +24,7 @@ export default function Partyinfo() {
 
   const [showLoginRequest, setShowLoginRequest] = useState(false);
   const [joining, setJoining] = useState(false);
+  const [showPartyCount, setShowPartyCount] = useState(false);
 
   // 이미지 경로 처리
   const resolveImg = (url) => {
@@ -60,22 +61,40 @@ export default function Partyinfo() {
       return;
     }
 
+    // setJoining(true);
+    // try {
+    //   const { data } = await api.post(`/api/reserve/join/${partyId}/`);
+    //   navigate("/payment", { state: { participationId: data.id } });
+    // } catch (err) {
+    //   if (err.response?.status === 409) {
+    //     alert("이미 참가한 파티입니다. 마이페이지에서 확인해 주세요.");
+    //   } else if (err.response?.status === 401) {
+    //     setShowLoginRequest(true);
+    //   } else {
+    //     alert(err.response?.data?.detail || "참가 신청 중 오류가 발생했습니다.");
+    //   }
+    // } finally {
+    //   setJoining(false);
+    // }
     setJoining(true);
     try {
       const { data } = await api.post(`/api/reserve/join/${partyId}/`);
       navigate("/payment", { state: { participationId: data.id } });
     } catch (err) {
-      if (err.response?.status === 409) {
+      const status = err.response?.status;
+      const data = err.response?.data || {};
+
+      if (data.daily_limit === true) {
+        setShowPartyCount(true);
+      } else if (status === 409) {
         alert("이미 참가한 파티입니다. 마이페이지에서 확인해 주세요.");
-      } else if (err.response?.status === 401) {
+      } else if (status === 401) {
         setShowLoginRequest(true);
       } else {
-        alert(err.response?.data?.detail || "참가 신청 중 오류가 발생했습니다.");
+        alert(data.detail || "참가 신청 중 오류가 발생했습니다.");
       }
-    } finally {
-      setJoining(false);
-    }
   };
+  }
 
   if (loadingParty) return <div className="party-info-container">로딩 중...</div>;
   if (error) return <div className="party-info-container">에러: {error}</div>;
@@ -236,6 +255,11 @@ export default function Partyinfo() {
           redirectTo={`/partyinfo/${partyId}`} 
         />
       )}
+
+      <PartyCount
+         isOpen={showPartyCount}
+         onConfirm={() => setShowPartyCount(false)}
+      />
     </div>
   );
 }
