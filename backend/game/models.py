@@ -1,8 +1,6 @@
 from django.db import models
 import uuid
 from django.conf import settings
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 
 class BalanceRound(models.Model):
     """한 파티당 하나만 존재하는 밸런스게임 라운드"""
@@ -24,6 +22,8 @@ class BalanceRound(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     closed_at = models.DateTimeField(null=True, blank=True)
+    # 롱폴링을 위한 마지막 업데이트 시간 필드 추가
+    last_updated_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return f"{self.party.title} 파티 라운드"
@@ -73,22 +73,4 @@ class BalanceVote(models.Model):
 
     def __str__(self):
         return f"{self.user_id} -> Q{self.question_id} ({self.choice})"
-
-class RoundState(models.Model):
-    """밸런스 게임 라운드의 상태를 추적 (롱폴링용)"""
-    round = models.OneToOneField(
-        BalanceRound,
-        on_delete=models.CASCADE,
-        related_name="state",
-        verbose_name="라운드",
-    )
-    version = models.PositiveIntegerField("상태 버전", default=1)
-    last_updated = models.DateTimeField("최종 업데이트", auto_now=True)
-
-    def __str__(self):
-        return f"{self.round_id} - Version {self.version}"
-
-@receiver(post_save, sender=BalanceRound)
-def create_round_state(sender, instance, created, **kwargs):
-    if created:
-        RoundState.objects.create(round=instance)
+    

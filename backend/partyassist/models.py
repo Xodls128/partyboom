@@ -21,3 +21,4 @@ class PartyWaitState(models.Model):
 def create_party_wait_state(sender, instance, created, **kwargs):
     if created:
         PartyWaitState.objects.create(party=instance)
+        

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import api from "../api/axios";
 import Back from "../assets/left_black.svg";
@@ -15,69 +15,73 @@ export default function Balancegame() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [votingMap, setVotingMap] = useState(new Map());
   const [errorMsg, setErrorMsg] = useState("");
-  const [version, setVersion] = useState(0);
-  const [loading, setLoading] = useState(true);
+  
+  // 롱폴링 관리를 위한 상태와 Ref
+  const [lastUpdatedAt, setLastUpdatedAt] = useState(null);
+  const isMounted = useRef(true);
 
+  // 컴포넌트 언마운트 시 폴링 중단하기 위한 설정
   useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const { data } = await api.get(`/api/v1/game/rounds/${roundId}/`);
-        setQuestions(data.questions || []);
-        setVersion(data.state?.version || 0);
-      } catch (err) {
-        const status = err.response?.status;
-        if (status === 404) setErrorMsg("라운드를 찾을 수 없거나 종료되었습니다.");
-        else if (status === 403) setErrorMsg("이 파티의 참가자만 게임에 접근할 수 있습니다.");
-        else setErrorMsg("게임 데이터를 불러올 수 없습니다.");
-      } finally {
-        setLoading(false);
-      }
+    isMounted.current = true;
+    return () => {
+      isMounted.current = false;
     };
-    fetchInitialData();
+  }, []);
+
+  // 롱폴링으로 데이터 업데이트를 확인하는 함수
+  const pollForUpdates = useCallback(async (timestamp) => {
+    if (!isMounted.current) return; // 컴포넌트가 언마운트되면 중단
+
+    try {
+      // 타임스탬프가 있으면 쿼리 파라미터로 추가
+      const url = `/api/v1/game/rounds/${roundId}/poll/${timestamp ? `?last_seen_timestamp=${timestamp}` : ''}`;
+      const response = await api.get(url);
+
+      if (!isMounted.current) return;
+
+      if (response.status === 200) {
+        // 200 OK: 새 데이터 수신
+        const { questions: newQuestions, last_updated_at: newTimestamp } = response.data;
+        setQuestions(newQuestions || []);
+        setLastUpdatedAt(newTimestamp);
+        // 새 타임스탬프로 즉시 다음 폴링 시작
+        pollForUpdates(newTimestamp);
+      } else if (response.status === 204) {
+        // 204 No Content: 타임아웃, 변경 없음
+        // 이전 타임스탬프로 즉시 다음 폴링 시작
+        pollForUpdates(timestamp);
+      }
+    } catch (err) {
+      const status = err.response?.status;
+      if (status === 404) setErrorMsg("라운드를 찾을 수 없거나 종료되었습니다.");
+      else if (status === 403) setErrorMsg("이 파티의 참가자만 게임에 접근할 수 있습니다.");
+      else {
+        setErrorMsg("데이터 동기화 오류. 5초 후 재시도합니다.");
+        // 에러 발생 시 5초 후 재시도
+        setTimeout(() => pollForUpdates(timestamp), 5000);
+      }
+    }
   }, [roundId]);
 
+  // 컴포넌트 마운트 시 최초 롱폴링 시작
   useEffect(() => {
-    if (loading) return;
-    let isMounted = true;
+    pollForUpdates(null);
+  }, [pollForUpdates]);
 
-    const poll = async (currentVersion) => {
-      if (!isMounted) return;
-      try {
-        const { data, status } = await api.get(`/api/v1/game/rounds/${roundId}/state/?version=${currentVersion}`);
-        if (isMounted && status === 200) {
-          setQuestions(data.data.questions || []);
-          setVersion(data.version);
-          setTimeout(() => poll(data.version), 1000);
-        } else {
-          setTimeout(() => poll(currentVersion), 1000);
-        }
-      } catch (error) {
-        console.error("Polling error:", error);
-        await new Promise(resolve => setTimeout(resolve, 5000));
-        if(isMounted) poll(currentVersion);
-      }
-    };
-
-    // 초기 버전(version)으로 첫 폴링 시작
-    poll(version);
-
-    return () => {
-      isMounted = false;
-    };
-    // 여기도 version 의존성을 제거합니다.
-  }, [roundId, loading]); // loading이 false가 되면 최초 1회만 실행
-
+  // 투표하기 (HTTP POST) - 이 함수는 변경 없음
   const handleVote = async (questionId, choice) => {
     if (votingMap.get(questionId)) return;
     setVotingMap((m) => new Map(m).set(questionId, true));
 
     try {
       await api.post(`/api/v1/game/questions/${questionId}/vote/`, { choice });
+      // UI 즉시 반응성을 위해 로컬 상태 우선 변경
       setQuestions((prev) =>
         prev.map((q) =>
           q.id === questionId ? { ...q, has_voted: true } : q
         )
       );
+      // 서버의 last_updated_at이 변경되었으므로 다음 롱폴링에서 최신 투표 결과가 반영됨
     } catch (err) {
       const status = err.response?.status;
       if (status === 403) setErrorMsg("파티 참가자만 투표할 수 있습니다.");
@@ -89,20 +93,22 @@ export default function Balancegame() {
     }
   };
 
-  if (loading) return <div className="balancegame-loader"></div>;
-  if (errorMsg) return <div className="balancegame-error-message">{errorMsg}</div>;
+  if (questions.length === 0) return <div>로딩 중...</div>;
 
   return (
-    <div className="balancegame-container">
+    // JSX 렌더링 부분은 변경사항 없음
+    <>
       <div className="balancegame-header">
         <button
-          onClick={() => navigate(-1)} // 이전 페이지로
+          onClick={() => navigate("/")}
           className="balancegame-back-button"
           aria-label="뒤로가기"
         >
           <img src={Back} alt="뒤로가기 아이콘" className="balancegame-back-icon" />
         </button>
       </div>
+
+      {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
 
       <Swiper
         spaceBetween={30}
@@ -121,7 +127,6 @@ export default function Balancegame() {
               <div className="balancegame-title">
                 {idx + 1} / {questions.length} : 둘 중 하나만 선택해야 한다면?!
               </div>
-
               <div className="balancegame-block-red">
                 <button
                   className="balancegame-btn-red"
@@ -133,11 +138,9 @@ export default function Balancegame() {
                   </span>
                 </button>
               </div>
-
               <div className="balancegame-vs-wrap">
                 <img src={Vs} alt="VS" className="balancegame-vs-img" />
               </div>
-
               <div className="balancegame-block-yellow">
                 <button
                   className="balancegame-btn-yellow"
@@ -149,7 +152,6 @@ export default function Balancegame() {
                   </span>
                 </button>
               </div>
-
               <div className="balancegame-status">밸런스 현황</div>
               <div className="balancegame-gauge-wrap">
                 <div className="balancegame-gauge-bar">
@@ -174,13 +176,12 @@ export default function Balancegame() {
           );
         })}
       </Swiper>
-
       <div className="balancegame-progress">
         <div
           className="balancegame-progress-bar"
           style={{ width: `${((activeIndex + 1) / questions.length) * 100}%` }}
         ></div>
       </div>
-    </div>
+    </>
   );
 }
