@@ -2,23 +2,23 @@
   padding: 20px;
 }
 
-
-
 /* 상단 헤더 스타일 */
 .history-header {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 8px;
   margin-bottom: 20px;
   justify-content: center;
-  position: relative;
+  align-items: flex-start;
 }
 .back-button {
   position: absolute;
-  left: 0;
+  margin-top: -20px;
   background: none;
   border: none;
   cursor: pointer;
+  display: flex;
+  align-items: center;
 }
 .back-icon {
   width: 17px;
