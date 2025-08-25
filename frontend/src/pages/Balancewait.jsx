@@ -1,187 +1,128 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import api from "../api/axios";  
-import NavBar from '../components/NavBar';
-import Profilesmall from '../assets/profilesmall.svg';
-import './balancewait.css';
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import api from "../api/axios";
 
+function wsBase() {
+  if (import.meta.env.VITE_WS_URL) return import.meta.env.VITE_WS_URL.replace(/\/$/, "");
+  const loc = window.location;
+  const proto = loc.protocol === "https:" ? "wss:" : "ws:";
+  return `${proto}//${loc.host}`;
+}
 
-export default function Balancewait() {
-  const [standbyCount, setStandbyCount] = useState(0);
-  const [participantCount, setParticipantCount] = useState(0);
-  const [participants, setParticipants] = useState([]);
-  const [isStandby, setIsStandby] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [navigating, setNavigating] = useState(false);
-  const [partyTitle, setPartyTitle] = useState(''); // 파티 제목 상태 추가
-
-  const navigate = useNavigate();
+export default function BalanceWait() {
   const { partyId } = useParams();
-  const token = localStorage.getItem("access");
+  const navigate = useNavigate();
 
-  // 파티 정보 가져오기
-  const fetchPartyInfo = async () => {
-    try {
-      // 모든 내 파티를 가져와서 현재 partyId와 일치하는 파티 찾기
-      const { data } = await api.get('/api/partyassist/myparties/');
-      const currentParty = data.find(party => party.id === parseInt(partyId));
-      
-      if (currentParty) {
-        setPartyTitle(currentParty.title);
-      }
-    } catch (err) {
-      console.error("파티 정보 불러오기 실패:", err.response?.data || err.message);
+  const [standbyCount, setStandbyCount] = useState(0);
+  const [participationCount, setParticipationCount] = useState(0);
+  const [isStandby, setIsStandby] = useState(false);
+
+  const [errorMsg, setErrorMsg] = useState("");
+  const [wsStatus, setWsStatus] = useState("disconnected");
+  const [toggling, setToggling] = useState(false);
+
+  const wsRef = useRef(null);
+  const retryRef = useRef({ attempts: 0, timer: null, closedByUser: false });
+
+  const clearRetryTimer = () => {
+    if (retryRef.current.timer) {
+      clearTimeout(retryRef.current.timer);
+      retryRef.current.timer = null;
     }
   };
 
-  // standby 토글
-  const handleJoin = async () => {
+  const scheduleReconnect = useCallback(() => {
+    if (retryRef.current.closedByUser) return;
+    const attempts = ++retryRef.current.attempts;
+    const delay = Math.min(30000, 500 * Math.pow(2, attempts - 1));
+    setWsStatus("reconnecting");
+    clearRetryTimer();
+    retryRef.current.timer = setTimeout(connect, delay);
+  }, []);
+
+  const connect = useCallback(() => {
+    clearRetryTimer();
+    setWsStatus("connecting");
+
     try {
-      const { data } = await api.post(`/api/partyassist/standby/${partyId}/toggle/`);
-      setIsStandby(data.is_standby);
-      setStandbyCount(data.standby_count);
-      setParticipantCount(data.participation_count);
-    } catch (err) {
-      console.error("참여 실패:", err.response?.data || err.message);
-    }
-  };
+      const url = `${wsBase()}/ws/party/${partyId}/`;
+      const sock = new WebSocket(url);
+      wsRef.current = sock;
 
-  // 참가자 불러오기
-  const fetchParticipants = async () => {
-    try {
-      const { data } = await api.get(`/api/partyassist/standby/${partyId}/participants/`);
-      setParticipants(data);
-    } catch (err) {
-      console.error("참여자 불러오기 실패:", err.response?.data || err.message);
-    }
-  };
+      sock.onopen = () => {
+        setWsStatus("connected");
+        retryRef.current.attempts = 0;
+      };
 
-  // WebSocket 연결
-  useEffect(() => {
-    // 초기화 시 파티 정보 가져오기
-    fetchPartyInfo();
-
-    // --- 활성 게임 여부 확인 ---
-    const checkForActiveGame = async () => {
-      try {
-        const { data } = await api.get(`/api/v1/game/parties/${partyId}/active-round/`);
-        if (data.round_id && !navigating) {
-          setNavigating(true);
-          setShowModal(true);
-          setTimeout(() => {
+      sock.onmessage = (e) => {
+        try {
+          const { type, data } = JSON.parse(e.data);
+          if (type === "send_standby_update") {
+            setStandbyCount(data.standby_count ?? 0);
+            setParticipationCount(data.participation_count ?? 0);
+          } else if (type === "send_game_created") {
             navigate(`/balancegame/${data.round_id}`);
-          }, 2000);
-          return true;
+          }
+        } catch {
+          // ignore parse errors
         }
-      } catch (err) {
-        if (err.response?.status !== 404) {
-          console.error("활성 게임 확인 실패:", err);
-        }
+      };
+
+      sock.onerror = () => {
+        setErrorMsg("대기실 연결 오류. 재연결 시도 중…");
+      };
+
+      sock.onclose = () => {
+        setWsStatus("disconnected");
+        scheduleReconnect();
+      };
+    } catch {
+      setErrorMsg("웹소켓 연결 실패.");
+      scheduleReconnect();
+    }
+  }, [partyId, navigate, scheduleReconnect]);
+
+  useEffect(() => {
+    retryRef.current.closedByUser = false;
+    connect();
+    return () => {
+      retryRef.current.closedByUser = true;
+      clearRetryTimer();
+      if (wsRef.current?.readyState === WebSocket.OPEN) {
+        wsRef.current.close(1000);
       }
-      return false;
     };
+  }, [connect]);
 
-    const initialize = async () => {
-      const gameInProgress = await checkForActiveGame();
-      if (gameInProgress) return;
-
-      fetchParticipants();
-
-      let interval;
-      const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-      const wsUrl = `${wsProtocol}://${window.location.host}/ws/party/${partyId}/`;
-      const ws = new WebSocket(wsUrl);
-
-      ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-
-        if (data.type === "send_game_created" && !navigating) {
-          setNavigating(true); // 중복 방지
-          setShowModal(true);  // 모달 띄우기
-
-          const roundId = data.data.round_id;
-          setTimeout(() => {
-            navigate(`/balancegame/${roundId}`);
-          }, 2000); // 2초 지연
-          return;
-        }
-
-        if (data.type === "send_standby_update") {
-          setStandbyCount(data.data.standby_count);
-          setParticipantCount(data.data.participation_count);
-          fetchParticipants();
-        }
-      };
-
-      ws.onclose = () => {
-        console.log("WebSocket closed, fallback polling ON");
-        interval = setInterval(fetchParticipants, 10000);
-      };
-
-      return () => {
-        ws.close();
-        if (interval) clearInterval(interval);
-      };
-    };
-
-    initialize();
-  }, [partyId, navigate, token, navigating]); 
+  const toggleStandby = async () => {
+    if (toggling) return;
+    setErrorMsg("");
+    setToggling(true);
+    try {
+      const res = await api.post(`/api/partyassist/standby/${partyId}/toggle/`);
+      setStandbyCount(res.data.standby_count ?? 0);
+      setParticipationCount(res.data.participation_count ?? 0);
+      setIsStandby(res.data.is_standby);
+    } catch (err) {
+      const status = err.response?.status;
+      if (status === 403) setErrorMsg("이 파티의 참가자만 대기할 수 있습니다.");
+      else if (status === 404) setErrorMsg("파티를 찾을 수 없습니다.");
+      else setErrorMsg("대기 상태 변경 실패. 다시 시도해주세요.");
+    } finally {
+      setToggling(false);
+    }
+  };
 
   return (
-    <>
-      <div className="balancewait-title">
-        <div className="balancewait-partyname">#{partyTitle}</div>
-        <div className="balancewait-partyname">파티가 진행 중이에요!</div>
-      </div>
-
-      <div style={{ position: 'relative', width: '343px', margin: '32px auto 0 auto' }}>
-        <button className="balancewait-join-btn" onClick={handleJoin}>
-          <span className="balancewait-join-text">
-            {isStandby ? `대기중... (${standbyCount}/${participantCount})` : "밸런스게임\n참여하기"}
-          </span>
-        </button>
-
-        {isStandby && (
-          <div className="balancewait-join-overlay">
-            <span className="balancewait-join-text">
-              대기중...<br />{standbyCount}/{participantCount}
-            </span>
-          </div>
-        )}
-      </div>
-
-      <div className="balancewait-profile-icons">
-        {participants.slice(0, 5).map((p) => (
-          <img
-            key={p.id}
-            src={p.user?.profile_image || Profilesmall}
-            alt={p.user?.username || "프로필"}
-            className="balancewait-profile-icon"
-            draggable="false"
-          />
-        ))}
-      </div>
-
-      <div className="balancewait-participants-link-wrap">
-        <button
-          className="balancewait-participants-link"
-          onClick={() => navigate(`/participants/${partyId}`)}
-        >
-          참여자 프로필 보기 →
-        </button>
-      </div>
-
-      <NavBar />
-
-      {/* 게임 시작 모달 */}
-      {showModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <p>게임이 곧 시작됩니다...</p>
-            <div className="spinner"></div>
-          </div>
-        </div>
-      )}
-    </>
+    <div>
+      <h2>파티 대기실</h2>
+      <p>WS 상태: {wsStatus}</p>
+      {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
+      <p>참여자 수: {participationCount}</p>
+      <p>Standby 수: {standbyCount}</p>
+      <button onClick={toggleStandby} disabled={toggling}>
+        {toggling ? "처리 중…" : isStandby ? "대기 취소" : "대기 참여"}
+      </button>
+    </div>
   );
 }
