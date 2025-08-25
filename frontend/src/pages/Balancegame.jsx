@@ -36,7 +36,7 @@ export default function Balancegame() {
     fetchRound();
 
     const wsProtocol = window.location.protocol === "https:" ? "wss" : "ws";
-    const wsUrl = `${wsProtocol}://${window.location.host}/ws/game/round/${roundId}/`;
+    const wsUrl = `${wsProtocol}://${window.location.host}/ws/party/${roundId}/`;
     const ws = new WebSocket(wsUrl);
     wsRef.current = ws;
 
