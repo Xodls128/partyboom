@@ -7,6 +7,7 @@ export default function PartySmallAfter(props) {
     placeName = props.location,
     placeImageUrl = props.thumbnailUrl,
     onClickDetail = props.onClick,
+    onProfileClick = props.onProfileClick,
   } = props;
 
   const d = new Date(eventDate);
@@ -34,9 +35,13 @@ export default function PartySmallAfter(props) {
           <span>{fmt}</span>
         </div>
 
-        <div className="party-item__meta">
+        <div
+          className="party-item__meta report"
+          onClick={onProfileClick}
+          style={{ cursor: 'pointer' }}
+        >
           <i className="material-icons-outlined">report</i>
-          <span className='report'>프로필 확인 및 신고</span>
+          <span>프로필 확인 및 신고</span>
         </div>
 
         <button className="party-item__button" onClick={onClickDetail}>리뷰 남기기</button>

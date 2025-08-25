@@ -11,6 +11,9 @@ const HISTORY_URL = `${API_BASE}/api/partyassist/myparties/`;
 
 export default function PartyHistory() {
   const navigate = useNavigate();
+  const goParticipants = (partyId) => {
+    navigate(`/participants/${partyId}`);
+  };
 
   const [historyData, setHistoryData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -91,6 +94,7 @@ export default function PartyHistory() {
             current={party.current}
             capacity={party.capacity}
             onClick={() => onOpen(party)}
+            onProfileClick={() => goParticipants(party.id)} 
           />
         ))}
       </section>

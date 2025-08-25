@@ -22,4 +22,5 @@
   background: transparent;        /* 배경 투명 */
   border: none;
   cursor: pointer;
+  margin-right: 8px;
 }
