@@ -19,6 +19,8 @@ import PaymentFinish from "./pages/PaymentFinish.jsx";
 import Balancewait from './pages/Balancewait.jsx';
 import Balancegame from "./pages/Balancegame.jsx";
 import Assist from "./pages/Assist.jsx";
+import Participants from "./pages/Participants.jsx";
+import ReportUser from "./pages/ReportUser.jsx";
 
 
 export default function App() {
@@ -54,6 +56,8 @@ export default function App() {
           <Route path="/paymentfinish" element={<PaymentFinish />} />
           <Route path="/balancewait/:partyId" element={<Balancewait />} />
           <Route path="/balancegame/:roundId" element={<Balancegame />} />
+          <Route path="/participants/:partyId" element={<Participants />} />
+          <Route path="/report/:userId" element={<ReportUser />} />
         </Routes>
       </AppFrame>
     </BrowserRouter>
