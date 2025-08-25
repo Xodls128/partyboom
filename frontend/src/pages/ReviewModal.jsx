@@ -4,11 +4,11 @@ import StarEmpty from '../assets/review.svg';
 import StarFull  from '../assets/review_full.svg';
 import CloseIcon from '../assets/close.svg';
 
-const API_BASE = import.meta.env.VITE_API_URL ; 
+const API_BASE = import.meta.env.VITE_API_URL; 
 const REVIEW_URL = `${API_BASE}/api/mypage/reviews/`;
 const AUTH_SCHEME = 'Bearer'; 
 
-// 저장된 토큰 구하기(여러 키 대응)
+// 저장된 토큰 구하기
 const getToken = () =>
   localStorage.getItem('access') ||
   localStorage.getItem('accessToken') ||
@@ -94,15 +94,13 @@ export default function ReviewModal({
     setSubmitting(true);
     setErr('');
 
-    // 단일 점수(평균) + 상세 점수 동시 전송
-    const count = [fun, people, place].filter(Boolean).length;
-    const rating = Math.round((fun + people + place) / Math.max(1, count));
+    // 서버 명세에 맞춘 payload
     const payload = {
       party: partyId,
-      party_id: partyId,
-      rating,          // 단일 점수
-      fun, people, place, // 상세 점수
-      content: text ?? '',
+      q1_rating: fun,
+      q2_rating: people,
+      q3_rating: place,
+      comment: text ?? '',
     };
 
     try {
@@ -117,8 +115,11 @@ export default function ReviewModal({
       });
 
       if (!res.ok) {
-        const msg = await res.text().catch(() => '');
-        throw new Error(msg || `리뷰 제출 실패(HTTP ${res.status})`);
+        const data = await res.json().catch(() => null);
+        if (data?.q1_rating || data?.q2_rating || data?.q3_rating) {
+          throw new Error("모든 항목에 별점을 입력해주세요.");
+        }
+        throw new Error(data?.detail || `리뷰 제출 실패(HTTP ${res.status})`);
       }
 
       onSuccess?.();
