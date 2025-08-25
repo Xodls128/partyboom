@@ -53,8 +53,6 @@ html, body { overflow-x: hidden; }
   justify-content: center;
   width: 36px; height: 36px;
   border-radius: 9999px;
-  background: rgba(0,0,0,0.35);    
-  backdrop-filter: saturate(120%) blur(2px);
 }
 .back-button img{ width:17px; height:29px; }
 
