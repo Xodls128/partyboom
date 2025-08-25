@@ -14,12 +14,12 @@ class Payment(models.Model):
 
     participation = models.OneToOneField(
         "detailview.Participation", 
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="payment"
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        on_delete=models.SET_NULL,
+        on_delete=models.PROTECT,
         related_name="payments"
     )
     amount = models.PositiveIntegerField("결제 금액")
