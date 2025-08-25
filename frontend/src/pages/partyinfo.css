@@ -140,19 +140,23 @@
 }
 .profile-icon:first-child{ margin-left:0; }
 
-.join-button{
-  width: calc(100% - 2 * var(--side-gap));
-  max-width: 354px;
-  height: 42px;
-  border: 0; border-radius: 8px;
-  font-family: Pretendard;
-  font-size: 20px; font-weight: 600;
-  letter-spacing: -0.019em; line-height: 1.5;
-  color: #FFFFFF;
+.join-button {
+  position: fixed;           /* viewport 하단에 고정 */
+  bottom: calc(12px + var(--safe-bottom)); /* 아이폰 safe area 고려 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 354px;              /* 네가 쓰는 카드 너비에 맞춤 */
+  height: 46px;
   background: linear-gradient(90deg, #FFCD50 0%, #FF2824 100%);
+  border: none;
+  border-radius: 8px;
+  font-family: Pretendard;
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  text-align: center;
   cursor: pointer;
-  display: block;
-  margin: 14px auto calc(12px + var(--safe-bottom)); /* 안전영역 고려 */
+  z-index: 1000;             /* 다른 요소 위에 올라오게 */
 }
 .join-button:active{ transform: translateY(1px); }
 
