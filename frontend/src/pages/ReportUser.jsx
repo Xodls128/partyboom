@@ -85,7 +85,7 @@ export default function ReportUser() {
       });
 
       if (!response.ok) {
-        const err = await response.json();
+        const err = await response.text();
         console.error('신고 실패:', err);
         setToast({ text: err.detail || "❌ 신고 중 오류가 발생했습니다.", type: "error" });
         setTimeout(() => setToast(null), 1500);
