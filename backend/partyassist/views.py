@@ -8,11 +8,11 @@ from rest_framework.views import APIView
 from .permissions import IsPartyParticipant
 from .serializers import MyPartySerializer, PartyParticipantSerializer, StandbyStateSerializer
 from django.utils.timezone import now
-from django.db import transaction, F
 from detailview.models import Party, Participation
 from game.models import BalanceRound, BalanceQuestion, PartyWaitState
 from utils.gameAI import generate_balance_by_ai  # AI 문항 생성 유틸
-
+from django.db import transaction
+from django.db.models import F
 
 class MyPartyViewSet(viewsets.ReadOnlyModelViewSet):
     """내가 참여한 파티 목록"""
